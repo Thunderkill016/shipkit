@@ -1,50 +1,66 @@
 # AGENTS.md — Shipkit
 
-## What this is
+You are helping build a **product** on Shipkit, not invent a new stack.
 
-Open **product foundation kit** (landing, auth, DB, security, deploy).  
-Not an HTTP micro-framework. Not multi-framework parity on day one.
+## Mission
 
-## Stack (v0)
+Maximize speed from **idea → working product**.  
+Foundation (auth, security, deploy shape) is already chosen. Implement **IDEA.md**.
 
-- Monorepo: `apps/web` (Next.js) + `packages/*` (kernel)
-- Auth: Supabase adapter behind `AuthPort`
-- Security: `@shipkit/security` headers + rate limit + Zod
-- Docs: `VISION.md`, `ARCHITECTURE.md`, `STANDARDS.md`, `DECISIONS.md`
+## Always read first
+
+1. `IDEA.md` — product scope and MVP checklist  
+2. This file — stack rules  
+3. `docs/VIBE.md` — workflow  
+4. `ARCHITECTURE.md` if changing structure  
+
+## Stack (do not replace)
+
+| Piece | Choice |
+|-------|--------|
+| App | Next.js App Router in `apps/web` |
+| Auth | `getAuth()` → AuthPort (Supabase adapter in `lib/adapters`) |
+| Validation | Zod via `@shipkit/security` or local schemas |
+| DB schema | `@shipkit/db` + SQL in `packages/db/sql` |
+| Style | Tailwind tokens in `apps/web/src/app/globals.css` |
 
 ## Commands
 
 ```bash
 pnpm install
 pnpm doctor
-pnpm dev          # apps/web
-pnpm build
-pnpm db:up        # docker postgres
+pnpm dev              # http://localhost:3000
+pnpm --filter @shipkit/web build
+pnpm db:up            # optional Docker Postgres
 ```
 
-## Rules
+## Hard rules
 
 1. **Vendor SDKs only in** `apps/web/src/lib/adapters/**`  
-2. **Do not** import `@supabase/*` from pages/features directly — use `getAuth()` / ports  
-3. **Do not** disable security headers or RLS examples without updating SECURITY notes  
-4. Prefer small PRs; keep domain business out of kernel packages  
-5. New deploy/auth providers = new adapter + preset doc + doctor hints  
+2. **Product UI** under `apps/web/src/app/` — prefer `/app/*` for logged-in features  
+3. **Validate** all writes (Zod)  
+4. **User isolation** — never query other users’ rows without a clear policy  
+5. **No new framework** (Vue/Svelte/Remix) unless the human asks  
+6. **No secrets** in git; use `.env.local`  
+7. Keep diffs small; one MVP slice per change set  
 
 ## Boundaries
 
-| Always | Ask first | Never |
-|--------|-----------|-------|
-| Keep ports stable | Add second UI framework | Commit secrets |
-| Add tests for authz | Rewrite monorepo tool | Put Stripe in v0 without issue |
-| Update AGENTS if commands change | Drop Supabase support | Claim L2 support without CI |
+| Always OK | Ask first | Never |
+|-----------|-----------|-------|
+| Landing/app UI from IDEA.md | New npm dependency | Disable security headers |
+| New `/app` routes | New auth provider | Commit `.env*` |
+| SQL migrations for domain tables | Multi-tenant redesign | Rewrite monorepo tooling casually |
+| Copy/SEO polish | Payments integration | Put service-role keys in client |
 
-## Map
+## When stuck
 
-```
-packages/config     env + presets types
-packages/security   headers, rate limit, validation
-packages/db         drizzle schema + SQL
-packages/auth       AuthPort types
-apps/web            Next adapter + UI
-presets/            human setup guides
-```
+- Prefer the smallest change that unblocks the MVP checklist in `IDEA.md`  
+- If env missing, say so and point to `pnpm doctor` / presets — don’t fake production auth  
+- If requirements conflict with IDEA.md, stop and ask  
+
+## Done means
+
+- [ ] MVP item implemented end-to-end (UI + data if needed)  
+- [ ] `pnpm --filter @shipkit/web build` still works  
+- [ ] IDEA.md checklist updated  

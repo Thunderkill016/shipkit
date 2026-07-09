@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: "%s · Shipkit",
   },
   description:
-    "Open product foundation kit — landing, auth, data, security, deploy. Portable infra; Next.js first adapter.",
+    "Open product kit for vibe coding — idea to landing, auth, app, security, and deploy.",
 };
 
 export default function RootLayout({

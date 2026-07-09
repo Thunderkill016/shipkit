@@ -1,52 +1,57 @@
-# Shipkit — Architecture
+# Architecture
 
-## Mental model
+## Goal
+
+Let people **vibe features** while the foundation stays boring and correct.
 
 ```text
-apps/web          → Next.js adapter (UI + routing glue)
-packages/*        → Kernel (framework-agnostic where possible)
-presets/*         → Opinionated combos for users
-deploy recipes    → Docker, Vercel (docs + config files)
+┌─────────────────────────────────────────────┐
+│  IDEA.md  →  agent / human implements       │
+│  features in apps/web (product UI)          │
+└───────────────────┬─────────────────────────┘
+                    │ uses
+┌───────────────────▼─────────────────────────┐
+│  Kernel packages (@shipkit/*)               │
+│  config · security · db · auth contracts    │
+└───────────────────┬─────────────────────────┘
+                    │ implemented by
+┌───────────────────▼─────────────────────────┐
+│  Adapters                                   │
+│  supabase auth · (better-auth next)         │
+│  postgres URL · deploy recipes              │
+└─────────────────────────────────────────────┘
 ```
-
-## Ports (contracts)
-
-| Port | Responsibility |
-|------|----------------|
-| `AuthPort` | session, sign-in/up, sign-out, getUser |
-| `DatabasePort` | typed queries; user-scoped by default |
-| `StoragePort` | upload/download (later) |
-| `MailPort` | transactional email (later) |
-| `RateLimitPort` | check(key) → allow/deny |
-
-App code depends on ports. Adapters implement ports.
 
 ## Packages
 
-| Package | Role |
-|---------|------|
-| `@shipkit/config` | Env schema, `kit.config` types, presets |
-| `@shipkit/security` | Headers policy, in-memory rate limit, base Zod schemas |
-| `@shipkit/db` | Drizzle schema (`profiles`), client factory for Postgres URL |
-| `@shipkit/auth` | Port types + adapter IDs (`supabase` \| `better-auth` planned) |
+| Package | Role for vibe coders |
+|---------|----------------------|
+| `@shipkit/config` | Env schema, preset IDs — “what’s configured?” |
+| `@shipkit/security` | Don’t reinvent CSP / rate limit / password schema |
+| `@shipkit/db` | Canonical `profiles` schema — extend for your domain |
+| `@shipkit/auth` | `AuthPort` — swap providers without rewriting pages |
 
-## Adapters (v0)
+## App adapter
 
-| Kind | v0 ship |
-|------|---------|
-| Auth | `supabase` (wired in `apps/web`) |
-| DB | Postgres via Supabase **or** `DATABASE_URL` (Docker) |
-| Deploy | `docker-compose.yml` + Vercel project docs |
-| Rate limit | memory always; Upstash when env set |
+`apps/web` — Next.js:
 
-## Dependency rule
-
-```text
-apps/web  →  packages/*
-packages/*  ↛  next, react, vue   (except thin type-only where unavoidable)
-features in apps  ↛  @supabase/* outside lib/adapters/*
-```
+- `/` landing  
+- `/login` auth  
+- `/app` protected shell (your product lives here)  
+- `src/lib/adapters/*` only place for vendor SDKs  
 
 ## Presets
 
-See `presets/`. CLI (later) only copies env + docs for a preset; architecture stays the same.
+| Preset | When |
+|--------|------|
+| `supabase-full` | Fastest managed auth+DB |
+| `portable-pg` | Own Postgres (Docker/Neon/Railway…) |
+
+## Extending for your idea
+
+1. Write `IDEA.md` (who, problem, MVP screens, data).  
+2. Add tables next to `profiles` + isolation rules.  
+3. Add routes under `/app/...`.  
+4. Keep imports: UI → ports → adapters.  
+
+Agents: follow `AGENTS.md`. Humans: same.

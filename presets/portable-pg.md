@@ -1,23 +1,23 @@
 # Preset: `portable-pg`
 
-**Vendor-light path** — any Postgres URL; auth adapter `better-auth` lands in v0.2.
+Own your database URL — Docker, Neon, Railway, RDS, etc.
 
-| Layer | Choice today (v0.1) |
-|-------|---------------------|
-| DB | Docker Postgres (`pnpm db:up`) or Neon/Railway URL |
-| Auth | Still Supabase **or** wait for Better Auth adapter |
-| Deploy | Docker host for app + managed PG |
+| Layer | Choice today |
+|-------|----------------|
+| DB | Any Postgres (`DATABASE_URL`) |
+| Auth | Supabase adapter still works if configured; **Better Auth** path is next |
+| Deploy | Docker for DB + app host of choice |
 
-## Setup DB
+## Local DB
 
 ```bash
 pnpm db:up
 # DATABASE_URL=postgresql://shipkit:shipkit@localhost:5432/shipkit
 ```
 
-Schema: `packages/db/sql/0001_init.sql` (auto-applied on first compose).
+Init SQL: `packages/db/sql/0001_init.sql` (applied on first compose).
 
-## Note
+## Vibe tip
 
-v0.1 prioritizes the **Supabase auth adapter** for a working login loop.  
-`@shipkit/db` schema is already portable; wire Drizzle client + Better Auth in v0.2 without changing feature routes.
+Use this preset when you care about **portability** or company policy blocks a BaaS.  
+Keep product code on ports so switching auth later is an adapter change.

@@ -1,40 +1,63 @@
-# Shipkit — Standards (constitution)
+# Standards — what “good” means
 
-## Anchors
+Shipkit is measured against **public standards**, not a single private codebase.
 
-| Layer | Standard |
-|-------|----------|
-| Cloud app | [Twelve-Factor](https://12factor.net/) — especially config + backing services |
-| Structure | Ports & Adapters (Hexagonal) |
-| Security | OWASP ASVS Level 1 (practical subset) + AtoEnglish SECURITY baseline |
-| Agents | [AGENTS.md](https://agents.md/) |
-| Comparison set | Open SaaS, MakerKit, supastarter, nextjs/saas-starter, ShipFast |
+## Layer 1 — Cloud app
 
-## Must-have modules (v0)
+**[Twelve-Factor](https://12factor.net/)** especially:
 
-- [x] Design tokens + landing  
-- [x] Auth path (Supabase adapter)  
-- [x] Protected app shell  
-- [x] Security headers (CSP, HSTS, …)  
-- [x] Validation + rate limit primitives  
-- [x] Docker Postgres + env example  
-- [x] AGENTS.md + production checklist  
-- [ ] E2E smoke (v0.2)  
-- [ ] Better Auth portable adapter (v0.2)  
+- III Config in the environment  
+- IV Backing services as attached resources  
+- X Dev/prod parity  
 
-## Supported matrix (v0)
+## Layer 2 — Architecture
 
-| | Supabase bundle | Postgres Docker |
-|--|-----------------|-----------------|
-| Next + Vercel | L2 goal | L1 |
-| Next + Docker | L1 | L2 goal |
+**Ports & Adapters**
 
-Legend: L2 = first-class + docs; L1 = works + docs.
+- Features depend on `AuthPort` / DB contracts  
+- Vendor SDKs only under `lib/adapters/*`  
 
-## Definition of done (release)
+## Layer 3 — Security
 
-1. `pnpm dev` shows landing  
-2. With env, auth login works  
-3. `pnpm doctor` reports missing env  
-4. Headers present on responses  
-5. README states presets and non-goals honestly  
+**OWASP ASVS Level 1 (practical subset)**
+
+- Safe auth session handling  
+- Access control on protected routes  
+- Input validation on writes  
+- Security headers (CSP, HSTS, frame deny, nosniff…)  
+- Rate limiting on sensitive actions  
+- No secrets in client bundles  
+
+See `PRODUCTION_CHECKLIST.md`.
+
+## Layer 4 — Product surface
+
+Industry SaaS-starter expectations (Must for v0):
+
+- Marketing landing + SEO metadata  
+- Auth (sign in / sign up / sign out)  
+- Protected app shell  
+- DB path + user-scoped model  
+- Deploy recipes (≥2)  
+- Agent-readable project map  
+
+## Layer 5 — Vibe / agents
+
+- [AGENTS.md](https://agents.md/) at repo root  
+- `IDEA.md` product brief for the current product  
+- `llms.txt` map of docs for agents  
+- Clear always / ask / never boundaries  
+
+## Comparison set (benchmark, not copy)
+
+Open SaaS · MakerKit · supastarter · nextjs/saas-starter · ShipFast  
+
+Score on: portability, security, TTP, agent DX, honesty of claims.
+
+## Release gates
+
+| Version | Gate |
+|---------|------|
+| v0.1 | Dev shell + auth path + headers + doctor + docs |
+| v0.2 | Better Auth portable path + e2e smoke + CI matrix |
+| v1.0 | Two deploy L2 + two auth paths L2 + measured TTFP writeup |

@@ -12,8 +12,8 @@ export default async function AppHomePage() {
     <div className="mx-auto min-h-screen max-w-2xl px-6 py-10">
       <header className="flex items-center justify-between border-b border-border pb-6">
         <div>
-          <p className="text-xs text-accent">Protected shell</p>
-          <h1 className="text-xl font-semibold">Dashboard</h1>
+          <p className="text-xs text-accent">Your product lives here</p>
+          <h1 className="text-xl font-semibold">App</h1>
         </div>
         <Link href="/" className="text-sm text-muted hover:text-foreground">
           Landing
@@ -23,30 +23,43 @@ export default async function AppHomePage() {
       <div className="mt-8 space-y-4">
         {!configured && (
           <div className="rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted">
-            Running in <strong className="text-foreground">demo mode</strong> (no Supabase
-            env). Middleware allows this route so you can design the shell. Wire env for real
-            auth guards.
+            <strong className="text-foreground">Demo mode</strong> — no Supabase env. UI works for
+            layout; add <code className="text-foreground">apps/web/.env.local</code> for real auth
+            guards. Run <code className="text-foreground">pnpm doctor</code>.
           </div>
         )}
 
         <div className="rounded-xl border border-border bg-card p-5">
-          <p className="text-sm text-muted">Signed in as</p>
+          <p className="text-sm text-muted">Session</p>
           <p className="mt-1 font-medium">
-            {user?.email ?? (configured ? "Not signed in" : "demo@shipkit.local")}
+            {user?.email ?? (configured ? "Not signed in — use /login" : "demo@shipkit.local")}
           </p>
-          {user?.id && (
-            <p className="mt-1 font-mono text-xs text-muted">{user.id}</p>
-          )}
+          {user?.id && <p className="mt-1 font-mono text-xs text-muted">{user.id}</p>}
         </div>
 
         <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted">
-          <p className="font-medium text-foreground">Next steps for your product</p>
-          <ol className="mt-3 list-decimal space-y-1 pl-5">
-            <li>Add domain tables + RLS (or app-level authz for portable-pg)</li>
-            <li>Extend landing sections / design tokens</li>
-            <li>Deploy: Vercel or Docker (see presets/)</li>
-            <li>Keep vendor SDKs inside <code className="text-foreground">lib/adapters/*</code></li>
+          <p className="font-medium text-foreground">Vibe the next slice</p>
+          <ol className="mt-3 list-decimal space-y-2 pl-5">
+            <li>
+              Edit repo root <code className="text-foreground">IDEA.md</code> (MVP checklist)
+            </li>
+            <li>
+              Tell your agent:{" "}
+              <em className="text-foreground">
+                Read IDEA.md + AGENTS.md. Implement the next MVP item under /app.
+              </em>
+            </li>
+            <li>Add routes in <code className="text-foreground">src/app/app/</code></li>
+            <li>Keep vendor SDKs inside <code className="text-foreground">lib/adapters/</code></li>
           </ol>
+        </div>
+
+        <div className="rounded-xl border border-dashed border-border p-5 text-sm text-muted">
+          <p className="font-medium text-foreground">Feature slot</p>
+          <p className="mt-2">
+            Replace this card with your first domain feature (list, editor, dashboard widget…).
+            That is the product — Shipkit is only the shell.
+          </p>
         </div>
 
         {user && (

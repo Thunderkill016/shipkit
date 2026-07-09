@@ -1,41 +1,46 @@
-# Decisions (locked by maintainer)
+# Decisions (product constitution)
 
-Date: 2026-07-10
+## Name
 
-## Product name
+**Shipkit** — ship products, not micro-frameworks.
 
-**Shipkit** — product foundation kit (not an HTTP micro-framework).
+## Why this exists
 
-## Multi-platform approach
+Maximize **vibe coding effectiveness**: humans + agents implement *product ideas* instead of re-wiring auth/deploy every project.
 
-**Strategy 2 now → Strategy 3 later** (industry terms):
+## Multi-platform strategy (from market research)
 
-1. **Infra portable** first (DB/auth/deploy)  
-2. **Next.js** = first app adapter only  
-3. Second UI framework later as a **variant**, not day-one parity  
+| Phase | What | Why |
+|-------|------|-----|
+| **Now** | Portable **infra** (Postgres URL, auth adapters, Docker + Vercel) | What Open SaaS / MakerKit-portable get right |
+| **Next** | First app adapter polished (**Next.js**) | Highest agent training data + SSR product path |
+| **Later** | Second app adapter (Nuxt or TanStack) as a **variant** | How supastarter/MakerKit scale multi-FW without one mega-repo |
 
-Not copying supastarter’s full multi-framework SKU model until there is demand + capacity.
+We explicitly **do not** ship three UI frameworks half-broken on day one.
 
-## Default stack (first-class)
+## Default stack (v0)
 
-| Layer | Choice | Why |
-|-------|--------|-----|
-| App | Next.js App Router | AtoEnglish production proof; agent training data |
-| Auth v0 | Supabase Auth | Already battle-tested in AtoEnglish |
-| Auth v0.2 | Better Auth + Drizzle | Portable / self-host path |
-| DB | Postgres | Universal; Supabase or Docker URL |
-| ORM path | Drizzle in `@shipkit/db` | Portable schema |
-| Deploy | Vercel **and** Docker | No single-host religion |
-| Style | Tailwind + simple tokens | Fast landing, no design rabbit hole |
+| Layer | Choice | Research rationale |
+|-------|--------|-------------------|
+| App | Next.js App Router | Dominant full-stack TS surface for agents |
+| Auth | Supabase Auth adapter → Better Auth next | Fast path + portable self-host path |
+| Data | Postgres (any URL) + optional Supabase | Twelve-factor backing service |
+| ORM contract | Drizzle schema in `@shipkit/db` | DB-agnostic TS industry default |
+| Security | Headers + Zod + rate-limit port | ASVS L1 practical baseline |
+| Deploy | Vercel recipe + Docker Compose | Two first-class hosts, no single religion |
+| Agent DX | AGENTS.md + IDEA.md + llms.txt | agents.md standard + vibe workflow |
 
-## Explicit rejections (for now)
+## Rejected (for now)
 
-- Rewriting AtoEnglish into the kit wholesale  
-- Billing / multi-tenant orgs in v0  
-- Cloudflare Edge as first-class (experimental later)  
-- Keeping the old HTTP-only `vibecode` design as the product  
+| Idea | Why not v0 |
+|------|------------|
+| HTTP-only microframework | Wrong problem (already solved by Hono/etc.) |
+| Full MakerKit feature parity | Scope death for a free OSS core |
+| Multi-framework SKU day one | Needs commercial team (supastarter model) |
+| Anchoring brand to one private product | Shipkit is for **everyone’s** ideas |
 
-## Repo
+## Success criteria
 
-New repo: `Thunderkill016/shipkit`  
-Old `vibecode` HTTP experiment: leave or archive with pointer.
+1. Newcomer runs `pnpm dev` and sees a real product shell  
+2. Agent can implement a feature from `IDEA.md` without inventing a new stack  
+3. Switching deploy/DB is a **preset/env** change, not a rewrite  

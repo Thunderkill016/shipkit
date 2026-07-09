@@ -1,96 +1,111 @@
 # ✦ Shipkit
 
-**Open product foundation kit** — ship landing, auth, app shell, database, security, and deploy without rebuilding the same base every time.
+**The open product kit for vibe coding.**
 
-> Multi-platform **by architecture** (ports + presets).  
-> **Next.js is the first app adapter**, not a permanent religion.  
-> Infra: Supabase **or** portable Postgres · Deploy: **Vercel and Docker**.
+Go from **idea → landing + auth + app + database + security + deploy** without rebuilding the foundation every time. Built for humans and AI agents who want to ship *their* product, not fight config.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-7dd3c0.svg)](./LICENSE)
-
----
-
-## Why
-
-| You want | Shipkit |
-|----------|---------|
-| Full product path A→Z | Landing → login → `/app` → SQL → headers → recipes |
-| Not locked forever to one cloud | Ports + `supabase-full` / `portable-pg` presets |
-| Lessons from a real app | Patterns from [AtoEnglish](https://github.com/Thunderkill016/AtoEnglish) |
-| AI / vibe coding | `AGENTS.md`, clear package boundaries |
-
-**Not** an Express clone. **Not** Lovable. **Not** full Nuxt+Next parity on day one (see `DECISIONS.md`).
-
----
-
-## Quick start
+[![Node >= 20](https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg)](https://nodejs.org)
 
 ```bash
 git clone git@github.com:Thunderkill016/shipkit.git
-cd shipkit
-pnpm install
-cp .env.example apps/web/.env.local
-# fill Supabase keys for real auth — or run without for demo UI
-pnpm doctor
-pnpm dev
+cd shipkit && pnpm install
+cp .env.example apps/web/.env.local   # optional for real auth
+pnpm doctor && pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
-
-### Presets
-
-| Preset | Guide |
-|--------|--------|
-| `supabase-full` | [`presets/supabase-full.md`](./presets/supabase-full.md) |
-| `portable-pg` | [`presets/portable-pg.md`](./presets/portable-pg.md) · `pnpm db:up` |
+Open [http://localhost:3000](http://localhost:3000) · edit **`IDEA.md`** · vibe the product.
 
 ---
 
-## Monorepo layout
+## Why Shipkit?
+
+| Pain | Shipkit |
+|------|---------|
+| Agents reinvent auth every chat | Fixed stack + `AuthPort` |
+| Demo apps die at deploy | Docker + Vercel recipes |
+| Insecure vibe prototypes | Headers, validation, rate-limit primitives |
+| Locked to one closed AI builder | **Your repo**, MIT, portable presets |
+| “Which framework?” thrash | Research-backed defaults (see `STANDARDS.md`) |
+
+Grounded in public standards: **Twelve-Factor**, **Ports & Adapters**, **OWASP ASVS L1**, **[AGENTS.md](https://agents.md/)**.
+
+---
+
+## Vibe workflow (2 minutes)
+
+1. **Edit** [`IDEA.md`](./IDEA.md) — who, problem, MVP checklist  
+2. **Run** `pnpm dev`  
+3. **Prompt your agent:**  
+   *“Read IDEA.md + AGENTS.md. Implement the next MVP item under /app.”*  
+4. **Ship** with a preset (`supabase-full` or `portable-pg`)
+
+Full guide: [`docs/VIBE.md`](./docs/VIBE.md)
+
+---
+
+## What’s included
+
+- **Landing** — product marketing shell  
+- **Auth** — sign in / sign up / sign out (Supabase adapter; portable auth next)  
+- **App shell** — protected `/app` for your features  
+- **Security** — CSP, HSTS, Zod, rate-limit port  
+- **Data** — Postgres schema + optional Supabase RLS SQL  
+- **Presets** — managed Supabase *or* your own Postgres  
+- **Agent DX** — `AGENTS.md`, `IDEA.md`, `llms.txt`  
+
+### Layout
 
 ```text
-apps/web                 Next.js adapter (UI + middleware)
-packages/config          Env schema, preset types
-packages/security        CSP/HSTS helpers, rate limit, Zod
-packages/db              Drizzle schema + SQL
-packages/auth            AuthPort contract
-presets/                 Human setup docs
+IDEA.md                 ← your product (start here)
+AGENTS.md               ← rules for AI agents
+apps/web                ← Next.js UI (first app adapter)
+packages/config         ← env + presets
+packages/security       ← headers, rate limit, validation
+packages/db             ← schema + SQL
+packages/auth           ← AuthPort contract
+presets/                ← supabase-full · portable-pg
+docs/VIBE.md            ← how to vibe effectively
 ```
 
 ---
 
-## Architecture (short)
+## Presets (multi-platform infra)
 
-```text
-Feature UI  →  getAuth() / ports  →  adapters (supabase, …)
-                     ↑
-              @shipkit/* kernel
-```
+| Preset | Best when |
+|--------|-----------|
+| [`supabase-full`](./presets/supabase-full.md) | Want managed auth + DB fast |
+| [`portable-pg`](./presets/portable-pg.md) | Want any Postgres (Docker/Neon/Railway…) |
 
-Details: [`ARCHITECTURE.md`](./ARCHITECTURE.md) · Standards: [`STANDARDS.md`](./STANDARDS.md) · Vision: [`VISION.md`](./VISION.md)
+Deploy recipes: **Vercel** and **Docker**. More hosts/adapters without rewriting product UI.
+
+Next.js is the **first** app adapter — architecture allows more later (see `DECISIONS.md`).
+
+---
+
+## Docs map
+
+| Doc | Purpose |
+|-----|---------|
+| [VISION.md](./VISION.md) | Product vision |
+| [STANDARDS.md](./STANDARDS.md) | Quality bar |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | Packages & ports |
+| [PRODUCTION_CHECKLIST.md](./PRODUCTION_CHECKLIST.md) | Before go-live |
+| [llms.txt](./llms.txt) | Agent doc index |
 
 ---
 
 ## Roadmap
 
-- [x] v0.1 Kernel packages + Next app + Supabase auth adapter + Docker PG + docs  
-- [ ] v0.2 Better Auth portable adapter + e2e smoke + CI matrix  
-- [ ] v0.3 Storage/mail ports  
-- [ ] v1.0 Second app adapter (Nuxt or TanStack — demand-driven)  
-
----
-
-## Comparison (honest)
-
-| | Shipkit | ShipFast | Open SaaS | MakerKit |
-|--|---------|----------|-----------|----------|
-| Price | Free MIT | Paid | Free | Paid |
-| Multi-FW day one | No (phased) | No | Wasp only | Variants |
-| Portable DB/auth | Yes (direction) | Limited | Yes deploy | Strong |
-| Source | Production extract | Template | Wasp template | Commercial kits |
+- [x] v0.1 — Kernel + Next adapter + auth path + security + vibe docs  
+- [ ] v0.2 — Better Auth portable path + e2e smoke  
+- [ ] v0.3 — Storage + mail ports  
+- [ ] v1.0 — Second app adapter when demand is clear  
 
 ---
 
 ## License
 
-MIT © ThunderK / [Thunderkill016](https://github.com/Thunderkill016)
+MIT © [Thunderkill016](https://github.com/Thunderkill016)
+
+**Stop configuring. Start shipping ideas.**

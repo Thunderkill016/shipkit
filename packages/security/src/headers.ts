@@ -1,6 +1,6 @@
 /**
- * Production security headers — pattern from AtoEnglish next.config.
- * Framework adapters apply these in Next headers() / middleware / nginx.
+ * Production security headers (ASVS-oriented baseline).
+ * App adapters apply these via Next headers() / middleware / reverse proxy.
  */
 export function buildContentSecurityPolicy(options: {
   isDev: boolean;
