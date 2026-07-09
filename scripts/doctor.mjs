@@ -60,6 +60,17 @@ console.log(
   `  Agent skills       : ${existsSync(resolve(root, ".agents/skills")) ? "ok" : "—"}`
 );
 
+// OAuth social providers (Better Auth only)
+const hasGoogle = Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET);
+const hasGitHub = Boolean(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET);
+console.log(`  OAuth Google       : ${hasGoogle ? "ok" : "— (optional)"}`);
+console.log(`  OAuth GitHub       : ${hasGitHub ? "ok" : "— (optional)"}`);
+
+// Mail + storage ports
+console.log(`  RESEND_API_KEY     : ${env.RESEND_API_KEY ? "ok" : "— (optional, console stub active)"}`);
+console.log(`  S3_BUCKET          : ${env.S3_BUCKET ? "ok" : "— (optional)"}`);
+
+
 const issues = [];
 if (adapter === "none") {
   issues.push(

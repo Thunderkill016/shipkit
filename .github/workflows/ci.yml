@@ -7,13 +7,14 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  # ── Unit tests + build (no external services needed) ────────────────────────
+  test-and-build:
+    name: Test & Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with:
-          # Must match package.json "packageManager": "pnpm@9.15.0"
           version: 9.15.0
       - uses: actions/setup-node@v4
         with:
@@ -21,11 +22,70 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
-      - run: pnpm doctor || true
       - run: pnpm build
+
+  # ── E2E smoke — demo mode (no auth configured, tests UI only) ───────────────
+  e2e-demo:
+    name: E2E / demo mode
+    runs-on: ubuntu-latest
+    needs: test-and-build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
       - name: Install Playwright Chromium
         run: pnpm --filter @shipkit/web exec playwright install chromium --with-deps
-      - name: E2E smoke
+      - name: E2E smoke (demo mode)
         run: pnpm test:e2e
         env:
           CI: true
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+
+  # ── E2E smoke — portable-pg preset (Better Auth + Postgres) ─────────────────
+  e2e-portable-pg:
+    name: E2E / portable-pg preset
+    runs-on: ubuntu-latest
+    needs: test-and-build
+    # Only run when DATABASE_URL secret is available (skip on forks)
+    if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: shipkit
+          POSTGRES_PASSWORD: shipkit
+          POSTGRES_DB: shipkit
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install Playwright Chromium
+        run: pnpm --filter @shipkit/web exec playwright install chromium --with-deps
+      - name: E2E smoke (portable-pg preset)
+        run: pnpm test:e2e
+        env:
+          CI: true
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          DATABASE_URL: postgresql://shipkit:shipkit@localhost:5432/shipkit
+          BETTER_AUTH_SECRET: ci-test-secret-at-least-32-characters-long!!
+          BETTER_AUTH_URL: http://localhost:3000
+          AUTH_ADAPTER: better-auth

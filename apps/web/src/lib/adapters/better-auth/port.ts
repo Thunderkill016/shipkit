@@ -58,5 +58,22 @@ export function createBetterAuthPort(): AuthPort {
         // ignore
       }
     },
+
+    async getOAuthUrl(provider) {
+      const auth = getBetterAuth();
+      if (!auth) return null;
+      try {
+        const res = await auth.api.signInSocial({
+          body: {
+            provider,
+            callbackURL: `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/app`,
+          },
+          headers: await headers(),
+        });
+        return (res as { url?: string }).url ?? null;
+      } catch {
+        return null;
+      }
+    },
   };
 }

@@ -443,6 +443,9 @@ Full guide: [`docs/VIBE.md`](./docs/VIBE.md) · Vietnamese detailed guide: [abov
 - Landing · Auth · Protected `/app` shell  
 - Security headers · Zod · rate-limit port  
 - Postgres path · Supabase or Better Auth  
+- **Mail:** `createConsoleMailer` (dev) · `createResendMailer` (prod)  
+- **Storage:** `createLocalStorage` (VPS/dev) · `createS3Storage` (S3/R2/MinIO)  
+- **SEO:** OG/Twitter metadata · `<JsonLd>` + schema helpers  
 - Agent DX: `AGENTS.md`, `IDEA.md`, `llms.txt`, `.agents/skills/`  
 - `pnpm create -- my-product` scaffold  
 
@@ -452,10 +455,12 @@ Full guide: [`docs/VIBE.md`](./docs/VIBE.md) · Vietnamese detailed guide: [abov
 IDEA.md                 ← your product brief
 AGENTS.md               ← rules for AI agents
 apps/web                ← Next.js UI
-packages/*              ← kernel (config, security, db, auth)
+  src/components/       ← shared components (JsonLd, …)
+  src/lib/adapters/     ← vendor SDKs (supabase/, better-auth/)
+packages/*              ← kernel (config, security, db, auth, mail, storage)
 presets/                ← supabase-full · portable-pg
 .agents/skills/         ← agent playbooks
-docs/                   ← VIBE + research notes
+docs/                   ← VIBE · ADAPTER_GUIDE · TTFP · research notes
 ```
 
 ---
@@ -479,7 +484,9 @@ Auto-detect if `AUTH_ADAPTER` unset. App code uses `getAuth()` only.
 | [STANDARDS.md](./STANDARDS.md) | Quality bar |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Packages & ports |
 | [PRODUCTION_CHECKLIST.md](./PRODUCTION_CHECKLIST.md) | Before go-live |
-| [ROADMAP.md](./ROADMAP.md) | What’s next |
+| [docs/VIBE.md](./docs/VIBE.md) | Vibe coding workflow |
+| [docs/ADAPTER_GUIDE.md](./docs/ADAPTER_GUIDE.md) | Write your own adapter |
+| [docs/TTFP.md](./docs/TTFP.md) | Time-to-first-product guide |
 | [docs/RESEARCH_NOTES.md](./docs/RESEARCH_NOTES.md) | Research → decisions |
 | [llms.txt](./llms.txt) | Agent doc index |
 
@@ -489,9 +496,8 @@ Auto-detect if `AUTH_ADAPTER` unset. App code uses `getAuth()` only.
 
 - [x] v0.1 — Kernel + Next + Supabase + vibe docs  
 - [x] v0.2 — Better Auth + skills + create CLI + tests  
-- [ ] e2e smoke + CI matrix  
-- [ ] Storage / mail ports  
-- [ ] Measured cold-start guide  
+- [x] v0.3 — Resend/S3 real adapters + JSON-LD helpers  
+- [ ] v1.0 — Adapter guide + TTFP guide + OAuth L2  
 
 ---
 

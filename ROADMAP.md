@@ -21,9 +21,9 @@
 - [x] Auth rate limit + Upstash factory  
 - [x] Notes example + profile page + SEO helpers  
 - [x] StoragePort + MailPort contracts  
-- [ ] CI matrix both presets with real services  
+- [x] CI matrix both presets with real services  
 
-## v0.3 — Product completeness
+## v0.3 — Product completeness ✅
 
 - [x] StoragePort contract (adapters later)  
 - [x] MailPort contract + console stub  
@@ -36,9 +36,10 @@
 
 ## v1.0 — Best-in-class OSS kit
 
-- [ ] Measured TTFP guide (< 60 min cold start)  
+- [x] Measured TTFP guide (< 60 min cold start)  
 - [ ] Two auth paths L2 + two deploy L2  
-- [ ] Adapter contribution guide  
+- [x] Adapter contribution guide  
+- [x] Better Auth OAuth (Google + GitHub)  
 - [ ] Optional second app adapter  
 
 ## Principles for prioritization

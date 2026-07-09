@@ -64,3 +64,25 @@ export async function signOutAction() {
   revalidatePath("/", "layout");
   redirect("/");
 }
+
+export async function oauthSignInAction(
+  _prev: AuthActionState,
+  formData: FormData
+): Promise<AuthActionState> {
+  const provider = formData.get("provider");
+  if (provider !== "google" && provider !== "github") {
+    return { error: "Invalid OAuth provider" };
+  }
+
+  const auth = getAuth();
+  if (!auth.getOAuthUrl) {
+    return { error: "OAuth is not supported by the current auth adapter" };
+  }
+
+  const url = await auth.getOAuthUrl(provider);
+  if (!url) {
+    return { error: `OAuth provider "${provider}" is not configured. Add ${provider.toUpperCase()}_CLIENT_ID/SECRET to .env.local` };
+  }
+
+  redirect(url);
+}

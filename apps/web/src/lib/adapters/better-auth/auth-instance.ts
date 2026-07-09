@@ -5,6 +5,7 @@ import { createDb } from "@/lib/db";
 /**
  * Better Auth instance — portable self-hosted auth (research default 2026).
  * Requires DATABASE_URL + BETTER_AUTH_SECRET.
+ * Optional OAuth: set GOOGLE_CLIENT_ID/SECRET or GITHUB_CLIENT_ID/SECRET.
  */
 function buildAuth() {
   const db = createDb();
@@ -18,6 +19,23 @@ function buildAuth() {
     return null;
   }
 
+  // Social providers — enabled only when env vars are present
+  const socialProviders: Record<string, { clientId: string; clientSecret: string }> = {};
+
+  if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    socialProviders.google = {
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    };
+  }
+
+  if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
+    socialProviders.github = {
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    };
+  }
+
   return betterAuth({
     database: drizzleAdapter(db, { provider: "pg" }),
     secret,
@@ -26,6 +44,7 @@ function buildAuth() {
       enabled: true,
       minPasswordLength: 8,
     },
+    socialProviders,
     trustedOrigins: [baseURL],
   });
 }

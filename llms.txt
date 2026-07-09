@@ -28,3 +28,10 @@
 - packages/security — headers, rate limit, validation
 - packages/db — schema + SQL
 - packages/auth — AuthPort
+- packages/mail — MailPort + createConsoleMailer + createResendMailer
+- packages/storage — StoragePort + createLocalStorage + createS3Storage
+
+## Adapters (in apps/web/src/lib/adapters)
+
+- supabase/ — Supabase auth + SSR client
+- better-auth/ — Better Auth (self-hosted, Drizzle/Postgres)
