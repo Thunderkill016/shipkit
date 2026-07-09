@@ -1,20 +1,415 @@
 # ✦ Shipkit
 
-**The open product kit for vibe coding.**
+**The open product kit for vibe coding.**  
+**Bộ khung sản phẩm mở — giúp bạn (và AI) biến ý tưởng thành website chạy được.**
 
-Go from **idea → landing + auth + app + database + security + deploy** without rebuilding the foundation every time. Built for humans and AI agents who want to ship *their* product, not fight config.
+Go from **idea → landing + auth + app + database + security + deploy** without rebuilding the foundation every time.
+
+Từ **ý tưởng → trang giới thiệu + đăng nhập + app + dữ liệu + bảo mật + đưa lên mạng** — không phải dựng lại nền móng mỗi lần.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-7dd3c0.svg)](./LICENSE)
 [![Node >= 20](https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg)](https://nodejs.org)
 
+| Language | Jump |
+|----------|------|
+| **Tiếng Việt (hướng dẫn chi tiết, cho người trái ngành)** | [↓ Xuống phần tiếng Việt](#-hướng-dẫn-tiếng-việt--dành-cho-người-trái-ngành) |
+| English (technical overview) | [↓ English](#-english--overview) |
+
+---
+
+# 🇻🇳 Hướng dẫn tiếng Việt — dành cho người trái ngành
+
+Phần này viết **bằng lời thường**, ít thuật ngữ.  
+Bạn **không cần** là lập trình viên. Bạn chỉ cần: máy tính, internet, kiên nhẫn 30–60 phút lần đầu, và (nên có) một công cụ AI như Cursor / ChatGPT / Claude / Grok để nhờ viết code theo ý.
+
+---
+
+## Shipkit là gì? (giải thích 1 phút)
+
+Tưởng tượng bạn muốn làm một **sản phẩm web** (app học, app quản lý khách, portfolio, SaaS nhỏ…):
+
+| Việc ai cũng phải làm | Shipkit đã làm sẵn |
+|------------------------|--------------------|
+| Trang giới thiệu sản phẩm | Có (`/`) |
+| Đăng ký / đăng nhập | Có (`/login`) |
+| Khu vực sau khi đăng nhập | Có (`/app`) |
+| Lưu dữ liệu người dùng | Có đường gắn database |
+| Bảo mật cơ bản | Có (headers, kiểm tra form…) |
+| Cách đưa lên mạng | Có hướng dẫn Vercel / Docker |
+
+**Việc của bạn:** mô tả **ý tưởng** (file `IDEA.md`) rồi nhờ AI (hoặc dev) làm **tính năng riêng** — không phải dựng nhà từ móng mỗi lần.
+
+Shipkit **miễn phí**, mã nguồn mở (MIT), code **nằm trên máy bạn / GitHub của bạn** — không bị nhốt trong một app chat đóng.
+
+---
+
+## Bạn cần cài gì trước? (một lần duy nhất)
+
+### 1) Node.js (máy “chạy web”)
+
+1. Vào: https://nodejs.org  
+2. Tải bản **LTS** (khuyên dùng).  
+3. Cài như phần mềm bình thường (Next → Next → Finish).  
+4. Mở **Terminal** (Mac) hoặc **PowerShell / Windows Terminal** (Windows).  
+5. Gõ rồi Enter:
+
 ```bash
-git clone git@github.com:Thunderkill016/shipkit.git
+node -v
+```
+
+Thấy kiểu `v20...` hoặc `v22...` là OK.
+
+### 2) pnpm (công cụ cài thư viện cho project)
+
+Trong Terminal:
+
+```bash
+npm install -g pnpm
+pnpm -v
+```
+
+Thấy số version là OK.
+
+### 3) Git (tải code về)
+
+- Windows: https://git-scm.com  
+- Mac: thường đã có, hoặc cài Xcode Command Line Tools khi hệ thống hỏi.
+
+Kiểm tra:
+
+```bash
+git --version
+```
+
+### 4) (Khuyến nghị) Editor + AI
+
+- **Cursor** (https://cursor.com) — vừa sửa file vừa chat AI trong project: hợp vibe coding nhất.  
+- Hoặc VS Code + ChatGPT/Claude dán code.  
+- Hoặc Grok / Claude web: copy file, nhờ sửa, dán lại (chậm hơn một chút).
+
+### 5) Tài khoản miễn phí (khi muốn đăng nhập “thật”)
+
+**Cách dễ nhất cho người mới:** [Supabase](https://supabase.com) (free tier)
+
+- Đăng ký bằng GitHub/Google  
+- Tạo 1 **Project** mới  
+- Vào **Project Settings → API** lấy 2 dòng:  
+  - **Project URL**  
+  - **anon public** key  
+
+(Ghi ra notepad — lát nữa dán vào file cấu hình.)
+
+---
+
+## Cách A — Xem giao diện ngay (không cần đăng nhập thật)
+
+Phù hợp khi bạn chỉ muốn **nhìn thử** trang chủ / layout.
+
+### Bước 1: Tải code
+
+```bash
+git clone https://github.com/Thunderkill016/shipkit.git
+cd shipkit
+```
+
+> Không rành Terminal? Trên GitHub bấm nút xanh **Code → Download ZIP**, giải nén, rồi trong Terminal `cd` vào thư mục vừa giải nén.
+
+### Bước 2: Cài đặt thư viện (vài phút)
+
+```bash
+pnpm install
+```
+
+Đợi tới khi xong, không tắt máy giữa chừng.
+
+### Bước 3: Chạy thử
+
+```bash
+pnpm dev
+```
+
+Thấy dòng kiểu `Ready` / `localhost:3000` thì mở trình duyệt:
+
+**http://localhost:3000**
+
+| Đường dẫn | Ý nghĩa |
+|-----------|---------|
+| `/` | Trang giới thiệu |
+| `/login` | Form đăng nhập (chưa cấu hình backend → có thể báo lỗi khi bấm — bình thường) |
+| `/app` | Khu vực app (demo mode nếu chưa gắn Supabase) |
+
+Dừng server: trong Terminal bấm `Ctrl + C`.
+
+---
+
+## Cách B — Có đăng ký / đăng nhập thật (khuyên dùng)
+
+### Bước 1–2: Giống Cách A (`clone` + `pnpm install`)
+
+### Bước 3: Tạo file cấu hình bí mật
+
+Trong thư mục `shipkit`, chạy:
+
+```bash
+cp .env.example apps/web/.env.local
+```
+
+Mở file `apps/web/.env.local` bằng Cursor/VS Code/Notepad.
+
+### Bước 4: Dán thông tin Supabase
+
+Bỏ dấu `#` và điền (ví dụ):
+
+```bash
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_SUPABASE_URL=https://xxxxxxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...dán-key-dài-của-bạn
+```
+
+**Lưu file.**  
+Không đưa file `.env.local` cho người lạ / không up công khai lên mạng (đó là chìa khóa dự án).
+
+### Bước 5: (Nên làm) Tạo bảng hồ sơ trên Supabase
+
+1. Vào Supabase → **SQL Editor** → New query  
+2. Mở file trong máy: `packages/db/sql/0001_init.sql` — copy nội dung, Run  
+3. (Tuỳ chọn bảo mật hơn) chạy thêm `packages/db/sql/0002_supabase_rls.sql`  
+
+### Bước 6: Cấu hình đường quay lại sau đăng nhập
+
+Supabase → **Authentication → URL Configuration**:
+
+- Site URL: `http://localhost:3000`  
+- Redirect URLs: thêm `http://localhost:3000/auth/callback`  
+
+### Bước 7: Kiểm tra cấu hình + chạy
+
+```bash
+pnpm doctor
+pnpm dev
+```
+
+- `doctor` báo **Ready** → tốt  
+- Mở http://localhost:3000/login → **Create account** / **Sign in**  
+- Vào được `/app` → thành công 🎉  
+
+---
+
+## Cách C — Tự host database (nâng cao hơn một chút)
+
+Dành cho ai có **Docker Desktop** và muốn database chạy trên máy.
+
+```bash
+pnpm db:up
+```
+
+Trong `apps/web/.env.local`:
+
+```bash
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+DATABASE_URL=postgresql://shipkit:shipkit@localhost:5432/shipkit
+BETTER_AUTH_SECRET=mot-chuoi-bi-mat-dai-hon-32-ky-tu-ngau-nhien!!
+BETTER_AUTH_URL=http://localhost:3000
+AUTH_ADAPTER=better-auth
+```
+
+```bash
+pnpm doctor
+pnpm dev
+```
+
+Chi tiết: [`presets/portable-pg.md`](./presets/portable-pg.md)
+
+---
+
+## Viết ý tưởng của bạn (bước quan trọng nhất)
+
+Mở file **`IDEA.md`** ở thư mục gốc. Đây là “bản tóm tắt sản phẩm” — **AI sẽ đọc file này** để làm đúng ý bạn.
+
+Viết bằng tiếng Việt cũng được, ví dụ:
+
+```markdown
+## Working title
+App ghi chú khách hàng cho thợ nail
+
+## One sentence
+Giúp chủ tiệm nail lưu SĐT, lịch hẹn, ghi chú khách.
+
+## Who is it for?
+Chủ tiệm nail nhỏ, dùng điện thoại nhiều.
+
+## Problem
+Hay quên lịch, note rải trong Zalo.
+
+## Solution (MVP)
+1. Đăng ký / đăng nhập
+2. Danh sách khách
+3. Thêm / sửa khách
+4. Xem trên điện thoại
+
+## MVP checklist
+- [ ] Đổi chữ trang chủ thành thương hiệu tiệm
+- [ ] Màn hình danh sách khách
+- [ ] Form thêm khách
+```
+
+Càng rõ **ai dùng / đau gì / 3–5 việc MVP**, AI càng làm đúng.
+
+---
+
+## Nhờ AI làm tính năng (vibe coding — cách dùng thực tế)
+
+1. Mở project trong **Cursor** (hoặc editor có AI).  
+2. Đảm bảo `IDEA.md` đã viết.  
+3. Chat với AI, dán đúng kiểu:
+
+> Đọc `IDEA.md` và `AGENTS.md`.  
+> Làm mục MVP tiếp theo trong checklist.  
+> Code nằm dưới `apps/web/src/app/app/`.  
+> Không đổi framework, không commit file `.env`.  
+> Xong thì đánh dấu checklist trong `IDEA.md`.
+
+4. AI sửa file → bạn **lưu** → trình duyệt (localhost) **tải lại** → bấm thử.  
+5. Không ổn: chat tiếp *“lỗi khi bấm nút X, màn hình hiện Y, sửa giúp”* (chụp màn hình càng tốt).
+
+### Việc nên nhờ AI
+
+- Đổi chữ / màu / layout trang chủ  
+- Thêm trang trong `/app` (danh sách, form, báo cáo đơn giản)  
+- Thêm bảng dữ liệu (kèm “chỉ user đó mới xem được data của mình”)  
+
+### Việc **không** nên để AI tự ý
+
+- Xóa bảo mật / tắt đăng nhập  
+- Đưa secret key lên GitHub public  
+- Đổi sang framework khác giữa chừng (Vue, WordPress…) nếu bạn chưa sẵn sàng  
+
+Quy tắc AI nằm trong [`AGENTS.md`](./AGENTS.md).  
+Kỹ năng sẵn: thư mục [`.agents/skills/`](./.agents/skills/).
+
+---
+
+## Tạo project mới từ Shipkit (sản phẩm thứ 2, 3…)
+
+```bash
+cd shipkit
+pnpm create -- ten-san-pham-cua-ban
+cd ten-san-pham-cua-ban
+pnpm install
+# sửa IDEA.md
+cp .env.example apps/web/.env.local
+pnpm doctor
+pnpm dev
+```
+
+---
+
+## Đưa website lên mạng (tổng quan dễ hiểu)
+
+### Cách phổ biến: Vercel (miễn phí cho hobby)
+
+1. Đẩy code lên **GitHub** (repo private cũng được).  
+2. Vào https://vercel.com → đăng nhập GitHub → **Import** repo.  
+3. Cấu hình build (monorepo):  
+   - Install: `pnpm install`  
+   - Build: `pnpm build`  
+   - (Nếu cần) Root / filter theo docs Vercel monorepo  
+4. Vào **Environment Variables** dán cùng các key như file `.env.local` (Supabase URL, anon key, `NEXT_PUBLIC_APP_URL` = domain Vercel).  
+5. Deploy → nhận link `https://....vercel.app`.  
+6. Vào Supabase cập nhật **Site URL / Redirect** thành domain production.
+
+Checklist trước khi public: [`PRODUCTION_CHECKLIST.md`](./PRODUCTION_CHECKLIST.md)
+
+### Docker
+
+Dành cho VPS / máy chủ — xem `docker-compose.yml` và preset portable. Người mới nên đi Vercel trước.
+
+---
+
+## Lỗi thường gặp (đừng hoảng)
+
+| Hiện tượng | Thường do | Cách xử |
+|------------|-----------|---------|
+| `pnpm: command not found` | Chưa cài pnpm | `npm install -g pnpm` |
+| `node: command not found` | Chưa cài Node | Cài Node LTS, mở lại Terminal |
+| Trang trắng / lỗi compile | Thiếu `pnpm install` hoặc sai thư mục | `cd` đúng folder `shipkit`, chạy lại `pnpm install` |
+| Đăng nhập báo lỗi cấu hình | Chưa có `.env.local` hoặc key sai | `pnpm doctor`, kiểm tra Supabase URL/key |
+| Đăng nhập xong không vào `/app` | Redirect URL Supabase chưa khớp | Thêm `http://localhost:3000/auth/callback` |
+| Đổi `.env` mà không ăn | Chưa restart server | `Ctrl+C` rồi `pnpm dev` lại |
+| AI sửa lung tung | Chưa chỉ `IDEA.md` + `AGENTS.md` | Nhắc lại 2 file đó mỗi lần chat lớn |
+
+Lệnh tự kiểm tra:
+
+```bash
+pnpm doctor
+```
+
+---
+
+## Giải thích vài từ (từ điển siêu ngắn)
+
+| Từ | Nghĩa thường |
+|----|----------------|
+| **Repo / GitHub** | Nơi cất code trên mạng |
+| **Terminal** | Cửa sổ gõ lệnh cho máy |
+| **Localhost** | Website chạy trên máy bạn |
+| **Env / `.env.local`** | File chứa khóa API, không public |
+| **Deploy** | Đưa web lên internet |
+| **Database** | “Excel thông minh” lưu user/data |
+| **Auth** | Đăng ký / đăng nhập |
+| **Adapter** | “Phích cắm” — đổi Supabase/DB mà UI vẫn dùng chung |
+| **Vibe coding** | Nói ý tưởng cho AI, AI gõ code, bạn kiểm tra kết quả |
+
+---
+
+## Cấu trúc thư mục (chỉ cần nhớ vài chỗ)
+
+```text
+IDEA.md              ← Ý tưởng sản phẩm (BẠN sửa)
+AGENTS.md            ← Luật cho AI (đọc, ít sửa)
+apps/web             ← Giao diện website (AI hay sửa ở đây)
+  src/app/page.tsx   ← Trang chủ
+  src/app/login      ← Đăng nhập
+  src/app/app        ← Phần sau login (tính năng của bạn)
+presets/             ← Hướng dẫn Supabase / Postgres
+docs/VIBE.md         ← Cách vibe (EN)
+```
+
+---
+
+## Lộ trình học 1 buổi (gợi ý)
+
+| Thời gian | Việc |
+|-----------|------|
+| 0–15' | Cài Node, pnpm, Git, Cursor |
+| 15–30' | Clone, `pnpm install`, `pnpm dev`, xem trang chủ |
+| 30–45' | Tạo Supabase, `.env.local`, đăng ký user thử |
+| 45–90' | Viết `IDEA.md`, nhờ AI làm 1 tính năng nhỏ trong `/app` |
+| Sau đó | Deploy Vercel khi demo ổn |
+
+---
+
+## Cần giúp thêm?
+
+- Issues: https://github.com/Thunderkill016/shipkit/issues  
+- English technical docs bên dưới và trong các file `.md` khác  
+
+**Bạn không phải “biết code” để bắt đầu — bạn cần biết ý tưởng của mình và cách nhờ AI đúng chỗ.**
+
+---
+
+# 🇬🇧 English — overview
+
+## Quick start
+
+```bash
+git clone https://github.com/Thunderkill016/shipkit.git
 cd shipkit && pnpm install
-cp .env.example apps/web/.env.local   # optional for real auth
+cp .env.example apps/web/.env.local   # fill for real auth
 pnpm doctor && pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) · edit **`IDEA.md`** · vibe the product.
+Open [http://localhost:3000](http://localhost:3000) · edit **`IDEA.md`** · build features under `/app`.
 
 ---
 
@@ -28,58 +423,51 @@ Open [http://localhost:3000](http://localhost:3000) · edit **`IDEA.md`** · vib
 | Locked to one closed AI builder | **Your repo**, MIT, portable presets |
 | “Which framework?” thrash | Research-backed defaults (see `STANDARDS.md`) |
 
-Grounded in public standards: **Twelve-Factor**, **Ports & Adapters**, **OWASP ASVS L1**, **[AGENTS.md](https://agents.md/)**.
+Grounded in: **Twelve-Factor**, **Ports & Adapters**, **OWASP ASVS L1**, **[AGENTS.md](https://agents.md/)**.
 
 ---
 
-## Vibe workflow (2 minutes)
+## Vibe workflow
 
-1. **Edit** [`IDEA.md`](./IDEA.md) — who, problem, MVP checklist  
-2. **Run** `pnpm dev`  
-3. **Prompt your agent:**  
-   *“Read IDEA.md + AGENTS.md. Implement the next MVP item under /app.”*  
-4. **Ship** with a preset (`supabase-full` or `portable-pg`)
+1. Edit [`IDEA.md`](./IDEA.md) — who, problem, MVP checklist  
+2. `pnpm dev`  
+3. Prompt: *“Read IDEA.md + AGENTS.md. Implement the next MVP item under /app.”*  
+4. Ship with preset `supabase-full` or `portable-pg`  
 
-Full guide: [`docs/VIBE.md`](./docs/VIBE.md)
+Full guide: [`docs/VIBE.md`](./docs/VIBE.md) · Vietnamese detailed guide: [above](#-hướng-dẫn-tiếng-việt--dành-cho-người-trái-ngành)
 
 ---
 
 ## What’s included
 
-- **Landing** — product marketing shell  
-- **Auth** — sign in / sign up / sign out (Supabase adapter; portable auth next)  
-- **App shell** — protected `/app` for your features  
-- **Security** — CSP, HSTS, Zod, rate-limit port  
-- **Data** — Postgres schema + optional Supabase RLS SQL  
-- **Presets** — managed Supabase *or* your own Postgres  
-- **Agent DX** — `AGENTS.md`, `IDEA.md`, `llms.txt`  
+- Landing · Auth · Protected `/app` shell  
+- Security headers · Zod · rate-limit port  
+- Postgres path · Supabase or Better Auth  
+- Agent DX: `AGENTS.md`, `IDEA.md`, `llms.txt`, `.agents/skills/`  
+- `pnpm create -- my-product` scaffold  
 
 ### Layout
 
 ```text
-IDEA.md                 ← your product (start here)
+IDEA.md                 ← your product brief
 AGENTS.md               ← rules for AI agents
-apps/web                ← Next.js UI (first app adapter)
-packages/config         ← env + presets
-packages/security       ← headers, rate limit, validation
-packages/db             ← schema + SQL
-packages/auth           ← AuthPort contract
+apps/web                ← Next.js UI
+packages/*              ← kernel (config, security, db, auth)
 presets/                ← supabase-full · portable-pg
-docs/VIBE.md            ← how to vibe effectively
+.agents/skills/         ← agent playbooks
+docs/                   ← VIBE + research notes
 ```
 
 ---
 
-## Presets (multi-platform infra)
+## Auth adapters
 
-| Preset | Best when |
-|--------|-----------|
-| [`supabase-full`](./presets/supabase-full.md) | Want managed auth + DB fast |
-| [`portable-pg`](./presets/portable-pg.md) | Want any Postgres (Docker/Neon/Railway…) |
+| Adapter | Env | Preset |
+|---------|-----|--------|
+| **Supabase** | `NEXT_PUBLIC_SUPABASE_*` | [`supabase-full`](./presets/supabase-full.md) |
+| **Better Auth** | `DATABASE_URL` + `BETTER_AUTH_SECRET` | [`portable-pg`](./presets/portable-pg.md) |
 
-Deploy recipes: **Vercel** and **Docker**. More hosts/adapters without rewriting product UI.
-
-Next.js is the **first** app adapter — architecture allows more later (see `DECISIONS.md`).
+Auto-detect if `AUTH_ADAPTER` unset. App code uses `getAuth()` only.
 
 ---
 
@@ -91,32 +479,19 @@ Next.js is the **first** app adapter — architecture allows more later (see `DE
 | [STANDARDS.md](./STANDARDS.md) | Quality bar |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Packages & ports |
 | [PRODUCTION_CHECKLIST.md](./PRODUCTION_CHECKLIST.md) | Before go-live |
+| [ROADMAP.md](./ROADMAP.md) | What’s next |
+| [docs/RESEARCH_NOTES.md](./docs/RESEARCH_NOTES.md) | Research → decisions |
 | [llms.txt](./llms.txt) | Agent doc index |
 
 ---
 
-## Auth adapters
-
-| Adapter | Env | Preset |
-|---------|-----|--------|
-| **Supabase** | `NEXT_PUBLIC_SUPABASE_*` | `supabase-full` |
-| **Better Auth** | `DATABASE_URL` + `BETTER_AUTH_SECRET` | `portable-pg` |
-
-Auto-detect if `AUTH_ADAPTER` unset. Always call `getAuth()` in app code.
-
-## Agent skills
-
-`.agents/skills/` — `vibe-setup`, `ship-feature`, `add-entity`, `security-pass`
-
-## Roadmap
-
-See [`ROADMAP.md`](./ROADMAP.md) · research [`docs/RESEARCH_NOTES.md`](./docs/RESEARCH_NOTES.md)
+## Roadmap (short)
 
 - [x] v0.1 — Kernel + Next + Supabase + vibe docs  
-- [x] v0.2a — Better Auth portable + skills + create CLI + tests  
-- [ ] v0.2b — Playwright e2e + CI matrix  
-- [ ] v0.3 — Storage + mail ports  
-- [ ] v1.0 — Measured TTFP + optional second app adapter  
+- [x] v0.2 — Better Auth + skills + create CLI + tests  
+- [ ] e2e smoke + CI matrix  
+- [ ] Storage / mail ports  
+- [ ] Measured cold-start guide  
 
 ---
 
@@ -124,4 +499,5 @@ See [`ROADMAP.md`](./ROADMAP.md) · research [`docs/RESEARCH_NOTES.md`](./docs/R
 
 MIT © [Thunderkill016](https://github.com/Thunderkill016)
 
-**Stop configuring. Start shipping ideas.**
+**Stop configuring. Start shipping ideas.**  
+**Bớt cấu hình. Bắt đầu biến ý tưởng thành sản phẩm.**
