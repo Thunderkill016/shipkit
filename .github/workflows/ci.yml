@@ -19,5 +19,6 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install
+      - run: pnpm test
       - run: pnpm doctor || true
-      - run: pnpm --filter @shipkit/web build
+      - run: pnpm build

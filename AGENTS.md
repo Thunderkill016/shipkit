@@ -19,7 +19,8 @@ Foundation (auth, security, deploy shape) is already chosen. Implement **IDEA.md
 | Piece | Choice |
 |-------|--------|
 | App | Next.js App Router in `apps/web` |
-| Auth | `getAuth()` → AuthPort (Supabase adapter in `lib/adapters`) |
+| Auth | `getAuth()` → AuthPort (`supabase` or `better-auth` via env) |
+| Skills | `.agents/skills/*/SKILL.md` (ship-feature, add-entity, …) |
 | Validation | Zod via `@shipkit/security` or local schemas |
 | DB schema | `@shipkit/db` + SQL in `packages/db/sql` |
 | Style | Tailwind tokens in `apps/web/src/app/globals.css` |
@@ -29,9 +30,11 @@ Foundation (auth, security, deploy shape) is already chosen. Implement **IDEA.md
 ```bash
 pnpm install
 pnpm doctor
+pnpm test             # security unit tests
 pnpm dev              # http://localhost:3000
-pnpm --filter @shipkit/web build
-pnpm db:up            # optional Docker Postgres
+pnpm build
+pnpm db:up            # Docker Postgres (portable-pg)
+pnpm create -- my-app # scaffold a new product folder
 ```
 
 ## Hard rules

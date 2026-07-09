@@ -1,12 +1,11 @@
 import Link from "next/link";
 import { signOutAction } from "@/app/actions/auth";
-import { getAuth } from "@/lib/auth";
+import { getAuth, getAuthAdapterName } from "@/lib/auth";
 
 export default async function AppHomePage() {
   const user = await getAuth().getUser();
-  const configured = Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
+  const adapter = getAuthAdapterName();
+  const configured = adapter !== "none";
 
   return (
     <div className="mx-auto min-h-screen max-w-2xl px-6 py-10">
@@ -23,14 +22,17 @@ export default async function AppHomePage() {
       <div className="mt-8 space-y-4">
         {!configured && (
           <div className="rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted">
-            <strong className="text-foreground">Demo mode</strong> — no Supabase env. UI works for
-            layout; add <code className="text-foreground">apps/web/.env.local</code> for real auth
-            guards. Run <code className="text-foreground">pnpm doctor</code>.
+            <strong className="text-foreground">Demo mode</strong> — no auth adapter. Configure
+            Supabase or Better Auth (<code className="text-foreground">pnpm doctor</code>).
           </div>
         )}
 
         <div className="rounded-xl border border-border bg-card p-5">
-          <p className="text-sm text-muted">Session</p>
+          <p className="text-sm text-muted">
+            Auth adapter:{" "}
+            <code className="text-foreground">{adapter}</code>
+          </p>
+          <p className="mt-3 text-sm text-muted">Session</p>
           <p className="mt-1 font-medium">
             {user?.email ?? (configured ? "Not signed in — use /login" : "demo@shipkit.local")}
           </p>

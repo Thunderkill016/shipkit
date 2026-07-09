@@ -1,22 +1,57 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+/**
+ * Route protection.
+ * - better-auth: cookie session checked lightly (full check in RSC via AuthPort)
+ * - supabase: getUser() refresh
+ * - none: allow /app in demo mode
+ */
 export async function middleware(request: NextRequest) {
+  const adapter = process.env.AUTH_ADAPTER?.toLowerCase();
+  const hasBetter =
+    Boolean(process.env.DATABASE_URL) && Boolean(process.env.BETTER_AUTH_SECRET);
+  const hasSupabase =
+    Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
+    Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+
+  const mode =
+    adapter === "supabase" || adapter === "better-auth"
+      ? adapter
+      : hasBetter
+        ? "better-auth"
+        : hasSupabase
+          ? "supabase"
+          : "none";
+
+  if (mode === "none") {
+    return NextResponse.next();
+  }
+
+  if (mode === "better-auth") {
+    // Session cookie presence — detailed validation in server components
+    const hasSession =
+      request.cookies.has("better-auth.session_token") ||
+      request.cookies.has("__Secure-better-auth.session_token");
+
+    if (request.nextUrl.pathname.startsWith("/app") && !hasSession) {
+      const login = new URL("/login", request.url);
+      login.searchParams.set("next", request.nextUrl.pathname);
+      return NextResponse.redirect(login);
+    }
+    if (request.nextUrl.pathname === "/login" && hasSession) {
+      return NextResponse.redirect(new URL("/app", request.url));
+    }
+    return NextResponse.next();
+  }
+
+  // supabase
   let response = NextResponse.next({
     request: { headers: request.headers },
   });
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!url || !key) {
-    // Demo mode: allow all routes when backend not configured
-    if (request.nextUrl.pathname.startsWith("/app")) {
-      // still allow dashboard in demo with banner
-      return response;
-    }
-    return response;
-  }
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
   const supabase = createServerClient(url, key, {
     cookies: {

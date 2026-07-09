@@ -95,12 +95,28 @@ Next.js is the **first** app adapter — architecture allows more later (see `DE
 
 ---
 
+## Auth adapters
+
+| Adapter | Env | Preset |
+|---------|-----|--------|
+| **Supabase** | `NEXT_PUBLIC_SUPABASE_*` | `supabase-full` |
+| **Better Auth** | `DATABASE_URL` + `BETTER_AUTH_SECRET` | `portable-pg` |
+
+Auto-detect if `AUTH_ADAPTER` unset. Always call `getAuth()` in app code.
+
+## Agent skills
+
+`.agents/skills/` — `vibe-setup`, `ship-feature`, `add-entity`, `security-pass`
+
 ## Roadmap
 
-- [x] v0.1 — Kernel + Next adapter + auth path + security + vibe docs  
-- [ ] v0.2 — Better Auth portable path + e2e smoke  
+See [`ROADMAP.md`](./ROADMAP.md) · research [`docs/RESEARCH_NOTES.md`](./docs/RESEARCH_NOTES.md)
+
+- [x] v0.1 — Kernel + Next + Supabase + vibe docs  
+- [x] v0.2a — Better Auth portable + skills + create CLI + tests  
+- [ ] v0.2b — Playwright e2e + CI matrix  
 - [ ] v0.3 — Storage + mail ports  
-- [ ] v1.0 — Second app adapter when demand is clear  
+- [ ] v1.0 — Measured TTFP + optional second app adapter  
 
 ---
 

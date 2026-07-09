@@ -1,16 +1,18 @@
 {
   "name": "shipkit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "description": "Open product foundation kit — landing, auth, data, security, deploy. Portable infra; Next.js first adapter.",
+  "description": "Open product kit for vibe coding — idea to landing, auth, app, security, deploy.",
   "license": "MIT",
   "packageManager": "pnpm@9.15.0",
   "scripts": {
     "dev": "pnpm --filter @shipkit/web dev",
-    "build": "pnpm -r build",
+    "build": "pnpm --filter @shipkit/web build",
     "lint": "pnpm --filter @shipkit/web lint",
     "typecheck": "pnpm -r typecheck",
+    "test": "pnpm --filter @shipkit/security test",
     "doctor": "node scripts/doctor.mjs",
+    "create": "node scripts/create-shipkit.mjs",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down"
   },

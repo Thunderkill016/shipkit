@@ -12,7 +12,7 @@
     "build": "tsc --noEmit"
   },
   "dependencies": {
-    "drizzle-orm": "^0.44.2"
+    "drizzle-orm": "^0.45.2"
   },
   "devDependencies": {
     "typescript": "^5.8.3"
@@ -21,6 +21,8 @@
     "postgres": "^3.4.5"
   },
   "peerDependenciesMeta": {
-    "postgres": { "optional": true }
+    "postgres": {
+      "optional": true
+    }
   }
 }
