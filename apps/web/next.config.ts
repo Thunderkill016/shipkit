@@ -4,6 +4,7 @@ import { securityHeaders } from "@shipkit/security";
 const isDev = process.env.NODE_ENV === "development";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   reactStrictMode: true,
   transpilePackages: [
     "@shipkit/config",

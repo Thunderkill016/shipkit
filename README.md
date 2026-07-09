@@ -487,6 +487,7 @@ Auto-detect if `AUTH_ADAPTER` unset. App code uses `getAuth()` only.
 | [docs/VIBE.md](./docs/VIBE.md) | Vibe coding workflow |
 | [docs/ADAPTER_GUIDE.md](./docs/ADAPTER_GUIDE.md) | Write your own adapter |
 | [docs/TTFP.md](./docs/TTFP.md) | Time-to-first-product guide |
+| [docs/DEPLOY.md](./docs/DEPLOY.md) | Production deployment guide (L2) |
 | [docs/RESEARCH_NOTES.md](./docs/RESEARCH_NOTES.md) | Research → decisions |
 | [llms.txt](./llms.txt) | Agent doc index |
 

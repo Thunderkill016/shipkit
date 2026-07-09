@@ -37,7 +37,7 @@
 ## v1.0 — Best-in-class OSS kit
 
 - [x] Measured TTFP guide (< 60 min cold start)  
-- [ ] Two auth paths L2 + two deploy L2  
+- [x] Two auth paths L2 + two deploy L2  
 - [x] Adapter contribution guide  
 - [x] Better Auth OAuth (Google + GitHub)  
 - [ ] Optional second app adapter  

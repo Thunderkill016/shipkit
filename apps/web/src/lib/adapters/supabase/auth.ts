@@ -37,5 +37,18 @@ export function createSupabaseAuthPort(): AuthPort {
       if (!supabase) return;
       await supabase.auth.signOut();
     },
+
+    async getOAuthUrl(provider) {
+      const supabase = await createSupabaseServerClient();
+      if (!supabase) return null;
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/auth/callback`,
+        },
+      });
+      if (error) return null;
+      return data.url;
+    },
   };
 }
