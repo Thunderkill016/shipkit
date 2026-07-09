@@ -5,6 +5,9 @@ export {
   createMemoryRateLimiter,
 } from "./rate-limit";
 
+export { createUpstashRateLimiter } from "./upstash";
+export { createRateLimiter } from "./factory";
+
 export {
   buildContentSecurityPolicy,
   securityHeaders,

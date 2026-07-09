@@ -4,6 +4,7 @@ import { EmailPasswordSchema } from "@shipkit/security";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getAuth } from "@/lib/auth";
+import { authRateLimit } from "@/lib/rate-limit";
 
 export type AuthActionState = { error: string | null };
 
@@ -17,6 +18,11 @@ export async function signInAction(
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const rl = await authRateLimit.check(`signin:${parsed.data.email}`);
+  if (!rl.success) {
+    return { error: "Too many sign-in attempts. Try again later." };
   }
 
   const auth = getAuth();
@@ -37,6 +43,11 @@ export async function signUpAction(
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+  }
+
+  const rl = await authRateLimit.check(`signup:${parsed.data.email}`);
+  if (!rl.success) {
+    return { error: "Too many sign-up attempts. Try again later." };
   }
 
   const auth = getAuth();

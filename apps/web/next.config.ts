@@ -10,6 +10,8 @@ const nextConfig: NextConfig = {
     "@shipkit/security",
     "@shipkit/db",
     "@shipkit/auth",
+    "@shipkit/storage",
+    "@shipkit/mail",
   ],
   async headers() {
     return [

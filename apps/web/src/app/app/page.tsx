@@ -56,12 +56,21 @@ export default async function AppHomePage() {
           </ol>
         </div>
 
-        <div className="rounded-xl border border-dashed border-border p-5 text-sm text-muted">
-          <p className="font-medium text-foreground">Feature slot</p>
-          <p className="mt-2">
-            Replace this card with your first domain feature (list, editor, dashboard widget…).
-            That is the product — Shipkit is only the shell.
-          </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Link
+            href="/app/notes"
+            className="rounded-xl border border-border bg-card p-5 text-sm hover:border-accent"
+          >
+            <p className="font-medium text-foreground">Notes example →</p>
+            <p className="mt-2 text-muted">CRUD pattern with Zod + server actions (in-memory).</p>
+          </Link>
+          <Link
+            href="/app/profile"
+            className="rounded-xl border border-border bg-card p-5 text-sm hover:border-accent"
+          >
+            <p className="font-medium text-foreground">Profile →</p>
+            <p className="mt-2 text-muted">Session + adapter info. Extend for your product.</p>
+          </Link>
         </div>
 
         {user && (

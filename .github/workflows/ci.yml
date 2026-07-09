@@ -23,3 +23,9 @@ jobs:
       - run: pnpm test
       - run: pnpm doctor || true
       - run: pnpm build
+      - name: Install Playwright Chromium
+        run: pnpm --filter @shipkit/web exec playwright install chromium --with-deps
+      - name: E2E smoke
+        run: pnpm test:e2e
+        env:
+          CI: true

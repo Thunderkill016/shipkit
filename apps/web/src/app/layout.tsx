@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { createMetadata } from "@/lib/seo";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,14 +12,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "Shipkit",
-    template: "%s · Shipkit",
-  },
+export const metadata = createMetadata({
   description:
     "Open product kit for vibe coding — idea to landing, auth, app, security, and deploy.",
-};
+  path: "/",
+});
 
 export default function RootLayout({
   children,

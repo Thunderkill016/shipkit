@@ -17,16 +17,22 @@
 - [x] create-shipkit CLI (`pnpm create -- name`)  
 - [x] Unit tests (security) + CI runs tests  
 - [x] Error / not-found pages  
-- [ ] Playwright e2e smoke  
+- [x] Playwright e2e smoke (demo mode)  
+- [x] Auth rate limit + Upstash factory  
+- [x] Notes example + profile page + SEO helpers  
+- [x] StoragePort + MailPort contracts  
 - [ ] CI matrix both presets with real services  
 
 ## v0.3 — Product completeness
 
-- [ ] StoragePort (S3-compatible)  
-- [ ] MailPort (Resend/SMTP)  
-- [ ] Profile settings UI  
-- [ ] SEO helpers (OG, JSON-LD)  
-- [ ] Rate limit Upstash adapter  
+- [x] StoragePort contract (adapters later)  
+- [x] MailPort contract + console stub  
+- [x] Profile page (basic)  
+- [x] SEO helpers (OG/Twitter)  
+- [x] Rate limit Upstash adapter  
+- [x] Resend/S3 real adapters  
+- [x] JSON-LD helpers  
+
 
 ## v1.0 — Best-in-class OSS kit
 

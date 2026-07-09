@@ -30,6 +30,8 @@ Let people **vibe features** while the foundation stays boring and correct.
 | `@shipkit/security` | Don’t reinvent CSP / rate limit / password schema |
 | `@shipkit/db` | Canonical `profiles` schema — extend for your domain |
 | `@shipkit/auth` | `AuthPort` — swap providers without rewriting pages |
+| `@shipkit/storage` | `StoragePort` — S3-compatible uploads (adapters later) |
+| `@shipkit/mail` | `MailPort` — transactional email (+ console stub) |
 
 ## App adapter
 
