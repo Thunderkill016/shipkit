@@ -19,9 +19,15 @@ importers:
       '@shipkit/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@shipkit/mail':
+        specifier: workspace:*
+        version: link:../../packages/mail
       '@shipkit/security':
         specifier: workspace:*
         version: link:../../packages/security
+      '@shipkit/storage':
+        specifier: workspace:*
+        version: link:../../packages/storage
       '@supabase/ssr':
         specifier: ^0.6.1
         version: 0.6.1(@supabase/supabase-js@2.110.2)

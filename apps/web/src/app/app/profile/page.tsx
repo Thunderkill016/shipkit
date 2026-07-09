@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { getAuth, getAuthAdapterName } from "@/lib/auth";
 import { signOutAction } from "@/app/actions/auth";
+import { getProfile } from "@/lib/profile-store";
+import { ProfileEditor } from "./profile-editor";
 
 export const metadata = {
   title: "Profile",
@@ -9,6 +11,10 @@ export const metadata = {
 export default async function ProfilePage() {
   const user = await getAuth().getUser();
   const adapter = getAuthAdapterName();
+
+  const profile = user
+    ? await getProfile(user.id, user.email)
+    : { id: "", email: null, displayName: null, avatarUrl: null };
 
   return (
     <div className="mx-auto min-h-screen max-w-2xl px-6 py-10">
@@ -22,7 +28,7 @@ export default async function ProfilePage() {
         </Link>
       </header>
 
-      <div className="mt-8 space-y-4">
+      <div className="mt-8 space-y-6">
         <div className="rounded-xl border border-border bg-card p-5 text-sm">
           <p className="text-muted">Adapter</p>
           <p className="mt-1 font-mono text-foreground">{adapter}</p>
@@ -32,13 +38,10 @@ export default async function ProfilePage() {
           <p className="mt-1 break-all font-mono text-xs text-muted">{user?.id ?? "—"}</p>
         </div>
 
-        <p className="text-sm text-muted">
-          Extend this page with display name, avatar upload (StoragePort), and email change when you
-          wire real profile rows in the database.
-        </p>
+        {user && <ProfileEditor profile={profile} />}
 
         {user && (
-          <form action={signOutAction}>
+          <form action={signOutAction} className="pt-2">
             <button
               type="submit"
               className="rounded-xl border border-border px-4 py-2 text-sm hover:border-accent"

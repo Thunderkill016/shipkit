@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { JsonLd, makeWebsiteSchema } from "@/components/jsonld";
 
 const steps = [
   { n: "01", title: "Write IDEA.md", body: "Who, problem, MVP checklist — one file agents actually follow." },
@@ -8,8 +9,14 @@ const steps = [
 ];
 
 export default function LandingPage() {
+  const websiteSchema = makeWebsiteSchema({
+    name: "Shipkit",
+    url: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+  });
+
   return (
     <div className="mx-auto flex min-h-screen max-w-3xl flex-col px-6 py-10">
+      <JsonLd schema={websiteSchema} />
       <header className="flex items-center justify-between">
         <span className="text-sm font-semibold tracking-wide text-accent">✦ shipkit</span>
         <nav className="flex gap-4 text-sm text-muted">
