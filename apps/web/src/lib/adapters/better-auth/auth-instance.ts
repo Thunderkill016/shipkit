@@ -1,11 +1,11 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { nextCookies } from "better-auth/next-js";
 import { createDb } from "@/lib/db";
 
 /**
- * Better Auth instance — portable self-hosted auth (research default 2026).
- * Requires DATABASE_URL + BETTER_AUTH_SECRET.
- * Optional OAuth: set GOOGLE_CLIENT_ID/SECRET or GITHUB_CLIENT_ID/SECRET.
+ * Better Auth instance — portable self-hosted auth.
+ * nextCookies() is required so Server Actions can Set-Cookie (CI e2e signup).
  */
 function buildAuth() {
   const db = createDb();
@@ -19,7 +19,6 @@ function buildAuth() {
     return null;
   }
 
-  // Social providers — enabled only when env vars are present
   const socialProviders: Record<string, { clientId: string; clientSecret: string }> = {};
 
   if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
@@ -43,9 +42,13 @@ function buildAuth() {
     emailAndPassword: {
       enabled: true,
       minPasswordLength: 8,
+      requireEmailVerification: false,
+      autoSignIn: true,
     },
     socialProviders,
     trustedOrigins: [baseURL],
+    // MUST be last plugin — propagates session cookies from Server Actions
+    plugins: [nextCookies()],
   });
 }
 

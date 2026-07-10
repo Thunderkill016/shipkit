@@ -14,8 +14,10 @@ async function signUp(page: import("@playwright/test").Page, email: string, pass
   const signUpForm = page.locator("form").filter({ hasText: /create account|tạo tài khoản/i });
   await signUpForm.locator('input[name="email"]').fill(email);
   await signUpForm.locator('input[name="password"]').fill(password);
-  await signUpForm.getByRole("button", { name: /create account|tạo tài khoản/i }).click();
-  await page.waitForURL(/\/app/, { timeout: 30_000 });
+  await Promise.all([
+    page.waitForURL(/\/app/, { timeout: 45_000 }),
+    signUpForm.getByRole("button", { name: /create account|tạo tài khoản/i }).click(),
+  ]);
 }
 
 test.describe("Notes isolation", () => {

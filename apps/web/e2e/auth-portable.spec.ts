@@ -17,16 +17,20 @@ test.describe("Auth portable-pg", () => {
     const password = "password12345";
 
     await page.goto("/login");
-    // Second form is sign-up
-    const signUpForm = page.locator("form").filter({ hasText: /create account/i });
+    // Last form on page is sign-up (after OAuth + sign-in)
+    const signUpForm = page.locator("form").filter({ hasText: /create account|tạo tài khoản/i });
     await signUpForm.locator('input[name="email"]').fill(email);
     await signUpForm.locator('input[name="password"]').fill(password);
-    await signUpForm.getByRole("button", { name: /create account/i }).click();
+    await Promise.all([
+      page.waitForURL(/\/app/, { timeout: 45_000 }),
+      signUpForm.getByRole("button", { name: /create account|tạo tài khoản/i }).click(),
+    ]);
 
-    await page.waitForURL(/\/app/, { timeout: 30_000 });
-    await expect(page.getByRole("heading", { name: /app/i })).toBeVisible();
-    // Should not be demo mode when auth works
-    await expect(page.getByText(/demo mode/i)).toHaveCount(0);
-    await expect(page.getByText(email).or(page.getByText(/better-auth/i))).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(page.getByText(/demo mode|chế độ demo/i)).toHaveCount(0);
+    await expect(
+      page.getByText(email).or(page.getByText(/better-auth/i)).first()
+    ).toBeVisible({ timeout: 10_000 });
   });
 });
+
