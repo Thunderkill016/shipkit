@@ -40,7 +40,7 @@
 - [x] Two auth paths L2 + two deploy L2  
 - [x] Adapter contribution guide  
 - [x] Better Auth OAuth (Google + GitHub)  
-- [ ] Optional second app adapter  
+- [x] Optional second app adapter  
 
 ## Principles for prioritization
 

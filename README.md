@@ -488,6 +488,7 @@ Auto-detect if `AUTH_ADAPTER` unset. App code uses `getAuth()` only.
 | [docs/ADAPTER_GUIDE.md](./docs/ADAPTER_GUIDE.md) | Write your own adapter |
 | [docs/TTFP.md](./docs/TTFP.md) | Time-to-first-product guide |
 | [docs/DEPLOY.md](./docs/DEPLOY.md) | Production deployment guide (L2) |
+| [docs/MULTI_FRAMEWORK.md](./docs/MULTI_FRAMEWORK.md) | Multi-framework integration guide |
 | [docs/RESEARCH_NOTES.md](./docs/RESEARCH_NOTES.md) | Research → decisions |
 | [llms.txt](./llms.txt) | Agent doc index |
 
@@ -498,7 +499,7 @@ Auto-detect if `AUTH_ADAPTER` unset. App code uses `getAuth()` only.
 - [x] v0.1 — Kernel + Next + Supabase + vibe docs  
 - [x] v0.2 — Better Auth + skills + create CLI + tests  
 - [x] v0.3 — Resend/S3 real adapters + JSON-LD helpers  
-- [ ] v1.0 — Adapter guide + TTFP guide + OAuth L2  
+- [x] v1.0 — Adapter guide + TTFP guide + OAuth L2 + Multi-FW  
 
 ---
 

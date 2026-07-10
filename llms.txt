@@ -15,6 +15,7 @@
 - [Deployment guide](https://github.com/Thunderkill016/shipkit/blob/main/docs/DEPLOY.md): production Vercel + Docker deployment
 - [Security guide](https://github.com/Thunderkill016/shipkit/blob/main/docs/SECURITY.md): CSRF, headers, secrets, upload
 - [API key rotation](https://github.com/Thunderkill016/shipkit/blob/main/docs/API_KEY_ROTATION.md): rotate secrets safely
+- [Multi-framework guide](https://github.com/Thunderkill016/shipkit/blob/main/docs/MULTI_FRAMEWORK.md): integrate Nuxt, SvelteKit, etc.
 
 ## Presets & research
 
