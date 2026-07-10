@@ -2,8 +2,11 @@ import Link from "next/link";
 import { signOutAction } from "@/app/actions/auth";
 import { getAuth, getAuthAdapterName } from "@/lib/auth";
 import { getProfile } from "@/lib/profile-store";
+import { getI18n } from "@/lib/i18n";
+import { LocaleSwitcher } from "@/components/locale-switcher";
 
 export default async function AppHomePage() {
+  const { t, locale } = await getI18n();
   const user = await getAuth().getUser();
   const adapter = getAuthAdapterName();
   const configured = adapter !== "none";
@@ -14,13 +17,13 @@ export default async function AppHomePage() {
 
   return (
     <div className="mx-auto min-h-screen max-w-2xl px-6 py-10">
-      {/* Header */}
       <header className="flex items-center justify-between border-b border-border pb-6">
         <div>
-          <p className="text-xs text-accent">Your product lives here</p>
-          <h1 className="text-xl font-semibold">App</h1>
+          <p className="text-xs text-accent">{t("app.tagline")}</p>
+          <h1 className="text-xl font-semibold">{t("app.title")}</h1>
         </div>
         <div className="flex items-center gap-3">
+          <LocaleSwitcher locale={locale} />
           {user && (
             <div className="flex items-center gap-2 text-sm text-muted">
               <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-card text-xs font-semibold">
@@ -34,8 +37,8 @@ export default async function AppHomePage() {
               <span className="hidden sm:block">{displayName}</span>
             </div>
           )}
-          <Link href="/" className="text-sm text-muted hover:text-foreground transition-colors">
-            Landing
+          <Link href="/" className="text-sm text-muted transition-colors hover:text-foreground">
+            {t("common.landing")}
           </Link>
         </div>
       </header>
@@ -43,98 +46,84 @@ export default async function AppHomePage() {
       <div className="mt-8 space-y-4">
         {!configured && (
           <div className="rounded-xl border border-border bg-card px-4 py-3 text-sm text-muted">
-            <strong className="text-foreground">Demo mode</strong> — no auth adapter. Configure
-            Supabase or Better Auth (<code className="text-foreground">pnpm doctor</code>).
+            {t("app.demoMode")}
           </div>
         )}
 
-        {/* Session card */}
         <div className="rounded-xl border border-border bg-card p-5">
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted">
-              Auth adapter:{" "}
-              <code className="text-foreground">{adapter}</code>
+              {t("app.adapter")}: <code className="text-foreground">{adapter}</code>
             </p>
             <span
               className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                configured
-                  ? "bg-accent/10 text-accent"
-                  : "bg-border text-muted"
+                configured ? "bg-accent/10 text-accent" : "bg-border text-muted"
               }`}
             >
               {configured ? "active" : "demo"}
             </span>
           </div>
-          <p className="mt-3 text-sm text-muted">Session</p>
+          <p className="mt-3 text-sm text-muted">{t("app.session")}</p>
           <p className="mt-1 font-medium">
-            {user?.email ?? (configured ? "Not signed in — use /login" : "demo@shipkit.local")}
+            {user?.email ?? (configured ? "—" : "demo@shipkit.local")}
           </p>
           {user?.id && (
             <p className="mt-1 break-all font-mono text-xs text-muted">{user.id}</p>
           )}
         </div>
 
-        {/* Vibe next slice */}
         <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted">
-          <p className="font-medium text-foreground">Vibe the next slice</p>
+          <p className="font-medium text-foreground">{t("app.vibeNext")}</p>
           <ol className="mt-3 list-decimal space-y-2 pl-5">
             <li>
-              Edit repo root <code className="text-foreground">IDEA.md</code> (MVP checklist)
+              Edit <code className="text-foreground">IDEA.md</code>
             </li>
             <li>
-              Tell your agent:{" "}
-              <em className="text-foreground">
-                Read IDEA.md + AGENTS.md. Implement the next MVP item under /app.
-              </em>
+              Agent: <em className="text-foreground">Read IDEA.md + AGENTS.md. Next MVP under /app.</em>
             </li>
             <li>
-              Add routes in <code className="text-foreground">src/app/app/</code>
-            </li>
-            <li>
-              Keep vendor SDKs inside <code className="text-foreground">lib/adapters/</code>
+              Routes in <code className="text-foreground">src/app/app/</code>
             </li>
           </ol>
         </div>
 
-        {/* Navigation cards */}
         <div className="grid gap-3 sm:grid-cols-2">
           <Link
             href="/app/notes"
-            className="rounded-xl border border-border bg-card p-5 text-sm hover:border-accent transition-colors group"
+            className="group rounded-xl border border-border bg-card p-5 text-sm transition-colors hover:border-accent"
           >
-            <p className="font-medium text-foreground group-hover:text-accent transition-colors">
-              Notes example →
+            <p className="font-medium text-foreground transition-colors group-hover:text-accent">
+              {t("app.notesCard")}
             </p>
-            <p className="mt-2 text-muted">CRUD + user isolation (Postgres hoặc memory).</p>
+            <p className="mt-2 text-muted">{t("app.notesDesc")}</p>
           </Link>
           <Link
             href="/app/profile"
-            className="rounded-xl border border-border bg-card p-5 text-sm hover:border-accent transition-colors group"
+            className="group rounded-xl border border-border bg-card p-5 text-sm transition-colors hover:border-accent"
           >
-            <p className="font-medium text-foreground group-hover:text-accent transition-colors">
-              Profile →
+            <p className="font-medium text-foreground transition-colors group-hover:text-accent">
+              {t("app.profileCard")}
             </p>
-            <p className="mt-2 text-muted">Tên + avatar (StoragePort).</p>
+            <p className="mt-2 text-muted">{t("app.profileDesc")}</p>
           </Link>
           <Link
             href="/app/billing"
-            className="rounded-xl border border-border bg-card p-5 text-sm hover:border-accent transition-colors group"
+            className="group rounded-xl border border-border bg-card p-5 text-sm transition-colors hover:border-accent"
           >
-            <p className="font-medium text-foreground group-hover:text-accent transition-colors">
-              Billing →
+            <p className="font-medium text-foreground transition-colors group-hover:text-accent">
+              {t("app.billingCard")}
             </p>
-            <p className="mt-2 text-muted">Stripe khi có env (mốc Open SaaS / ShipFast).</p>
+            <p className="mt-2 text-muted">{t("app.billingDesc")}</p>
           </Link>
         </div>
 
-        {/* Sign out */}
         {user && (
           <form action={signOutAction}>
             <button
               type="submit"
-              className="rounded-xl border border-border px-4 py-2 text-sm hover:border-accent transition-colors"
+              className="rounded-xl border border-border px-4 py-2 text-sm transition-colors hover:border-accent"
             >
-              Đăng xuất
+              {t("auth.signOut")}
             </button>
           </form>
         )}

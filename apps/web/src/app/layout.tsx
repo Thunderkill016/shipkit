@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import { createMetadata } from "@/lib/seo";
+import { getLocale } from "@/lib/i18n";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -18,13 +19,15 @@ export const metadata = createMetadata({
   path: "/",
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen antialiased`}>
         {children}
       </body>

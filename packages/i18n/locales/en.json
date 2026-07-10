@@ -1,14 +1,20 @@
 {
   "auth": {
     "signIn": "Sign in",
-    "signUp": "Sign up",
+    "signUp": "Create account",
     "signOut": "Sign out",
     "email": "Email",
     "password": "Password",
     "forgotPassword": "Forgot password?",
     "orContinueWith": "Or continue with",
     "alreadyHaveAccount": "Already have an account?",
-    "noAccount": "Don't have an account?",
+    "noAccount": "No account? Create one (same fields).",
+    "continueGoogle": "Continue with Google",
+    "continueGithub": "Continue with GitHub",
+    "subtitle": "Email + password, or continue with a provider below.",
+    "envHint": "Auth env not detected. Copy .env.example → apps/web/.env.local and restart pnpm dev.",
+    "signingIn": "Signing in…",
+    "creating": "Creating…",
     "errors": {
       "invalidCredentials": "Invalid email or password.",
       "emailRequired": "Email is required.",
@@ -41,15 +47,90 @@
     "error": "Something went wrong",
     "retry": "Try again",
     "notFound": "Page not found",
-    "goHome": "Go home"
+    "goHome": "Go home",
+    "openApp": "Open app",
+    "landing": "Landing",
+    "github": "GitHub",
+    "language": "Language"
+  },
+  "app": {
+    "title": "App",
+    "tagline": "Your product lives here",
+    "demoMode": "Demo mode — no auth adapter. Configure Supabase or Better Auth (pnpm doctor).",
+    "session": "Session",
+    "adapter": "Auth adapter",
+    "vibeNext": "Vibe the next slice",
+    "notesCard": "Notes example →",
+    "notesDesc": "CRUD + user isolation (Postgres or memory).",
+    "profileCard": "Profile →",
+    "profileDesc": "Name + avatar (StoragePort).",
+    "billingCard": "Billing →",
+    "billingDesc": "Stripe when env is set (Open SaaS / ShipFast parity)."
   },
   "landing": {
     "tagline": "Product kit for vibe coding",
     "hero": "Your idea.",
     "heroAccent": "Foundation already shipped.",
+    "subtitle": "Auth, security, database, and deploy recipes are ready. You and your agent focus on the product — not re-picking a stack every session.",
     "cta": "Start building",
     "viewOnGithub": "View on GitHub",
-    "footerMission": "Built so everyone can ship ideas faster"
+    "included": "Included in the kit",
+    "stepsTitle": "4-step workflow",
+    "footerMission": "Built so everyone can ship ideas faster",
+    "footerHint": "Edit IDEA.md then run pnpm dev",
+    "login": "Log in",
+    "openApp": "Open app",
+    "features": {
+      "authTitle": "Auth, plug-and-play",
+      "authBody": "Supabase or Better Auth. Switch with one env var.",
+      "dbTitle": "Portable database",
+      "dbBody": "Drizzle + Postgres. Local, Neon, Railway, Supabase, or RDS — same code.",
+      "mailTitle": "Mail & storage",
+      "mailBody": "Resend / console. S3 / local. Works in dev and production.",
+      "secTitle": "Security by default",
+      "secBody": "CSP headers, Zod, rate limits, ASVS L1 baseline — preconfigured.",
+      "deployTitle": "Two deploy presets",
+      "deployBody": "Vercel or Docker compose. Step-by-step guides included.",
+      "aiTitle": "AI-first workflow",
+      "aiBody": "AGENTS.md + IDEA.md + llms.txt. Agents know what to do."
+    },
+    "steps": {
+      "s1t": "Write IDEA.md",
+      "s1b": "Who, problem, MVP — one file agents actually follow.",
+      "s2t": "pnpm dev",
+      "s2b": "Landing, auth, and /app shell are already wired.",
+      "s3t": "Vibe the product",
+      "s3b": "Ship features under /app. Stack stays fixed.",
+      "s4t": "Ship a preset",
+      "s4b": "supabase-full or portable-pg · Vercel or Docker."
+    },
+    "checks": {
+      "c1": "Ports & adapters — no vendor lock-in",
+      "c2": "Research-backed defaults (12-factor, ASVS)",
+      "c3": "IDEA.md + AGENTS.md workflow for AI",
+      "c4": "Monorepo packages: auth, db, security, mail, storage",
+      "c5": "Playwright E2E + Vitest unit tests",
+      "c6": "Docker multi-stage + compose production"
+    },
+    "pricingTitle": "Simple pricing for your product",
+    "pricingSub": "Shipkit is free. This section is a template for your SaaS plans.",
+    "planFree": "Free",
+    "planPro": "Pro",
+    "planFreePrice": "$0",
+    "planProPrice": "$19/mo",
+    "planFreeDesc": "Hobby & prototypes",
+    "planProDesc": "When you charge customers",
+    "planCta": "Get started",
+    "planProCta": "Upgrade (Stripe)",
+    "faqTitle": "FAQ",
+    "faq1q": "Do I need to know how to code?",
+    "faq1a": "Basic Terminal + an AI editor (Cursor, etc.) is enough. Follow the Vietnamese guide in the README.",
+    "faq2q": "Am I locked to Vercel or Supabase?",
+    "faq2a": "No. Use Supabase or any Postgres URL, deploy with Vercel or Docker.",
+    "faq3q": "How do I add my product features?",
+    "faq3a": "Edit IDEA.md, then ask your agent to implement the next MVP item under /app.",
+    "faq4q": "Is billing included?",
+    "faq4a": "Stripe adapter is ready. Set STRIPE_SECRET_KEY + STRIPE_PRICE_ID and open /app/billing."
   },
   "notes": {
     "title": "Notes",
@@ -57,8 +138,13 @@
     "emptyState": "No notes yet — add one above.",
     "titlePlaceholder": "Title...",
     "bodyPlaceholder": "Body (optional)...",
+    "domainTag": "Domain example (user-isolated)",
     "errors": {
       "titleRequired": "Title is required."
     }
+  },
+  "billing": {
+    "title": "Billing",
+    "tag": "Open SaaS parity · billing"
   }
 }

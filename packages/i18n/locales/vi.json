@@ -1,14 +1,20 @@
 {
   "auth": {
     "signIn": "Đăng nhập",
-    "signUp": "Đăng ký",
+    "signUp": "Tạo tài khoản",
     "signOut": "Đăng xuất",
     "email": "Email",
     "password": "Mật khẩu",
     "forgotPassword": "Quên mật khẩu?",
     "orContinueWith": "Hoặc tiếp tục với",
     "alreadyHaveAccount": "Đã có tài khoản?",
-    "noAccount": "Chưa có tài khoản?",
+    "noAccount": "Chưa có tài khoản? Tạo mới (cùng form).",
+    "continueGoogle": "Tiếp tục với Google",
+    "continueGithub": "Tiếp tục với GitHub",
+    "subtitle": "Email + mật khẩu, hoặc chọn nhà cung cấp bên dưới.",
+    "envHint": "Chưa thấy cấu hình auth. Copy .env.example → apps/web/.env.local rồi chạy lại pnpm dev.",
+    "signingIn": "Đang đăng nhập…",
+    "creating": "Đang tạo…",
     "errors": {
       "invalidCredentials": "Email hoặc mật khẩu không đúng.",
       "emailRequired": "Vui lòng nhập email.",
@@ -41,24 +47,104 @@
     "error": "Có lỗi xảy ra",
     "retry": "Thử lại",
     "notFound": "Không tìm thấy trang",
-    "goHome": "Về trang chủ"
+    "goHome": "Về trang chủ",
+    "openApp": "Mở app",
+    "landing": "Trang chủ",
+    "github": "GitHub",
+    "language": "Ngôn ngữ"
+  },
+  "app": {
+    "title": "App",
+    "tagline": "Sản phẩm của bạn nằm ở đây",
+    "demoMode": "Chế độ demo — chưa có auth. Cấu hình Supabase hoặc Better Auth (pnpm doctor).",
+    "session": "Phiên đăng nhập",
+    "adapter": "Auth adapter",
+    "vibeNext": "Vibe tính năng tiếp theo",
+    "notesCard": "Notes mẫu →",
+    "notesDesc": "CRUD + tách theo user (Postgres hoặc memory).",
+    "profileCard": "Hồ sơ →",
+    "profileDesc": "Tên + avatar (StoragePort).",
+    "billingCard": "Thanh toán →",
+    "billingDesc": "Stripe khi có env (mốc Open SaaS / ShipFast)."
   },
   "landing": {
     "tagline": "Product kit cho vibe coding",
     "hero": "Ý tưởng của bạn.",
     "heroAccent": "Nền tảng đã ship.",
+    "subtitle": "Auth, security, database và deploy đã sẵn. Bạn và AI chỉ tập trung sản phẩm — không chọn lại stack mỗi buổi.",
     "cta": "Bắt đầu xây dựng",
     "viewOnGithub": "Xem trên GitHub",
-    "footerMission": "Built so everyone can ship ideas faster"
+    "included": "Có sẵn trong kit",
+    "stepsTitle": "Quy trình 4 bước",
+    "footerMission": "Built so everyone can ship ideas faster",
+    "footerHint": "Sửa IDEA.md rồi chạy pnpm dev",
+    "login": "Đăng nhập",
+    "openApp": "Mở app",
+    "features": {
+      "authTitle": "Auth, plug-and-play",
+      "authBody": "Supabase hoặc Better Auth. Đổi bằng một biến môi trường.",
+      "dbTitle": "Database portable",
+      "dbBody": "Drizzle + Postgres. Local, Neon, Railway, Supabase, RDS — cùng code.",
+      "mailTitle": "Mail & Storage",
+      "mailBody": "Resend / console. S3 / local. Dev và production đều chạy.",
+      "secTitle": "Security mặc định",
+      "secBody": "CSP, Zod, rate-limit, ASVS L1 — đã cấu hình sẵn.",
+      "deployTitle": "Hai preset deploy",
+      "deployBody": "Vercel hoặc Docker compose. Có hướng dẫn từng bước.",
+      "aiTitle": "AI-first workflow",
+      "aiBody": "AGENTS.md + IDEA.md + llms.txt. Agent biết phải làm gì."
+    },
+    "steps": {
+      "s1t": "Viết IDEA.md",
+      "s1b": "Ai, vấn đề, MVP — một file agent thực sự tuân theo.",
+      "s2t": "pnpm dev",
+      "s2b": "Landing, auth, /app shell đã sẵn.",
+      "s3t": "Vibe the product",
+      "s3b": "Làm tính năng dưới /app. Stack cố định.",
+      "s4t": "Ship a preset",
+      "s4b": "supabase-full hoặc portable-pg · Vercel hoặc Docker."
+    },
+    "checks": {
+      "c1": "Ports & Adapters — không khoá vendor",
+      "c2": "Defaults theo research (12-factor, ASVS)",
+      "c3": "IDEA.md + AGENTS.md cho AI",
+      "c4": "Monorepo: auth, db, security, mail, storage",
+      "c5": "Playwright E2E + Vitest",
+      "c6": "Docker multi-stage + compose prod"
+    },
+    "pricingTitle": "Bảng giá mẫu cho sản phẩm của bạn",
+    "pricingSub": "Shipkit miễn phí. Đây là template plan SaaS bạn có thể chỉnh.",
+    "planFree": "Free",
+    "planPro": "Pro",
+    "planFreePrice": "0đ",
+    "planProPrice": "$19/tháng",
+    "planFreeDesc": "Thử nghiệm & hobby",
+    "planProDesc": "Khi bạn thu phí khách",
+    "planCta": "Bắt đầu",
+    "planProCta": "Nâng cấp (Stripe)",
+    "faqTitle": "Câu hỏi thường gặp",
+    "faq1q": "Có cần biết code không?",
+    "faq1a": "Biết Terminal cơ bản + editor AI (Cursor…) là đủ. Xem hướng dẫn tiếng Việt trong README.",
+    "faq2q": "Có bị khoá Vercel/Supabase không?",
+    "faq2a": "Không. Dùng Supabase hoặc mọi Postgres URL; deploy Vercel hoặc Docker.",
+    "faq3q": "Thêm tính năng sản phẩm thế nào?",
+    "faq3a": "Sửa IDEA.md, nhờ agent làm mục MVP tiếp theo trong /app.",
+    "faq4q": "Billing có sẵn không?",
+    "faq4a": "Có Stripe adapter. Điền STRIPE_SECRET_KEY + STRIPE_PRICE_ID rồi mở /app/billing."
   },
   "notes": {
     "title": "Ghi chú",
     "addNote": "Thêm ghi chú",
-    "emptyState": "Chưa có ghi chú — hãy thêm một cái ở trên.",
+    "emptyState": "Chưa có ghi chú — hãy thêm ở trên.",
     "titlePlaceholder": "Tiêu đề...",
     "bodyPlaceholder": "Nội dung (tuỳ chọn)...",
+    "domainTag": "Ví dụ domain (tách theo user)",
     "errors": {
       "titleRequired": "Tiêu đề là bắt buộc."
     }
+  },
+  "billing": {
+    "title": "Thanh toán",
+    "tag": "Mốc Open SaaS · billing"
   }
 }

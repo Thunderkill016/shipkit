@@ -33,8 +33,10 @@
 - [x] SEO helpers + JsonLd  
 - [x] Notes persist Postgres + user isolation (memory fallback)  
 - [x] Payment: Stripe adapter + `/app/billing` (env-gated)  
-- [ ] Wire i18n vào UI  
-- [ ] `pnpm db:migrate` documented for all presets ✅ script added
+- [x] Wire i18n vi/en (landing, login, app + switcher)  
+- [x] Landing pricing + FAQ (ShipFast shell)  
+- [x] E2E notes isolation + i18n smoke  
+- [x] `pnpm db:migrate`
 
 ## v1.0 — Best-in-class OSS kit (chưa đạt)
 

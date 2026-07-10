@@ -74,7 +74,7 @@ Ký hiệu: ✅ solid · ⚠️ partial/demo · ❌ missing · 💰 paid only
 | supastarter | **4.1** |
 | ShipFast | **3.3** |
 | next saas-starter | **2.9** |
-| **Shipkit (sau P0 sprint)** | **~3.6** (billing/mail/notes/e2e lên; chưa teams/admin) |
+| **Shipkit (sau P1)** | **~3.8** (i18n UI + pricing/FAQ + isolation e2e; chưa teams/admin) |
 
 **Đọc điểm:** Shipkit đang **ngang/dưới ShipFast về “đủ để bán SaaS”**, **mạnh hơn starter official** về vibe/security/docs VI, **yếu rõ billing/teams/admin** so với Open SaaS & MakerKit.
 
