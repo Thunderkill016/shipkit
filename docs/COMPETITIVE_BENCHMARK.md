@@ -118,7 +118,7 @@ Ký hiệu: ✅ solid · ⚠️ partial/demo · ❌ missing · 💰 paid only
 | Họ | Shipkit |
 |----|---------|
 | Next + Nuxt + TanStack **code** | Chỉ guide multi-FW |
-| Nhiều payment provider | PaymentPort noop |
+| Nhiều payment provider | Stripe adapter env-gated (1 provider) |
 
 **Kết luận:** Multi-framework là mốc **Phase D**, sau khi parity core với Open SaaS free features.
 
