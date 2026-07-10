@@ -78,9 +78,13 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Migrate database
+        run: pnpm db:migrate
+        env:
+          DATABASE_URL: postgresql://shipkit:shipkit@localhost:5432/shipkit
       - name: Install Playwright Chromium
         run: pnpm --filter @shipkit/web exec playwright install chromium --with-deps
-      - name: E2E smoke (portable-pg preset)
+      - name: E2E smoke + auth (portable-pg)
         run: pnpm test:e2e
         env:
           CI: true

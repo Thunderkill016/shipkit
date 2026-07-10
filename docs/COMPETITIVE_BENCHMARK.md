@@ -31,8 +31,8 @@ Ký hiệu: ✅ solid · ⚠️ partial/demo · ❌ missing · 💰 paid only
 | **Auth email/password** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **OAuth social** | ✅ multi | ✅ | ✅ | ✅ | ⚠️ | ⚠️ BA env-gated + UI |
 | **Teams / multi-tenant** | ⚠️ light | ✅✅ | ✅✅ | ❌ | ⚠️ light | ❌ |
-| **Billing Stripe** | ✅ | ✅ | ✅ multi-pay | ✅ | ✅ | ⚠️ Port only, **noop** |
-| **Email transactional** | ✅ | ✅ | ✅ | ✅ | ⚠️ | ⚠️ Resend adapter, **chưa wire flow** |
+| **Billing Stripe** | ✅ | ✅ | ✅ multi-pay | ✅ | ✅ | ⚠️ Stripe adapter + `/app/billing` (env) |
+| **Email transactional** | ✅ | ✅ | ✅ | ✅ | ⚠️ | ⚠️ Resend/console + **welcome on signup** |
 | **File upload / storage** | ✅ S3 | ✅ | ✅ | ⚠️ | ❌ | ✅ local+S3 (profile) |
 | **Admin dashboard** | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
 | **Blog / CMS** | ✅ | ⚠️ | ⚠️ | ⚠️ | ❌ | ❌ |
@@ -74,7 +74,7 @@ Ký hiệu: ✅ solid · ⚠️ partial/demo · ❌ missing · 💰 paid only
 | supastarter | **4.1** |
 | ShipFast | **3.3** |
 | next saas-starter | **2.9** |
-| **Shipkit (hiện tại)** | **~3.2** |
+| **Shipkit (sau P0 sprint)** | **~3.6** (billing/mail/notes/e2e lên; chưa teams/admin) |
 
 **Đọc điểm:** Shipkit đang **ngang/dưới ShipFast về “đủ để bán SaaS”**, **mạnh hơn starter official** về vibe/security/docs VI, **yếu rõ billing/teams/admin** so với Open SaaS & MakerKit.
 

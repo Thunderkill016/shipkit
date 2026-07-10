@@ -1,6 +1,6 @@
 {
   "name": "shipkit",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Open product kit for vibe coding — idea to landing, auth, app, security, deploy.",
   "license": "MIT",
@@ -15,7 +15,8 @@
     "doctor": "node scripts/doctor.mjs",
     "create": "node scripts/create-shipkit.mjs",
     "db:up": "docker compose up -d postgres",
-    "db:down": "docker compose down"
+    "db:down": "docker compose down",
+    "db:migrate": "node scripts/db-migrate.mjs"
   },
   "engines": {
     "node": ">=20"

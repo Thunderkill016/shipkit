@@ -12,7 +12,8 @@ export function getMailer(): MailPort {
 
   const apiKey = process.env.RESEND_API_KEY;
   if (apiKey) {
-    cachedMailer = createResendMailer(apiKey);
+    const from = process.env.MAIL_FROM ?? "onboarding@resend.dev";
+    cachedMailer = createResendMailer(apiKey, from);
     return cachedMailer;
   }
 

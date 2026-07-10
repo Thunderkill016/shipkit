@@ -71,14 +71,14 @@ export function createNoopPaymentPort(): PaymentPort {
     async createCheckoutSession() {
       throw new Error(
         "[shipkit/payment] No payment adapter configured. " +
-        "Set up Stripe in lib/adapters/stripe/ — see docs/ADAPTER_GUIDE.md."
+          "Set STRIPE_SECRET_KEY (+ STRIPE_PRICE_ID) — see packages/payment and /app/billing."
       );
     },
 
     async createBillingPortalSession() {
       throw new Error(
         "[shipkit/payment] No payment adapter configured. " +
-        "Set up Stripe in lib/adapters/stripe/ — see docs/ADAPTER_GUIDE.md."
+          "Set STRIPE_SECRET_KEY — see packages/payment and /app/billing."
       );
     },
 
@@ -92,3 +92,5 @@ export function createNoopPaymentPort(): PaymentPort {
     },
   };
 }
+
+export { createStripePaymentPort } from "./stripe";

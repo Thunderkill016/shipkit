@@ -22,18 +22,19 @@
 - [x] Unit tests + Playwright demo e2e  
 - [x] Auth rate limit + Upstash factory  
 - [x] CI: test/build + e2e demo + portable-pg service job  
-- [ ] E2E signup→session assert (portable-pg) — **còn**  
-- [ ] Middleware Better Auth verify session (không chỉ cookie name) — **còn**  
+- [x] E2E signup→session assert (portable-pg) — `e2e/auth-portable.spec.ts`  
+- [x] Middleware Better Auth: `getSessionCookie` (edge-safe official)  
 
 ## v0.3 — Product completeness (partial)
 
 - [x] StoragePort + local/S3 adapters (profile upload uses storage)  
-- [x] MailPort + console/Resend (**chưa** gọi trong signup flow)  
+- [x] MailPort + console/Resend + **welcome mail on signup**  
 - [x] Profile page + store (DB + memory fallback)  
 - [x] SEO helpers + JsonLd  
-- [ ] Notes example persist on Postgres (hiện **in-memory**)  
+- [x] Notes persist Postgres + user isolation (memory fallback)  
+- [x] Payment: Stripe adapter + `/app/billing` (env-gated)  
 - [ ] Wire i18n vào UI  
-- [ ] Payment: Stripe adapter (hiện **noop only**)  
+- [ ] `pnpm db:migrate` documented for all presets ✅ script added
 
 ## v1.0 — Best-in-class OSS kit (chưa đạt)
 

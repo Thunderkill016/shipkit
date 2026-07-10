@@ -66,6 +66,22 @@ export async function signUpAction(
     return { error };
   }
 
+  // Welcome email — console or Resend (Open SaaS parity: mail on signup)
+  try {
+    const { getMailer } = await import("@/lib/mail");
+    await getMailer().send({
+      to: parsed.data.email,
+      subject: "Welcome to Shipkit",
+      text: `You're in. Open your app and edit IDEA.md to build your product.\n\n— Shipkit`,
+      html: `<p>You're in.</p><p>Open your app and edit <code>IDEA.md</code> to build your product.</p><p>— Shipkit</p>`,
+    });
+  } catch (e) {
+    logger.warn("Welcome email failed (non-blocking)", {
+      email: parsed.data.email,
+      error: e instanceof Error ? e.message : String(e),
+    });
+  }
+
   logger.info("User signed up", { email: parsed.data.email });
   revalidatePath("/", "layout");
   redirect("/app");

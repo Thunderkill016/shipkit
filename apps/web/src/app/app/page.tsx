@@ -105,7 +105,7 @@ export default async function AppHomePage() {
             <p className="font-medium text-foreground group-hover:text-accent transition-colors">
               Notes example →
             </p>
-            <p className="mt-2 text-muted">CRUD pattern với Zod + server actions (in-memory).</p>
+            <p className="mt-2 text-muted">CRUD + user isolation (Postgres hoặc memory).</p>
           </Link>
           <Link
             href="/app/profile"
@@ -114,7 +114,16 @@ export default async function AppHomePage() {
             <p className="font-medium text-foreground group-hover:text-accent transition-colors">
               Profile →
             </p>
-            <p className="mt-2 text-muted">Chỉnh sửa tên và tải lên avatar. Lưu vào DB hoặc bộ nhớ.</p>
+            <p className="mt-2 text-muted">Tên + avatar (StoragePort).</p>
+          </Link>
+          <Link
+            href="/app/billing"
+            className="rounded-xl border border-border bg-card p-5 text-sm hover:border-accent transition-colors group"
+          >
+            <p className="font-medium text-foreground group-hover:text-accent transition-colors">
+              Billing →
+            </p>
+            <p className="mt-2 text-muted">Stripe khi có env (mốc Open SaaS / ShipFast).</p>
           </Link>
         </div>
 

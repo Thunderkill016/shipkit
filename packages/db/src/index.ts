@@ -1,4 +1,11 @@
-export { profiles, type Profile, type NewProfile } from "./schema";
+export {
+  profiles,
+  notes,
+  type Profile,
+  type NewProfile,
+  type NoteRow,
+  type NewNote,
+} from "./schema";
 
 /**
  * DatabasePort — thin contract for future multi-adapter work.

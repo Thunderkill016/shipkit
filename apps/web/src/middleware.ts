@@ -1,9 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
+import { getSessionCookie } from "better-auth/cookies";
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
  * Route protection.
- * - better-auth: cookie session checked lightly (full check in RSC via AuthPort)
+ * - better-auth: official getSessionCookie (edge-safe); full session in RSC via AuthPort
  * - supabase: getUser() refresh
  * - none: allow /app in demo mode
  */
@@ -29,10 +30,9 @@ export async function middleware(request: NextRequest) {
   }
 
   if (mode === "better-auth") {
-    // Session cookie presence — detailed validation in server components
-    const hasSession =
-      request.cookies.has("better-auth.session_token") ||
-      request.cookies.has("__Secure-better-auth.session_token");
+    // better-auth/cookies — recommended edge-safe check (see Better Auth Next.js docs)
+    const sessionCookie = getSessionCookie(request);
+    const hasSession = Boolean(sessionCookie);
 
     if (request.nextUrl.pathname.startsWith("/app") && !hasSession) {
       const login = new URL("/login", request.url);

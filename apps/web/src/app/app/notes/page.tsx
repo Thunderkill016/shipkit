@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { listNotes } from "@/lib/notes-store";
+import { listNotes, DEMO_USER_ID } from "@/lib/notes-store";
+import { getAuth } from "@/lib/auth";
+import { createDb } from "@/lib/db";
 import { NoteForm } from "./note-form";
 import { deleteNoteAction } from "@/app/actions/notes";
 
@@ -7,14 +9,17 @@ export const metadata = {
   title: "Notes example",
 };
 
-export default function NotesPage() {
-  const notes = listNotes();
+export default async function NotesPage() {
+  const user = await getAuth().getUser();
+  const userId = user?.id ?? DEMO_USER_ID;
+  const notes = await listNotes(userId);
+  const usingDb = Boolean(createDb());
 
   return (
     <div className="mx-auto min-h-screen max-w-2xl px-6 py-10">
       <header className="flex items-center justify-between border-b border-border pb-6">
         <div>
-          <p className="text-xs text-accent">Example domain feature</p>
+          <p className="text-xs text-accent">Domain example (user-isolated)</p>
           <h1 className="text-xl font-semibold">Notes</h1>
         </div>
         <Link href="/app" className="text-sm text-muted hover:text-foreground">
@@ -23,9 +28,12 @@ export default function NotesPage() {
       </header>
 
       <p className="mt-4 text-sm text-muted">
-        Pattern for vibe coding: Zod validation + server actions + UI. Data is{" "}
-        <strong className="text-foreground">in-memory</strong> (resets on server restart). Swap to
-        Postgres via <code className="text-foreground">add-entity</code> skill when ready.
+        Pattern: Zod + server actions +{" "}
+        <strong className="text-foreground">
+          {usingDb ? "Postgres (scoped by user_id)" : "in-memory demo (no DATABASE_URL)"}
+        </strong>
+        . Owner:{" "}
+        <code className="text-foreground">{user?.email ?? userId}</code>
       </p>
 
       <div className="mt-8">
@@ -43,17 +51,16 @@ export default function NotesPage() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="font-medium">{n.title}</p>
-                {n.body && <p className="mt-1 text-sm text-muted whitespace-pre-wrap">{n.body}</p>}
+                {n.body && (
+                  <p className="mt-1 whitespace-pre-wrap text-sm text-muted">{n.body}</p>
+                )}
                 <p className="mt-2 font-mono text-xs text-muted">
                   {new Date(n.createdAt).toLocaleString()}
                 </p>
               </div>
               <form action={deleteNoteAction}>
                 <input type="hidden" name="id" value={n.id} />
-                <button
-                  type="submit"
-                  className="text-xs text-muted hover:text-red-400"
-                >
+                <button type="submit" className="text-xs text-muted hover:text-red-400">
                   Delete
                 </button>
               </form>

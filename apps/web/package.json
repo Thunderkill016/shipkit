@@ -19,6 +19,7 @@
     "@shipkit/i18n": "workspace:*",
     "@shipkit/logger": "workspace:*",
     "@shipkit/mail": "workspace:*",
+    "@shipkit/payment": "workspace:^",
     "@shipkit/security": "workspace:*",
     "@shipkit/storage": "workspace:*",
     "@supabase/ssr": "^0.6.1",
@@ -29,6 +30,7 @@
     "postgres": "^3.4.9",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "stripe": "^22.3.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {
