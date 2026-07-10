@@ -6,8 +6,12 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  # Stable host for cookies + Playwright (P2 e2e harden)
+  PLAYWRIGHT_HOST: 127.0.0.1
+  PORT: "3000"
+
 jobs:
-  # ── Unit tests + build (no external services needed) ────────────────────────
   test-and-build:
     name: Test & Build
     runs-on: ubuntu-latest
@@ -23,8 +27,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
       - run: pnpm build
+      - run: pnpm doctor || true
+      - run: pnpm check:deploy || true
 
-  # ── E2E smoke — demo mode (no auth configured, tests UI only) ───────────────
   e2e-demo:
     name: E2E / demo mode
     runs-on: ubuntu-latest
@@ -41,18 +46,17 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Install Playwright Chromium
         run: pnpm --filter @shipkit/web exec playwright install chromium --with-deps
-      - name: E2E smoke (demo mode)
+      - name: E2E smoke (demo)
         run: pnpm test:e2e
         env:
           CI: true
-          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
 
-  # ── E2E smoke — portable-pg preset (Better Auth + Postgres) ─────────────────
   e2e-portable-pg:
-    name: E2E / portable-pg preset
+    name: E2E / portable-pg
     runs-on: ubuntu-latest
     needs: test-and-build
-    # Only run when DATABASE_URL secret is available (skip on forks)
     if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository }}
     services:
       postgres:
@@ -84,12 +88,13 @@ jobs:
           DATABASE_URL: postgresql://shipkit:shipkit@localhost:5432/shipkit
       - name: Install Playwright Chromium
         run: pnpm --filter @shipkit/web exec playwright install chromium --with-deps
-      - name: E2E smoke + auth (portable-pg)
+      - name: E2E auth + isolation
         run: pnpm test:e2e
         env:
           CI: true
-          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+          BETTER_AUTH_URL: http://127.0.0.1:3000
           DATABASE_URL: postgresql://shipkit:shipkit@localhost:5432/shipkit
           BETTER_AUTH_SECRET: ci-test-secret-at-least-32-characters-long!!
-          BETTER_AUTH_URL: http://localhost:3000
           AUTH_ADAPTER: better-auth

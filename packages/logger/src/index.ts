@@ -1,16 +1,5 @@
 /**
  * @shipkit/logger — structured logging port.
- *
- * Goals:
- * - Zero dependency by default (console fallback).
- * - Swap in Pino, Winston, or Sentry without touching application code.
- * - Structured fields: level, message, context, error.
- *
- * Usage:
- *   import { getLogger } from "@shipkit/logger";
- *   const logger = getLogger("auth");
- *   logger.info("User signed in", { userId });
- *   logger.error("Sign in failed", { email }, error);
  */
 
 export type LogLevel = "debug" | "info" | "warn" | "error";
@@ -26,7 +15,7 @@ export interface LoggerPort {
   error(message: string, context?: LogContext, error?: unknown): void;
 }
 
-/** Structured console logger — colour-coded in dev, JSON-friendly in prod. */
+/** Structured console logger — colour-coded in dev, JSON in prod. */
 export function createConsoleLogger(namespace: string): LoggerPort {
   const isDev = process.env.NODE_ENV !== "production";
 
@@ -36,7 +25,14 @@ export function createConsoleLogger(namespace: string): LoggerPort {
       ns: namespace,
       msg: message,
       ...(context && Object.keys(context).length > 0 ? { ctx: context } : {}),
-      ...(error ? { err: error instanceof Error ? { message: error.message, stack: error.stack } : error } : {}),
+      ...(error
+        ? {
+            err:
+              error instanceof Error
+                ? { message: error.message, stack: error.stack }
+                : error,
+          }
+        : {}),
       ts: new Date().toISOString(),
     };
 
@@ -46,8 +42,12 @@ export function createConsoleLogger(namespace: string): LoggerPort {
       else if (level === "warn") console.warn(prefix, message, context ?? "");
       else console.log(prefix, message, context ?? "");
     } else {
-      // Production: structured JSON for log aggregators (Datadog, Logtail, etc.)
       console.log(JSON.stringify(entry));
+    }
+
+    // Optional Sentry (P2 observability) — fire and forget
+    if (level === "error" && process.env.SENTRY_DSN) {
+      void import("./sentry").then((m) => m.captureSentryError(message, context, error));
     }
   }
 
@@ -61,10 +61,6 @@ export function createConsoleLogger(namespace: string): LoggerPort {
 
 const loggerCache = new Map<string, LoggerPort>();
 
-/**
- * Returns a cached logger for a given namespace.
- * In future: swap `createConsoleLogger` with a Pino adapter here.
- */
 export function getLogger(namespace: string): LoggerPort {
   const cached = loggerCache.get(namespace);
   if (cached) return cached;
@@ -72,3 +68,5 @@ export function getLogger(namespace: string): LoggerPort {
   loggerCache.set(namespace, logger);
   return logger;
 }
+
+export { captureSentryError } from "./sentry";

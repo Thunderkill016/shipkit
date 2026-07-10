@@ -44,7 +44,7 @@ Ký hiệu: ✅ solid · ⚠️ partial/demo · ❌ missing · 💰 paid only
 | **Rate limiting** | ⚠️ | ✅ | ✅ | ⚠️ | ❌ | ✅ memory/Upstash |
 | **E2E tests in CI** | ⚠️ | ✅ | ✅ | ❌ | ⚠️ | ✅ demo + pg job |
 | **Agent DX (AGENTS/skills)** | ✅✅ | ✅ | ⚠️ | ❌ | ❌ | ✅✅ IDEA+skills |
-| **Non-dev / i18n docs** | ⚠️ EN | EN | EN | EN | EN | ✅✅ README VI trái ngành |
+| **Non-dev / i18n docs** | ⚠️ EN | EN | EN | EN | EN | ✅✅ README VI + **UI vi/en switcher** |
 | **Multi UI framework code** | ❌ (Wasp) | ⚠️ variants | ✅✅ | ❌ | ❌ | ❌ (docs only) |
 | **Vibe / IDEA workflow** | ⚠️ | ⚠️ | ⚠️ | ❌ | ❌ | ✅✅ core bet |
 
@@ -74,7 +74,7 @@ Ký hiệu: ✅ solid · ⚠️ partial/demo · ❌ missing · 💰 paid only
 | supastarter | **4.1** |
 | ShipFast | **3.3** |
 | next saas-starter | **2.9** |
-| **Shipkit (sau P1)** | **~3.8** (i18n UI + pricing/FAQ + isolation e2e; chưa teams/admin) |
+| **Shipkit (sau P2)** | **~4.0** (setup/doctor/deploy gates + Sentry optional + e2e harden) |
 
 **Đọc điểm:** Shipkit đang **ngang/dưới ShipFast về “đủ để bán SaaS”**, **mạnh hơn starter official** về vibe/security/docs VI, **yếu rõ billing/teams/admin** so với Open SaaS & MakerKit.
 

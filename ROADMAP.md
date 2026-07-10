@@ -49,10 +49,18 @@ Chỉ claim v1.0 khi đủ DoD trong `docs/DEVELOPMENT_PLAN.md` §7.
 - [ ] Billing honest (Stripe env-gated **hoặc** không claim)  
 - [ ] Docs = code  
 
+## P2 — ShipFast TTP + ops (done this sprint)
+
+- [x] Doctor v3 checklist + score  
+- [x] `pnpm setup -- --preset=...` env wizard  
+- [x] `pnpm check:deploy` production gates  
+- [x] `vercel.json` + deploy button docs  
+- [x] Optional Sentry (DSN + instrumentation + logger)  
+- [x] E2E harden (127.0.0.1, retries, demo vs auth split)  
+
 ## Later
 
 - [ ] App adapter #2 (Nuxt **hoặc** TanStack) — sau kernel ổn  
-- [ ] Sentry default wiring  
 - [ ] npm `create-shipkit` publish  
 
 ## Principles

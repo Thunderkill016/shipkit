@@ -13,6 +13,8 @@
     "test": "pnpm -r test",
     "test:e2e": "pnpm --filter @shipkit/web test:e2e",
     "doctor": "node scripts/doctor.mjs",
+    "setup": "node scripts/setup.mjs",
+    "check:deploy": "node scripts/check-deploy.mjs",
     "create": "node scripts/create-shipkit.mjs",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
