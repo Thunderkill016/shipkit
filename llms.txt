@@ -25,6 +25,7 @@
 - [Roadmap](https://github.com/Thunderkill016/shipkit/blob/main/ROADMAP.md)
 - [Development plan / audit](https://github.com/Thunderkill016/shipkit/blob/main/docs/DEVELOPMENT_PLAN.md)
 - [Competitive benchmark](https://github.com/Thunderkill016/shipkit/blob/main/docs/COMPETITIVE_BENCHMARK.md)
+- [Quickstart (usable)](https://github.com/Thunderkill016/shipkit/blob/main/docs/QUICKSTART.md)
 - Skills: .agents/skills/ship-feature, add-entity, security-pass, vibe-setup
 
 ## Code map

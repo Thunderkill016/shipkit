@@ -38,16 +38,24 @@
 - [x] E2E notes isolation + i18n smoke  
 - [x] `pnpm db:migrate`
 
+## v0.4 — Đủ xài (usable) ✅
+
+Mức **dùng được mỗi ngày** cho vibe product — không claim “best-in-class vs MakerKit”.
+
+- [x] `pnpm ready` one-path  
+- [x] `docs/QUICKSTART.md`  
+- [x] Demo / portable / supabase presets rõ  
+- [x] Auth + notes + profile + billing (optional Stripe)  
+- [x] `/api/health`  
+- [x] Doctor không fail oan ở demo  
+
 ## v1.0 — Best-in-class OSS kit (chưa đạt)
 
-Chỉ claim v1.0 khi đủ DoD trong `docs/DEVELOPMENT_PLAN.md` §7.
+Chỉ claim v1.0 khi đủ DoD trong `docs/DEVELOPMENT_PLAN.md` + benchmark score ≥ 4.2.
 
-- [ ] TTFP đo được &lt; 60 phút (evidence)  
-- [ ] Hai auth path e2e solid  
-- [ ] Domain example có isolation + persist  
-- [ ] Mail dùng trong 1 user flow  
-- [ ] Billing honest (Stripe env-gated **hoặc** không claim)  
-- [ ] Docs = code  
+- [ ] Admin tối thiểu / showcase  
+- [ ] App adapter #2 (optional)  
+- [ ] npm create-shipkit publish  
 
 ## P2 — ShipFast TTP + ops (done this sprint)
 

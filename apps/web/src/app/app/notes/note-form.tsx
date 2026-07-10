@@ -1,15 +1,24 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { createNoteAction, type NoteActionState } from "@/app/actions/notes";
 
 const initial: NoteActionState = { error: null };
 
 export function NoteForm() {
   const [state, action, pending] = useActionState(createNoteAction, initial);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (state.ok && !state.error) formRef.current?.reset();
+  }, [state]);
 
   return (
-    <form action={action} className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
+    <form
+      ref={formRef}
+      action={action}
+      className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4"
+    >
       <label className="text-xs text-muted">
         Title
         <input
@@ -31,9 +40,7 @@ export function NoteForm() {
         />
       </label>
       {state.error && <p className="text-sm text-red-400">{state.error}</p>}
-      {state.ok && !state.error && (
-        <p className="text-sm text-accent">Saved.</p>
-      )}
+      {state.ok && !state.error && <p className="text-sm text-accent">Saved.</p>}
       <button
         type="submit"
         disabled={pending}

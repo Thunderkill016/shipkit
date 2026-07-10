@@ -1,13 +1,15 @@
 {
   "name": "shipkit",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "Open product kit for vibe coding — idea to landing, auth, app, security, deploy.",
   "license": "MIT",
   "packageManager": "pnpm@9.15.0",
   "scripts": {
+    "ready": "node scripts/ready.mjs",
     "dev": "pnpm --filter @shipkit/web dev",
     "build": "pnpm --filter @shipkit/web build",
+    "start": "pnpm --filter @shipkit/web start",
     "lint": "pnpm --filter @shipkit/web lint",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",

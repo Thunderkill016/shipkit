@@ -10,6 +10,23 @@ Từ **ý tưởng → trang giới thiệu + đăng nhập + app + dữ liệu 
 [![License: MIT](https://img.shields.io/badge/License-MIT-7dd3c0.svg)](./LICENSE)
 [![Node >= 20](https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg)](https://nodejs.org)
 
+## ⚡ Đủ xài ngay (copy-paste)
+
+```bash
+git clone https://github.com/Thunderkill016/shipkit.git
+cd shipkit && pnpm install
+
+# A) Chỉ xem UI
+pnpm ready && pnpm dev
+
+# B) Auth + notes thật (cần Docker)
+pnpm ready -- --preset=portable-pg
+pnpm db:up && pnpm db:migrate && pnpm dev
+# → http://localhost:3000/login → đăng ký → /app/notes
+```
+
+Chi tiết ngắn: **[docs/QUICKSTART.md](./docs/QUICKSTART.md)** · Deploy: **[docs/DEPLOY.md](./docs/DEPLOY.md)**
+
 | Language | Jump |
 |----------|------|
 | **Tiếng Việt (hướng dẫn chi tiết, cho người trái ngành)** | [↓ Xuống phần tiếng Việt](#-hướng-dẫn-tiếng-việt--dành-cho-người-trái-ngành) |
@@ -103,122 +120,59 @@ git --version
 
 ## Cách A — Xem giao diện ngay (không cần đăng nhập thật)
 
-Phù hợp khi bạn chỉ muốn **nhìn thử** trang chủ / layout.
-
-### Bước 1: Tải code
-
 ```bash
 git clone https://github.com/Thunderkill016/shipkit.git
 cd shipkit
-```
-
-> Không rành Terminal? Trên GitHub bấm nút xanh **Code → Download ZIP**, giải nén, rồi trong Terminal `cd` vào thư mục vừa giải nén.
-
-### Bước 2: Cài đặt thư viện (vài phút)
-
-```bash
 pnpm install
-```
-
-Đợi tới khi xong, không tắt máy giữa chừng.
-
-### Bước 3: Chạy thử
-
-```bash
+pnpm ready          # tạo .env.local demo nếu chưa có
 pnpm dev
 ```
 
-Thấy dòng kiểu `Ready` / `localhost:3000` thì mở trình duyệt:
-
-**http://localhost:3000**
+Mở **http://localhost:3000**
 
 | Đường dẫn | Ý nghĩa |
 |-----------|---------|
-| `/` | Trang giới thiệu |
-| `/login` | Form đăng nhập (chưa cấu hình backend → có thể báo lỗi khi bấm — bình thường) |
-| `/app` | Khu vực app (demo mode nếu chưa gắn Supabase) |
+| `/` | Trang giới thiệu (VI \| EN) |
+| `/login` | Form đăng nhập |
+| `/app` | Khu vực app (demo nếu chưa gắn auth) |
 
-Dừng server: trong Terminal bấm `Ctrl + C`.
+Dừng server: `Ctrl + C`.
+
+> Không rành Terminal? GitHub → **Code → Download ZIP**, giải nén, `cd` vào thư mục đó.
 
 ---
 
 ## Cách B — Có đăng ký / đăng nhập thật (khuyên dùng)
 
-### Bước 1–2: Giống Cách A (`clone` + `pnpm install`)
-
-### Bước 3: Tạo file cấu hình bí mật
-
-Trong thư mục `shipkit`, chạy:
+### Nhanh nhất (Docker + Better Auth)
 
 ```bash
-cp .env.example apps/web/.env.local
-```
-
-Mở file `apps/web/.env.local` bằng Cursor/VS Code/Notepad.
-
-### Bước 4: Dán thông tin Supabase
-
-Bỏ dấu `#` và điền (ví dụ):
-
-```bash
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-NEXT_PUBLIC_SUPABASE_URL=https://xxxxxxxx.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...dán-key-dài-của-bạn
-```
-
-**Lưu file.**  
-Không đưa file `.env.local` cho người lạ / không up công khai lên mạng (đó là chìa khóa dự án).
-
-### Bước 5: (Nên làm) Tạo bảng hồ sơ trên Supabase
-
-1. Vào Supabase → **SQL Editor** → New query  
-2. Mở file trong máy: `packages/db/sql/0001_init.sql` — copy nội dung, Run  
-3. (Tuỳ chọn bảo mật hơn) chạy thêm `packages/db/sql/0002_supabase_rls.sql`  
-
-### Bước 6: Cấu hình đường quay lại sau đăng nhập
-
-Supabase → **Authentication → URL Configuration**:
-
-- Site URL: `http://localhost:3000`  
-- Redirect URLs: thêm `http://localhost:3000/auth/callback`  
-
-### Bước 7: Kiểm tra cấu hình + chạy
-
-```bash
+pnpm install
+pnpm ready -- --preset=portable-pg
+pnpm db:up && pnpm db:migrate
 pnpm doctor
 pnpm dev
 ```
 
-- `doctor` báo **Ready** → tốt  
-- Mở http://localhost:3000/login → **Create account** / **Sign in**  
-- Vào được `/app` → thành công 🎉  
+→ `/login` tạo tài khoản → `/app/notes`.
 
----
-
-## Cách C — Tự host database (nâng cao hơn một chút)
-
-Dành cho ai có **Docker Desktop** và muốn database chạy trên máy.
+### Hoặc Supabase
 
 ```bash
-pnpm db:up
+pnpm ready -- --preset=supabase-full
 ```
 
-Trong `apps/web/.env.local`:
+Mở `apps/web/.env.local`, dán URL + anon key (thay chỗ `YOUR_PROJECT` / `your-anon-key`).
 
-```bash
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-DATABASE_URL=postgresql://shipkit:shipkit@localhost:5432/shipkit
-BETTER_AUTH_SECRET=mot-chuoi-bi-mat-dai-hon-32-ky-tu-ngau-nhien!!
-BETTER_AUTH_URL=http://localhost:3000
-AUTH_ADAPTER=better-auth
-```
+**Lưu file.** Không share `.env.local` / không commit lên GitHub public.
 
-```bash
-pnpm doctor
-pnpm dev
-```
+### SQL + redirect (Supabase)
 
-Chi tiết: [`presets/portable-pg.md`](./presets/portable-pg.md)
+1. SQL Editor: chạy lần lượt `0001_init.sql`, `0002_supabase_rls.sql`, `0004_notes.sql`, `0005_notes_rls.sql`  
+2. Auth → URL: Site `http://localhost:3000`, Redirect `http://localhost:3000/auth/callback`  
+3. `pnpm doctor && pnpm dev` → `/login` → vào `/app` 🎉  
+
+Chi tiết preset: [`presets/supabase-full.md`](./presets/supabase-full.md) · [`presets/portable-pg.md`](./presets/portable-pg.md)
 
 ---
 
@@ -405,11 +359,12 @@ docs/VIBE.md         ← Cách vibe (EN)
 ```bash
 git clone https://github.com/Thunderkill016/shipkit.git
 cd shipkit && pnpm install
-cp .env.example apps/web/.env.local   # fill for real auth
-pnpm doctor && pnpm dev
+pnpm ready -- --preset=portable-pg   # or: demo | supabase-full
+pnpm db:up && pnpm db:migrate        # portable-pg only
+pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) · edit **`IDEA.md`** · build features under `/app`.
+Full: [docs/QUICKSTART.md](./docs/QUICKSTART.md). Open http://localhost:3000 · edit **`IDEA.md`**.
 
 ---
 

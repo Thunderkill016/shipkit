@@ -49,9 +49,13 @@ export function LoginForm({ labels }: { labels: LoginLabels }) {
   const [signUpState, signUp, signUpPending] = useActionState(signUpAction, initial);
   const [oauthState, oauthSignIn, oauthPending] = useActionState(oauthSignInAction, initial);
 
+  const mode = process.env.NEXT_PUBLIC_SHIPKIT_MODE || "";
   const configured =
-    typeof process.env.NEXT_PUBLIC_SUPABASE_URL === "string" &&
-    process.env.NEXT_PUBLIC_SUPABASE_URL.length > 0;
+    mode === "better-auth" ||
+    mode === "supabase" ||
+    (typeof process.env.NEXT_PUBLIC_SUPABASE_URL === "string" &&
+      process.env.NEXT_PUBLIC_SUPABASE_URL.length > 0 &&
+      !process.env.NEXT_PUBLIC_SUPABASE_URL.includes("YOUR_PROJECT"));
 
   return (
     <>
