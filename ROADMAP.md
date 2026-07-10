@@ -1,7 +1,10 @@
 # Roadmap
 
-> **Nguồn sự thật chi tiết:** [`docs/DEVELOPMENT_PLAN.md`](./docs/DEVELOPMENT_PLAN.md) (audit code).  
-> Dưới đây là trạng thái **trung thực** — không đánh dấu xong nếu chỉ có interface/docs.
+> **Nguồn sự thật:**  
+> - Code audit: [`docs/DEVELOPMENT_PLAN.md`](./docs/DEVELOPMENT_PLAN.md)  
+> - **Mốc thị trường (bắt buộc):** [`docs/COMPETITIVE_BENCHMARK.md`](./docs/COMPETITIVE_BENCHMARK.md)  
+>
+> Ưu tiên theo **gap vs Open SaaS / MakerKit / ShipFast**, không chỉ theo cảm tính.
 
 ## v0.1 — Foundation ✅
 

@@ -3,6 +3,14 @@
 > Tài liệu này bám **code thật** (audit ~2026-07).  
 > `ROADMAP.md` hiện đánh dấu nhiều mục “xong” ở mức **contract/docs**; bảng dưới phân biệt **shipped / partial / missing**.
 
+## ⚠️ Mấu chốt định hướng
+
+**Không chỉ soi trong repo.** Tiêu chuẩn “đang làm tốt chưa?” lấy từ **đối thủ / mốc thị trường**:
+
+→ **[`COMPETITIVE_BENCHMARK.md`](./COMPETITIVE_BENCHMARK.md)** — Open SaaS, MakerKit, ShipFast, supastarter, next saas-starter.
+
+Mọi ưu tiên sprint phải trả lời: *đưa Shipkit gần mốc nào, trên trục nào?*
+
 ---
 
 ## 1. Tóm tắt điều hành
