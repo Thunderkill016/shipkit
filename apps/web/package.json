@@ -16,6 +16,8 @@
     "@shipkit/auth": "workspace:*",
     "@shipkit/config": "workspace:*",
     "@shipkit/db": "workspace:*",
+    "@shipkit/i18n": "workspace:*",
+    "@shipkit/logger": "workspace:*",
     "@shipkit/mail": "workspace:*",
     "@shipkit/security": "workspace:*",
     "@shipkit/storage": "workspace:*",

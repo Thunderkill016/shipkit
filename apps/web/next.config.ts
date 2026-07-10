@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
     "@shipkit/auth",
     "@shipkit/storage",
     "@shipkit/mail",
+    "@shipkit/logger",
+    "@shipkit/i18n",
   ],
   async headers() {
     return [

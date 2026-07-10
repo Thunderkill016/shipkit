@@ -1,0 +1,15 @@
+{
+  "name": "@shipkit/i18n",
+  "version": "0.1.0",
+  "description": "Lightweight i18n port for Shipkit — locale detection and type-safe dictionary",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "vitest": "^4"
+  }
+}

@@ -5,6 +5,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getAuth } from "@/lib/auth";
 import { authRateLimit } from "@/lib/rate-limit";
+import { getLogger } from "@shipkit/logger";
+
+const logger = getLogger("auth/actions");
 
 export type AuthActionState = { error: string | null };
 
@@ -22,13 +25,18 @@ export async function signInAction(
 
   const rl = await authRateLimit.check(`signin:${parsed.data.email}`);
   if (!rl.success) {
+    logger.warn("Rate limit exceeded", { action: "signIn", email: parsed.data.email, remaining: rl.remaining });
     return { error: "Too many sign-in attempts. Try again later." };
   }
 
   const auth = getAuth();
   const { error } = await auth.signInWithPassword(parsed.data.email, parsed.data.password);
-  if (error) return { error };
+  if (error) {
+    logger.info("Sign in failed", { email: parsed.data.email, reason: error });
+    return { error };
+  }
 
+  logger.info("User signed in", { email: parsed.data.email });
   revalidatePath("/", "layout");
   redirect("/app");
 }
@@ -47,13 +55,18 @@ export async function signUpAction(
 
   const rl = await authRateLimit.check(`signup:${parsed.data.email}`);
   if (!rl.success) {
+    logger.warn("Rate limit exceeded", { action: "signUp", email: parsed.data.email, remaining: rl.remaining });
     return { error: "Too many sign-up attempts. Try again later." };
   }
 
   const auth = getAuth();
   const { error } = await auth.signUpWithPassword(parsed.data.email, parsed.data.password);
-  if (error) return { error };
+  if (error) {
+    logger.info("Sign up failed", { email: parsed.data.email, reason: error });
+    return { error };
+  }
 
+  logger.info("User signed up", { email: parsed.data.email });
   revalidatePath("/", "layout");
   redirect("/app");
 }
@@ -61,6 +74,7 @@ export async function signUpAction(
 export async function signOutAction() {
   const auth = getAuth();
   await auth.signOut();
+  logger.info("User signed out");
   revalidatePath("/", "layout");
   redirect("/");
 }

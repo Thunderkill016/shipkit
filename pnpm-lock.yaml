@@ -19,6 +19,12 @@ importers:
       '@shipkit/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@shipkit/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
+      '@shipkit/logger':
+        specifier: workspace:*
+        version: link:../../packages/logger
       '@shipkit/mail':
         specifier: workspace:*
         version: link:../../packages/mail
@@ -122,6 +128,24 @@ importers:
         specifier: ^5.8.3
         version: 5.9.3
 
+  packages/i18n:
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+      vitest:
+        specifier: ^4
+        version: 4.1.10(@types/node@20.19.43)(vite@8.1.4(@types/node@20.19.43)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.0))
+
+  packages/logger:
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+      vitest:
+        specifier: ^4
+        version: 4.1.10(@types/node@20.19.43)(vite@8.1.4(@types/node@20.19.43)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.0))
+
   packages/mail:
     devDependencies:
       typescript:
@@ -130,6 +154,12 @@ importers:
       vitest:
         specifier: ^4.1.10
         version: 4.1.10(@types/node@20.19.43)(vite@8.1.4(@types/node@20.19.43)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.0))
+
+  packages/payment:
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.9.3
 
   packages/security:
     dependencies:

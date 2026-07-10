@@ -1,0 +1,64 @@
+{
+  "auth": {
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "signOut": "Sign out",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "orContinueWith": "Or continue with",
+    "alreadyHaveAccount": "Already have an account?",
+    "noAccount": "Don't have an account?",
+    "errors": {
+      "invalidCredentials": "Invalid email or password.",
+      "emailRequired": "Email is required.",
+      "passwordRequired": "Password is required.",
+      "networkError": "Network error. Please try again."
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "displayName": "Display name",
+    "avatar": "Avatar",
+    "uploadNewImage": "Upload new image",
+    "saveChanges": "Save changes",
+    "saving": "Saving...",
+    "uploading": "Uploading...",
+    "updateSuccess": "Profile updated successfully!",
+    "errors": {
+      "fileTooLarge": "File size exceeds 2MB limit.",
+      "invalidFileType": "Only JPEG, PNG, GIF, or WebP images are allowed.",
+      "uploadFailed": "Upload failed. Please try again."
+    }
+  },
+  "common": {
+    "back": "Back",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "notFound": "Page not found",
+    "goHome": "Go home"
+  },
+  "landing": {
+    "tagline": "Product kit for vibe coding",
+    "hero": "Your idea.",
+    "heroAccent": "Foundation already shipped.",
+    "cta": "Start building",
+    "viewOnGithub": "View on GitHub",
+    "footerMission": "Built so everyone can ship ideas faster"
+  },
+  "notes": {
+    "title": "Notes",
+    "addNote": "Add note",
+    "emptyState": "No notes yet — add one above.",
+    "titlePlaceholder": "Title...",
+    "bodyPlaceholder": "Body (optional)...",
+    "errors": {
+      "titleRequired": "Title is required."
+    }
+  }
+}

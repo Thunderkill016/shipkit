@@ -1,0 +1,13 @@
+{
+  "name": "@shipkit/payment",
+  "version": "0.1.0",
+  "description": "PaymentPort contract for Shipkit — provider-agnostic billing interface",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}

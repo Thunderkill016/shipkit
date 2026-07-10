@@ -1,0 +1,64 @@
+{
+  "auth": {
+    "signIn": "Đăng nhập",
+    "signUp": "Đăng ký",
+    "signOut": "Đăng xuất",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "forgotPassword": "Quên mật khẩu?",
+    "orContinueWith": "Hoặc tiếp tục với",
+    "alreadyHaveAccount": "Đã có tài khoản?",
+    "noAccount": "Chưa có tài khoản?",
+    "errors": {
+      "invalidCredentials": "Email hoặc mật khẩu không đúng.",
+      "emailRequired": "Vui lòng nhập email.",
+      "passwordRequired": "Vui lòng nhập mật khẩu.",
+      "networkError": "Lỗi mạng. Vui lòng thử lại."
+    }
+  },
+  "profile": {
+    "title": "Hồ sơ",
+    "displayName": "Tên hiển thị",
+    "avatar": "Ảnh đại diện",
+    "uploadNewImage": "Tải ảnh mới",
+    "saveChanges": "Lưu thay đổi",
+    "saving": "Đang lưu...",
+    "uploading": "Đang tải lên...",
+    "updateSuccess": "Cập nhật hồ sơ thành công!",
+    "errors": {
+      "fileTooLarge": "Kích thước ảnh tối đa 2MB.",
+      "invalidFileType": "Chỉ cho phép ảnh JPEG, PNG, GIF, WebP.",
+      "uploadFailed": "Tải ảnh thất bại. Vui lòng thử lại."
+    }
+  },
+  "common": {
+    "back": "Quay lại",
+    "cancel": "Huỷ",
+    "confirm": "Xác nhận",
+    "delete": "Xoá",
+    "edit": "Chỉnh sửa",
+    "loading": "Đang tải...",
+    "error": "Có lỗi xảy ra",
+    "retry": "Thử lại",
+    "notFound": "Không tìm thấy trang",
+    "goHome": "Về trang chủ"
+  },
+  "landing": {
+    "tagline": "Product kit cho vibe coding",
+    "hero": "Ý tưởng của bạn.",
+    "heroAccent": "Nền tảng đã ship.",
+    "cta": "Bắt đầu xây dựng",
+    "viewOnGithub": "Xem trên GitHub",
+    "footerMission": "Built so everyone can ship ideas faster"
+  },
+  "notes": {
+    "title": "Ghi chú",
+    "addNote": "Thêm ghi chú",
+    "emptyState": "Chưa có ghi chú — hãy thêm một cái ở trên.",
+    "titlePlaceholder": "Tiêu đề...",
+    "bodyPlaceholder": "Nội dung (tuỳ chọn)...",
+    "errors": {
+      "titleRequired": "Tiêu đề là bắt buộc."
+    }
+  }
+}

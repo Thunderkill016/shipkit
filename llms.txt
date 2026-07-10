@@ -13,6 +13,8 @@
 - [Decisions](https://github.com/Thunderkill016/shipkit/blob/main/DECISIONS.md): locked product choices
 - [Production checklist](https://github.com/Thunderkill016/shipkit/blob/main/PRODUCTION_CHECKLIST.md)
 - [Deployment guide](https://github.com/Thunderkill016/shipkit/blob/main/docs/DEPLOY.md): production Vercel + Docker deployment
+- [Security guide](https://github.com/Thunderkill016/shipkit/blob/main/docs/SECURITY.md): CSRF, headers, secrets, upload
+- [API key rotation](https://github.com/Thunderkill016/shipkit/blob/main/docs/API_KEY_ROTATION.md): rotate secrets safely
 
 ## Presets & research
 
@@ -31,6 +33,9 @@
 - packages/auth — AuthPort
 - packages/mail — MailPort + createConsoleMailer + createResendMailer
 - packages/storage — StoragePort + createLocalStorage + createS3Storage
+- packages/logger — LoggerPort + getLogger (structured logging, Pino/Sentry-ready)
+- packages/i18n — createDictionary + detectLocale (vi/en locale files included)
+- packages/payment — PaymentPort + createNoopPaymentPort (Stripe-ready skeleton)
 
 ## Adapters (in apps/web/src/lib/adapters)
 
