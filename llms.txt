@@ -23,6 +23,7 @@
 - [portable-pg](https://github.com/Thunderkill016/shipkit/blob/main/presets/portable-pg.md) (Better Auth)
 - [Research notes](https://github.com/Thunderkill016/shipkit/blob/main/docs/RESEARCH_NOTES.md)
 - [Roadmap](https://github.com/Thunderkill016/shipkit/blob/main/ROADMAP.md)
+- [Development plan / audit](https://github.com/Thunderkill016/shipkit/blob/main/docs/DEVELOPMENT_PLAN.md)
 - Skills: .agents/skills/ship-feature, add-entity, security-pass, vibe-setup
 
 ## Code map
