@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { deleteProductRecordAction } from "@/app/actions/product-slices";
 import { getAuth } from "@/lib/auth";
-import { createDb } from "@/lib/db";
 import { DEMO_USER_ID } from "@/lib/notes-store";
 import { listProductRecords } from "@/lib/product-records-store";
 import { getProductSlice } from "@/lib/product-slices";
@@ -21,6 +20,7 @@ export default async function ProductSlicePage({
   const owner = user?.id ?? DEMO_USER_ID;
   const records = await listProductRecords(owner, slice.id);
   const deleteAction = deleteProductRecordAction.bind(null, slice.id);
+  const databaseConfigured = Boolean(process.env.DATABASE_URL);
 
   return (
     <div className="mx-auto min-h-screen max-w-3xl px-6 py-10">
@@ -37,7 +37,7 @@ export default async function ProductSlicePage({
 
       <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted">
         <span className="rounded-full border border-border px-2 py-1">
-          {createDb() ? "Postgres" : "explicit demo memory"}
+          {databaseConfigured ? "Postgres" : "explicit demo memory"}
         </span>
         <span className="rounded-full border border-border px-2 py-1">
           owner: {user?.email ?? owner}

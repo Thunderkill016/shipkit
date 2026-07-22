@@ -33,8 +33,9 @@ test.describe("Product Slice Engine demo", () => {
     await page.locator('select[name="priority"]').selectOption("high");
     await page.getByRole("button", { name: "Add feedback" }).click();
 
-    await expect(page.getByText(summary)).toBeVisible();
-    await page.getByRole("button", { name: "Delete" }).first().click();
+    const record = page.locator("li").filter({ hasText: summary });
+    await expect(record).toBeVisible();
+    await record.getByRole("button", { name: "Delete" }).click();
     await expect(page.getByText(summary)).toHaveCount(0);
   });
 });
