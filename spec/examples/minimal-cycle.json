@@ -1,0 +1,67 @@
+{
+  "presVersion": "0.1.0",
+  "cycleId": "example:software:2026-001",
+  "system": {
+    "id": "example-project",
+    "type": "software-product",
+    "version": "0.3.0",
+    "profile": "software-project/0.1"
+  },
+  "status": "verified",
+  "objective": {
+    "statement": "Reduce false completion claims by requiring executed verification evidence.",
+    "stakeholders": ["project owner", "developers", "users"],
+    "outcomeMetrics": ["unsupported completion claims", "verification lead time"],
+    "constraints": ["no production deployment", "no weakening of existing tests"],
+    "budget": "one bounded pull request"
+  },
+  "autonomy": "A3",
+  "riskClass": "R1",
+  "baseline": {
+    "capturedAt": "2026-07-22T10:00:00Z",
+    "artifactRefs": ["docs/project-model.md", "ci/run-100"],
+    "knownFailures": ["documentation can claim checks that did not run"],
+    "blindSpots": ["no production telemetry available"]
+  },
+  "decision": {
+    "candidates": ["manual checklist", "machine-readable verification registry", "no action"],
+    "selected": "machine-readable verification registry",
+    "reasoningRef": "research/verification-registry.md",
+    "researchRefs": ["research/evidence.md"]
+  },
+  "change": {
+    "planRef": "plans/verification-registry.md",
+    "changeRefs": ["commit:abc123", "pull-request:42"],
+    "rollbackRef": "revert commit abc123",
+    "deviations": []
+  },
+  "verification": {
+    "checks": ["valid registry passes", "missing evidence fails", "independent diff review"],
+    "independent": true,
+    "assessorClass": "internal-independent",
+    "result": "pass",
+    "residualRisks": ["file existence does not prove runtime behavior"]
+  },
+  "outcome": {
+    "verdict": "verified",
+    "metricDeltas": ["four invalid-registry cases now fail mechanically"],
+    "regressions": [],
+    "uncertainty": ["future semantic drift remains possible"],
+    "cost": "one implementation cycle"
+  },
+  "learning": {
+    "memoryRefs": ["docs/capabilities.json", "retrospectives/2026-001.md"],
+    "lessons": ["traceability and runtime verification require separate states"],
+    "metaChanges": ["future cycles load a verified capability registry"],
+    "nextQuestions": ["does the registry reduce investigation errors on later tasks?"]
+  },
+  "provenance": {
+    "repository": "https://example.org/example-project",
+    "baseRevision": "base000",
+    "resultRevision": "abc123",
+    "agentSystems": ["example-agent/version-1"],
+    "humanApprovals": ["owner approved A3 scope"],
+    "startedAt": "2026-07-22T10:00:00Z",
+    "completedAt": "2026-07-22T12:00:00Z"
+  }
+}
