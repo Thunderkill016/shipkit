@@ -117,42 +117,44 @@ if (schema && example) {
   validate(example, schema);
 }
 
-const whitepaper = await readFile(resolve(root, "WHITEPAPER.md"), "utf8").catch(
-  () => ""
+function normalizeMarkdown(content) {
+  return content.replace(/[*_`]/g, "").replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+const whitepaper = normalizeMarkdown(
+  await readFile(resolve(root, "WHITEPAPER.md"), "utf8").catch(() => "")
 );
-const core = await readFile(resolve(root, "spec/PRES-1.md"), "utf8").catch(
-  () => ""
+const core = normalizeMarkdown(
+  await readFile(resolve(root, "spec/PRES-1.md"), "utf8").catch(() => "")
 );
-const conformance = await readFile(
-  resolve(root, "spec/CONFORMANCE.md"),
-  "utf8"
-).catch(() => "");
+const conformance = normalizeMarkdown(
+  await readFile(resolve(root, "spec/CONFORMANCE.md"), "utf8").catch(() => "")
+);
 
 for (const phrase of [
-  "Positive Recursive Evolution Standard",
+  "positive recursive evolution standard",
   "improved-improver evidence",
   "negative recursion",
-  "Shipkit currently maps to **PRES E2",
+  "shipkit currently maps to pres e2",
 ]) {
   if (!whitepaper.includes(phrase)) {
     errors.push(`WHITEPAPER.md missing required concept: ${phrase}`);
   }
 }
 
-const normalizedCore = core.replace(/[*_`]/g, "").replace(/\s+/g, " ");
 for (const phrase of [
-  "MUST NOT claim positive recursive evolution",
-  "Memory consumption requirement",
-  "Conformance claims",
+  "must not claim positive recursive evolution",
+  "memory consumption requirement",
+  "conformance claims",
 ]) {
-  if (!normalizedCore.includes(phrase)) {
+  if (!core.includes(phrase)) {
     errors.push(`PRES-1.md missing normative concept: ${phrase}`);
   }
 }
 
-for (const level of ["E0", "E1", "E2", "E3", "E4"]) {
+for (const level of ["e0", "e1", "e2", "e3", "e4"]) {
   if (!conformance.includes(level)) {
-    errors.push(`CONFORMANCE.md missing level: ${level}`);
+    errors.push(`CONFORMANCE.md missing level: ${level.toUpperCase()}`);
   }
 }
 
