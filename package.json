@@ -17,7 +17,7 @@
     "doctor": "node scripts/doctor.mjs",
     "setup": "node scripts/setup.mjs",
     "check:deploy": "node scripts/check-deploy.mjs",
-    "check:ai": "node scripts/check-ai-workflow.mjs",
+    "check:ai": "node scripts/check-ai-workflow.mjs && node scripts/test-create-shipkit.mjs",
     "verify": "pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm check:ai",
     "create": "node scripts/create-shipkit.mjs",
     "db:up": "docker compose up -d postgres",

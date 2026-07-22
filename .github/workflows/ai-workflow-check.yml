@@ -7,8 +7,11 @@ on:
       - "AI_WORKFLOW.md"
       - "docs/ai/**"
       - "prompts/**"
+      - ".agents/**"
       - ".github/**"
       - "scripts/check-ai-workflow.mjs"
+      - "scripts/create-shipkit.mjs"
+      - "scripts/test-create-shipkit.mjs"
       - "package.json"
   workflow_dispatch:
 
@@ -24,3 +27,4 @@ jobs:
         with:
           node-version: 20
       - run: node scripts/check-ai-workflow.mjs
+      - run: node scripts/test-create-shipkit.mjs

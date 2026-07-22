@@ -40,6 +40,8 @@ const required = [
   ".github/ISSUE_TEMPLATE/research.yml",
   ".github/copilot-instructions.md",
   ".github/pull_request_template.md",
+  "scripts/create-shipkit.mjs",
+  "scripts/test-create-shipkit.mjs",
 ];
 
 const missing = [];

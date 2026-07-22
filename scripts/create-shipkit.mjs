@@ -49,6 +49,12 @@ function copyDirSync(src, out) {
   for (const entry of fs.readdirSync(src)) {
     if (skip.has(entry)) continue;
     const from = join(src, entry);
+
+    // `pnpm create -- my-app` is commonly run from the Shipkit root. The
+    // destination then becomes a child of the source repository and must not
+    // be copied into itself recursively.
+    if (resolve(from) === dest) continue;
+
     const to = join(out, entry);
     if (fs.statSync(from).isDirectory()) copyDirSync(from, to);
     else fs.copyFileSync(from, to);
