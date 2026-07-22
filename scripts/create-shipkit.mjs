@@ -17,8 +17,8 @@ if (!name || name.startsWith("-")) {
 Usage:
   pnpm create -- <name>
 
-Copies the Shipkit foundation, AI workflow, and GitHub templates into a new
-folder, then seeds IDEA.md.
+Copies the Shipkit foundation, AI workflow, research system, and GitHub
+templates into a new folder, then seeds IDEA.md and PROJECT_MODEL.md.
 `);
   process.exit(name ? 1 : 0);
 }
@@ -105,11 +105,39 @@ TODO
 ## Notes for agents
 
 Read AGENTS.md and AI_WORKFLOW.md before coding.
-For non-trivial work, start from a GitHub Issue and save a plan under
+Use prompts/00-improve-project.md for an evidence-backed project audit.
+Use prompts/00-discover-opportunity.md before building an uncertain idea.
+For non-trivial delivery, start from a GitHub Issue and save a plan under
 docs/ai/plans/. Implement one verified vertical slice at a time.
 `;
 
+const projectModel = `# Project model — ${name}
+
+Status: not audited  
+Last verified: never  
+Coverage: no repository investigation recorded
+
+This file becomes the compact evidence-backed map of the product and codebase.
+An agent must refresh it using docs/ai/templates/PROJECT_MODEL.md before claiming
+whole-project understanding or starting an open-ended improvement cycle.
+
+## Product
+
+See IDEA.md. Product claims are not yet verified against implementation.
+
+## Repository coverage
+
+No journeys, modules, trust boundaries, tests, deployments, or blind spots have
+been mapped yet.
+
+## Next action
+
+Run prompts/00-improve-project.md at autonomy level A0, A1, or A2 before asking
+an agent to autonomously improve this project.
+`;
+
 fs.writeFileSync(join(dest, "IDEA.md"), idea);
+fs.writeFileSync(join(dest, "docs/ai/PROJECT_MODEL.md"), projectModel);
 
 try {
   const pkgPath = join(dest, "package.json");
@@ -129,15 +157,18 @@ console.log(`
   # 1. Define the product
   # edit IDEA.md
 
-  # 2. Read the working system
-  # open AI_WORKFLOW.md and AGENTS.md
+  # 2. Validate the workflow
   pnpm check:ai
 
-  # 3. Configure and run
+  # 3. Ask AI to model and audit the project before broad changes
+  # use prompts/00-improve-project.md with A0, A1, or A2
+
+  # 4. Configure and run
   cp .env.example apps/web/.env.local
   pnpm doctor
   pnpm dev
 
-Use a GitHub Issue as the task prompt. Run pnpm verify before every PR.
+Use a GitHub Issue as the delivery prompt. Run pnpm verify before every PR.
+Use research evidence, not novelty, before building a breakthrough idea.
 Happy verified shipping.
 `);

@@ -11,11 +11,33 @@ const required = [
   "docs/ai/VERIFICATION.md",
   "docs/ai/SAFETY.md",
   "docs/ai/LEARNING_MODE.md",
+  "docs/ai/AUTONOMOUS_IMPROVEMENT.md",
+  "docs/ai/DISCOVERY_RESEARCH.md",
+  "docs/ai/SOURCES.md",
+  "docs/ai/improvements/README.md",
+  "docs/ai/improvements/INDEX.md",
+  "docs/ai/research/README.md",
+  "docs/ai/research/INDEX.md",
   "docs/ai/templates/IMPLEMENTATION_PLAN.md",
+  "docs/ai/templates/PROJECT_MODEL.md",
+  "docs/ai/templates/PROJECT_HEALTH_REPORT.md",
+  "docs/ai/templates/IMPROVEMENT_PROPOSAL.md",
+  "docs/ai/templates/RESEARCH_BRIEF.md",
+  "docs/ai/templates/EVIDENCE_LEDGER.md",
+  "docs/ai/templates/OPPORTUNITY_BRIEF.md",
+  "docs/ai/templates/EXPERIMENT_CARD.md",
+  "docs/ai/templates/RESEARCH_RETROSPECTIVE.md",
+  "prompts/00-improve-project.md",
+  "prompts/00-discover-opportunity.md",
+  "prompts/00-validate-idea.md",
   "prompts/01-audit.md",
   "prompts/02-plan.md",
   "prompts/03-implement.md",
   "prompts/04-review.md",
+  ".agents/skills/improve-project/SKILL.md",
+  ".agents/skills/discover-opportunity/SKILL.md",
+  ".github/ISSUE_TEMPLATE/improvement.yml",
+  ".github/ISSUE_TEMPLATE/research.yml",
   ".github/copilot-instructions.md",
   ".github/pull_request_template.md",
 ];
@@ -43,7 +65,29 @@ for (const file of activeDocs) {
   if (placeholderPattern.test(content)) unresolved.push(file);
 }
 
-if (missing.length || unresolved.length) {
+const contentChecks = [
+  {
+    file: "docs/ai/AUTONOMOUS_IMPROVEMENT.md",
+    phrases: ["Autonomy levels", "project model", "Stop and escalation conditions"],
+  },
+  {
+    file: "docs/ai/DISCOVERY_RESEARCH.md",
+    phrases: ["evidence ledger", "contradiction", "cheapest useful experiment"],
+  },
+  {
+    file: "AGENTS.md",
+    phrases: ["Default to A2", "Never claim to understand the entire project"],
+  },
+];
+
+const incomplete = [];
+for (const check of contentChecks) {
+  const content = await readFile(check.file, "utf8");
+  const missingPhrases = check.phrases.filter((phrase) => !content.includes(phrase));
+  if (missingPhrases.length) incomplete.push({ file: check.file, missingPhrases });
+}
+
+if (missing.length || unresolved.length || incomplete.length) {
   console.error("AI workflow validation failed.");
 
   if (missing.length) {
@@ -54,6 +98,13 @@ if (missing.length || unresolved.length) {
   if (unresolved.length) {
     console.error("\nUnresolved placeholders in active documents:");
     for (const file of unresolved) console.error(`- ${file}`);
+  }
+
+  if (incomplete.length) {
+    console.error("\nRequired workflow concepts are missing:");
+    for (const item of incomplete) {
+      console.error(`- ${item.file}: ${item.missingPhrases.join(", ")}`);
+    }
   }
 
   process.exit(1);
