@@ -33,7 +33,11 @@ try {
     await readFile(resolve(root, "spec/examples/minimal-cycle.json"), "utf8")
   );
 } catch (error) {
-  errors.push(`PRES JSON could not be parsed: ${error instanceof Error ? error.message : String(error)}`);
+  errors.push(
+    `PRES JSON could not be parsed: ${
+      error instanceof Error ? error.message : String(error)
+    }`
+  );
 }
 
 function typeMatches(value, expected) {
@@ -92,8 +96,6 @@ function validate(value, rule, path = "$") {
     for (const [key, child] of Object.entries(value)) {
       if (rule.properties?.[key]) {
         validate(child, rule.properties[key], `${path}.${key}`);
-      } else if (key === "extensions" && rule.properties?.extensions) {
-        validate(child, rule.properties.extensions, `${path}.${key}`);
       } else if (rule.additionalProperties === false) {
         errors.push(`${path}.${key} is not allowed`);
       }
@@ -115,9 +117,16 @@ if (schema && example) {
   validate(example, schema);
 }
 
-const whitepaper = await readFile(resolve(root, "WHITEPAPER.md"), "utf8").catch(() => "");
-const core = await readFile(resolve(root, "spec/PRES-1.md"), "utf8").catch(() => "");
-const conformance = await readFile(resolve(root, "spec/CONFORMANCE.md"), "utf8").catch(() => "");
+const whitepaper = await readFile(resolve(root, "WHITEPAPER.md"), "utf8").catch(
+  () => ""
+);
+const core = await readFile(resolve(root, "spec/PRES-1.md"), "utf8").catch(
+  () => ""
+);
+const conformance = await readFile(
+  resolve(root, "spec/CONFORMANCE.md"),
+  "utf8"
+).catch(() => "");
 
 for (const phrase of [
   "Positive Recursive Evolution Standard",
@@ -125,15 +134,26 @@ for (const phrase of [
   "negative recursion",
   "Shipkit currently maps to **PRES E2",
 ]) {
-  if (!whitepaper.includes(phrase)) errors.push(`WHITEPAPER.md missing required concept: ${phrase}`);
+  if (!whitepaper.includes(phrase)) {
+    errors.push(`WHITEPAPER.md missing required concept: ${phrase}`);
+  }
 }
 
-for (const phrase of ["MUST NOT claim positive recursive evolution", "Memory consumption requirement", "Conformance claims"]) {
-  if (!core.includes(phrase)) errors.push(`PRES-1.md missing normative concept: ${phrase}`);
+const normalizedCore = core.replace(/[*_`]/g, "").replace(/\s+/g, " ");
+for (const phrase of [
+  "MUST NOT claim positive recursive evolution",
+  "Memory consumption requirement",
+  "Conformance claims",
+]) {
+  if (!normalizedCore.includes(phrase)) {
+    errors.push(`PRES-1.md missing normative concept: ${phrase}`);
+  }
 }
 
 for (const level of ["E0", "E1", "E2", "E3", "E4"]) {
-  if (!conformance.includes(level)) errors.push(`CONFORMANCE.md missing level: ${level}`);
+  if (!conformance.includes(level)) {
+    errors.push(`CONFORMANCE.md missing level: ${level}`);
+  }
 }
 
 if (errors.length) {
@@ -142,4 +162,6 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("PRES specification OK: documents present and example conforms to the committed schema subset.");
+console.log(
+  "PRES specification OK: documents present and example conforms to the committed schema subset."
+);
