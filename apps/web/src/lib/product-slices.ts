@@ -82,6 +82,15 @@ export const ProductSliceDefinitionSchema = z
             message: "Select defaultValue must match an option value",
           });
         }
+      } else if (
+        field.defaultValue !== undefined &&
+        field.defaultValue.length > field.maxLength
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["fields", index, "defaultValue"],
+          message: "defaultValue exceeds maxLength",
+        });
       }
     }
   });
@@ -133,7 +142,10 @@ export function buildProductRecordSchema(
       schema = z
         .string()
         .trim()
-        .refine((value) => allowed.has(value), `${field.label} has an invalid option`);
+        .refine(
+          (value) => (value === "" ? !field.required : allowed.has(value)),
+          `${field.label} has an invalid option`
+        );
     } else {
       schema = z.string().trim().max(field.maxLength, `${field.label} is too long`);
     }

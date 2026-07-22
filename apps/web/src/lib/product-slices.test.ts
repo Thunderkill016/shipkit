@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  ProductSliceDefinitionSchema,
   ProductSliceRegistrySchema,
   buildProductRecordSchema,
   getProductSlice,
@@ -54,5 +55,27 @@ describe("Product Slice definitions", () => {
     expect(
       schema.safeParse({ summary: "", details: "", priority: "urgent" }).success
     ).toBe(false);
+  });
+
+  it("allows an empty optional select but rejects an unknown option", () => {
+    const slice = ProductSliceDefinitionSchema.parse({
+      id: "leads",
+      title: "Lead Inbox",
+      description: "Capture leads before choosing a CRM.",
+      fields: [
+        {
+          id: "source",
+          label: "Source",
+          type: "select",
+          required: false,
+          options: [{ value: "referral", label: "Referral" }],
+        },
+      ],
+    });
+    const schema = buildProductRecordSchema(slice);
+
+    expect(schema.safeParse({ source: "" }).success).toBe(true);
+    expect(schema.safeParse({ source: "referral" }).success).toBe(true);
+    expect(schema.safeParse({ source: "unknown" }).success).toBe(false);
   });
 });

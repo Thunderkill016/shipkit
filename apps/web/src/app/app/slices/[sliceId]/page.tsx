@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { deleteProductRecordAction } from "@/app/actions/product-slices";
-import { getAuth } from "@/lib/auth";
+import { getAuth, getAuthAdapterName } from "@/lib/auth";
 import { DEMO_USER_ID } from "@/lib/notes-store";
 import { listProductRecords } from "@/lib/product-records-store";
 import { getProductSlice } from "@/lib/product-slices";
@@ -17,6 +17,9 @@ export default async function ProductSlicePage({
   if (!slice) notFound();
 
   const user = await getAuth().getUser();
+  const adapter = getAuthAdapterName();
+  if (!user && adapter !== "none") redirect("/login");
+
   const owner = user?.id ?? DEMO_USER_ID;
   const records = await listProductRecords(owner, slice.id);
   const deleteAction = deleteProductRecordAction.bind(null, slice.id);

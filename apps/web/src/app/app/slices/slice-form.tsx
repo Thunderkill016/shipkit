@@ -17,8 +17,8 @@ export function ProductSliceForm({ slice }: { slice: ProductSliceDefinition }) {
   );
 
   useEffect(() => {
-    if (state.ok) formRef.current?.reset();
-  }, [state.ok]);
+    if (state.ok && !state.error) formRef.current?.reset();
+  }, [state]);
 
   return (
     <form ref={formRef} action={action} className="space-y-4 rounded-xl border border-border bg-card p-5">

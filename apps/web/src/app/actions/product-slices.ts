@@ -1,7 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getAuth } from "@/lib/auth";
+import { z } from "zod";
+import { getAuth, getAuthAdapterName } from "@/lib/auth";
 import { DEMO_USER_ID } from "@/lib/notes-store";
 import {
   buildProductRecordSchema,
@@ -18,9 +19,15 @@ export type ProductSliceActionState = {
   ok?: boolean;
 };
 
+const ProductRecordIdSchema = z.string().uuid();
+
 async function ownerId(): Promise<string> {
   const user = await getAuth().getUser();
-  return user?.id ?? DEMO_USER_ID;
+  if (user) return user.id;
+  if (getAuthAdapterName() !== "none") {
+    throw new Error("Authentication required");
+  }
+  return DEMO_USER_ID;
 }
 
 export async function createProductRecordAction(
@@ -57,9 +64,16 @@ export async function deleteProductRecordAction(
   formData: FormData
 ): Promise<void> {
   const slice = getProductSlice(sliceId);
-  const id = String(formData.get("id") ?? "");
-  if (!slice || !id) return;
+  const id = ProductRecordIdSchema.safeParse(String(formData.get("id") ?? ""));
+  if (!slice || !id.success) return;
 
-  await deleteProductRecord(await ownerId(), slice.id, id);
+  let owner: string;
+  try {
+    owner = await ownerId();
+  } catch {
+    return;
+  }
+
+  await deleteProductRecord(owner, slice.id, id.data);
   revalidatePath(`/app/slices/${slice.id}`);
 }
