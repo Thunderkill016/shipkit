@@ -3,66 +3,78 @@
 > Last verified: 2026-07-22  
 > Machine-readable status: [`docs/CAPABILITIES.json`](./docs/CAPABILITIES.json)  
 > Current model: [`docs/ai/PROJECT_MODEL.md`](./docs/ai/PROJECT_MODEL.md)  
-> Ranked backlog: [`docs/ai/improvements/INDEX.md`](./docs/ai/improvements/INDEX.md)
+> Product Slice guide: [`docs/PRODUCT_SLICE_ENGINE.md`](./docs/PRODUCT_SLICE_ENGINE.md)
 
-The roadmap describes direction. It must not be used as proof that a capability
-works; use the registry and current checks for that.
+The roadmap describes direction. Current behavior and verification belong in the
+capability registry and CI.
+
+## Product direction
+
+Shipkit is moving beyond a boilerplate. Its differentiator is the Product Slice
+Engine: a narrow declarative contract becomes a server-validated, owner-scoped
+workflow that runs in demo mode or Postgres without a paid AI dependency.
+
+This is a mechanism for reaching evidence faster, not a promise to replace
+specialized domain code forever.
 
 ## Shipped foundation
 
-- pnpm monorepo with a Next.js App Router application;
-- public landing, login, protected/demo app shell, profile, notes, and billing
-  example surfaces;
+- Next.js application with landing, auth, app shell, profile, notes, and billing;
 - Supabase and Better Auth selection through AuthPort;
 - Postgres schema/migrations and portable-pg setup;
 - security, storage, mail, payment, i18n, and logger packages;
-- Vercel/Docker recipes, setup wizard, doctor, health endpoint, and generator;
-- unit/build checks, demo E2E, portable-pg E2E definitions, and AI workflow
-  validation;
-- repository-first AI delivery, research, independent review, and autonomous
-  improvement system.
-
-“Shipped” means code and repository evidence exist. Environment-specific
-verification is recorded separately in `docs/CAPABILITIES.json`.
+- Vercel/Docker recipes, setup, doctor, health, and project generator;
+- repository-first AI delivery, research, review, and improvement system;
+- Product Slice contracts, shared validation, generic create/list/delete UI,
+  explicit demo storage, owner/slice-scoped Postgres storage, CLI, and tests.
 
 ## Current reliability gate
 
-The portable-pg auth/isolation job failed on the initial PR #1 run and failed
-again on rerun. Issue #3 is the highest-priority repair. Until it passes, the
-portable path is implemented but not reliably verified.
+The feature-specific Product Slice demo and Postgres checks pass. The broader
+Better Auth portable browser job still fails repeatedly and remains issue #3.
+Shipkit must not describe the complete authenticated portable journey as stable
+until that issue passes twice from clean CI environments.
 
-## Near term
+## Next product experiments
 
-1. Diagnose and repair the repeated portable-pg E2E failure.
-2. Stop hiding configured-database failures behind the notes memory fallback.
-3. Keep capability status and evidence machine-verifiable.
-4. Align CI and `pnpm verify`.
-5. Replace the demo root `IDEA.md` with Shipkit’s actual product definition.
-6. Measure time-to-first-product and remove the largest measured delay.
+1. Measure time from `pnpm slice:new` to a completed browser action in a generated
+   project; publish the result rather than repeating an unmeasured speed claim.
+2. Use the included Feedback Inbox to collect evidence about the next required
+   field or workflow behavior.
+3. Add update/status transitions and filters only if the feedback slice proves
+   they reduce real implementation time.
+4. Define a documented promotion path from generic JSONB records to specialized
+   relational schema and routes.
+5. Localize the Product Slice runtime after the English workflow is stable.
+
+## Reliability and trust
+
+6. Diagnose and repair the repeated portable auth E2E failure.
+7. Stop hiding configured-database failures behind the notes memory fallback.
+8. Align CI and `pnpm verify` without weakening checks.
+9. Retain Playwright traces, screenshots, and useful server logs on failure.
 
 ## Before v1.0
 
 - required CI checks reliably pass;
-- capability claims match code and current verification;
-- generated-project workflow remains covered end to end;
-- at least one primary setup path has measured TTFP evidence;
-- one generated project demonstrates a real domain slice without foundation
-  rewrites;
-- production/integration claims clearly distinguish code presence from live
-  verification.
+- a generated project creates a second Product Slice without editing TypeScript;
+- first-slice time is measured for demo and one authenticated database path;
+- capability claims match current code and verification;
+- the JSONB-to-specialized-code promotion path is documented and exercised once;
+- production claims distinguish code presence from live verification.
 
 ## Later, only with evidence
 
+- more field types, relationships, files, automations, and background work;
+- a visual editor or natural-language contract generator;
 - standalone published `create-shipkit`;
-- admin or showcase applications;
-- a second app adapter;
 - team/multi-tenant features;
-- deeper billing and operational integrations.
+- a second app adapter and deeper billing/operations.
 
 ## Principles
 
 1. Outcome and trust over feature count.
-2. One polished path before several partial paths.
+2. One polished mechanism before many field types.
 3. Security and user isolation cannot regress.
-4. Research before uncertain product or technical bets.
-5. Active docs may not claim more than code and verification.
+4. Research and measurement before broadening the abstraction.
+5. Generic code must have an explicit escape hatch to specialized code.

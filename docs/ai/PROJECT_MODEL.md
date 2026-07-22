@@ -2,167 +2,176 @@
 
 Status: verified snapshot  
 Last verified: 2026-07-22  
-Coverage: product intent, repository units, generator, auth, notes, i18n, billing, health, CI, and AI workflow  
+Coverage: product intent, Product Slice Engine, generator, auth, notes, i18n, billing, health, CI, and AI workflow  
 Autonomy level used: A3
 
 This is a compact evidence-backed map. It does not claim production, analytics,
-Supabase-live, OAuth-provider, Resend-delivery, Stripe-webhook, or deploy-runtime
-coverage.
+live third-party delivery, or a healthy Better Auth portable browser path.
 
 ## Product
 
-- Mission: reduce repeated foundation work so AI-assisted builders can reach a
-  verified product slice quickly without replacing auth, security, data, or
-  deploy architecture.
+- Mission: turn a product idea into a verified executable slice quickly while
+  preserving auth, data isolation, security, and deploy boundaries.
+- Differentiator: `product/slices.json` can produce the first class of working
+  owner-scoped product workflows without a paid AI call or hand-built CRUD UI.
 - Current target: builders launching small web products with AI coding agents.
-- Core outcome: a stranger can start from the kit, configure a primary path, and
-  complete a domain action quickly.
-- Current product ambiguity: root `IDEA.md` describes a demo product rather than
-  Shipkit itself; this remains a human product decision.
-- Evidence: `README.md`, `IDEA.md`, `ROADMAP.md`, `ARCHITECTURE.md`.
+- Core outcome: a builder can create or edit a slice contract, run Shipkit, and
+  complete a domain action before writing specialized domain code.
+- Product ambiguity remains in root `IDEA.md`, which still describes a demo
+  product rather than Shipkit itself.
 
 ## Repository structure
 
-| Area | Purpose | Entry points | Boundary | Evidence | Confidence |
-|---|---|---|---|---|---|
-| `apps/web` | Next.js product adapter | routes under `src/app` | vendor integrations through app adapters/facades | `apps/web/package.json` | High |
-| `packages/auth` | AuthPort | package exports | app chooses Supabase or Better Auth | `ARCHITECTURE.md` | Medium |
-| `packages/db` | Drizzle schema and SQL | schemas/migrations | forward migrations | `packages/db` | High |
-| `packages/security` | validation, headers, rate limits | package exports | security must not be weakened | `AGENTS.md` | High |
-| `packages/storage`, `mail`, `payment` | external-service ports | package exports | env-gated adapters | app integration files | Medium |
-| `scripts` | setup, diagnostics, generation, verification | root package scripts | dependency-free control tooling where practical | `package.json` | High |
-| `docs/ai` | durable agent memory | workflow index, plans, research, improvements | active claims require evidence | `AI_WORKFLOW.md` | High |
+| Area | Purpose | Entry points | Boundary | Confidence |
+|---|---|---|---|---|
+| `product` | executable product-slice contracts | `slices.json` | narrow supported field types | High |
+| `apps/web` | Next.js runtime, generic slice UI, server actions | routes under `src/app` | vendor integrations through adapters/facades | High |
+| `packages/db` | Drizzle schema and forward SQL migrations | schema + `sql/` | explicit relational promotion path | High |
+| `packages/auth` | AuthPort | package exports | app selects Supabase or Better Auth | Medium |
+| `packages/security` | validation, headers, rate limits | package exports | controls must not be weakened | High |
+| `packages/storage`, `mail`, `payment` | external-service ports | package exports | env-gated adapters | Medium |
+| `scripts` | setup, generation, diagnostics, slice CLI, verification | root scripts | dependency-light control tooling | High |
+| `docs/ai` | durable project/research/improvement memory | indexes and plans | active claims require evidence | High |
 
 ## Runtime and deployment units
 
 - Primary runtime: Next.js 15 application in `apps/web`.
+- Product Slice Engine: config parser, derived Zod validation, generic routes,
+  explicit demo store, and owner/slice-scoped Postgres store.
 - Supported auth selections: Supabase SSR and Better Auth.
-- Portable data path: PostgreSQL through Drizzle.
-- Demo path: no configured auth/database, with visible demo behavior.
+- Portable data path: PostgreSQL through Drizzle and SQL migrations.
+- Demo path: no configured auth/database, with visibly labeled memory behavior.
 - Deployment recipes: Vercel and Docker.
-- External integrations represented in code: Supabase, Better Auth, Postgres,
-  S3-compatible storage, Resend, Stripe, and optional observability.
 
 ## Critical journey traces
+
+### Create an executable product slice
+
+```text
+pnpm slice:new -- --id=ideas --title="Idea Inbox"
+→ update product/slices.json
+→ registry validation at import/build
+→ generic /app/slices/[sliceId] UI
+→ server-derived Zod record validation
+→ explicit demo memory or product_records Postgres table
+→ owner + slice scoped list/delete
+```
+
+- Evidence: `product/slices.json`, `apps/web/src/lib/product-slices.ts`,
+  `apps/web/src/lib/product-records-store.ts`, slice routes/actions, migration,
+  CLI, unit tests, and E2E.
+- Verification: unit/CLI/build pass; demo browser create/list/delete passes;
+  focused Postgres owner/slice isolation passes on PR #5.
+- Remaining dependency: the full auth-dependent portable browser job is still
+  failing under issue #3.
+- Promotion rule: replace JSONB/generic routes with specialized schema and code
+  when relations, transactions, complex queries, or authorization demand it.
 
 ### Generate a product
 
 ```text
 pnpm create -- name
-→ copy repository foundation
-→ seed IDEA.md and docs/ai/PROJECT_MODEL.md
-→ rewrite package identity
-→ validate generated workflow
+→ copy foundation, AI system, and Product Slice Engine
+→ seed IDEA.md and PROJECT_MODEL.md
+→ rewrite project/capability identity
+→ reset inherited verification to not-run
+→ validate generated workflow and slice CLI
 ```
 
 - Evidence: `scripts/create-shipkit.mjs`, `scripts/test-create-shipkit.mjs`.
-- Verification: AI workflow check run 7 passed.
-- Risk found during workflow development: recursive self-copy when destination is
-  inside the source; fixed and covered by the generator integration test.
+- Verification: generated-project integration check passes.
 
 ### Email/password signup
 
 ```text
-/login → localized LoginForm → signUpAction
-→ Zod validation → rate limit → AuthPort signup
-→ non-blocking MailPort welcome message → /app
+/login → LoginForm → validation + rate limit → AuthPort signup
+→ session cookie → non-blocking welcome mail → /app
 ```
 
-- Evidence: `apps/web/src/app/login/page.tsx`,
-  `apps/web/src/app/login/login-form.tsx`, `apps/web/src/app/actions/auth.ts`.
-- Trust boundary: credentials cross a server action and selected auth adapter.
-- Current signal: the portable-pg E2E failed on PR #1 and failed again when the failed job was rerun; issue #3 tracks diagnosis.
-- Unknown: exact failing test/assertion because the CI run retained no accessible
-  Playwright artifact.
+- Evidence: login UI and `apps/web/src/app/actions/auth.ts`.
+- Current signal: portable browser E2E remains failing; issue #3 owns diagnosis.
 
 ### Notes
 
 ```text
 /app/notes → user identity → validated action
-→ notes store → Postgres when available, memory fallback otherwise
+→ Postgres when available, broad memory fallback otherwise
 → user-scoped list/write/delete
 ```
 
-- Evidence: `apps/web/src/lib/notes-store.ts`,
-  `apps/web/e2e/notes-isolation.spec.ts`.
-- Authorization: every query/mutation includes user ID.
-- Reliability risk: all database errors are caught and silently fall back to
-  memory, including errors other than an intentionally absent demo database.
+- Reliability risk: configured database errors can still be silently hidden by
+  the notes fallback. The Product Slice Engine intentionally does not copy this
+  behavior.
 
-### Localization
+### Localization and billing
 
-```text
-request locale → getI18n → translated strings → LocaleSwitcher
-```
-
-- Evidence: landing, login, and app-shell pages.
-- Verification: demo-mode E2E passed in PR #1 CI run 22.
-
-### Billing
-
-```text
-/app/billing → current user → PaymentPort
-→ Stripe adapter when configured, noop/free state otherwise
-```
-
-- Evidence: `apps/web/src/app/app/billing/page.tsx`, payment facade/package.
-- Blind spot: webhook lifecycle and live Stripe environment are not verified.
+- Landing, login, and app shell use VI/EN dictionaries and locale switching.
+- Billing is env-gated through the payment facade; live Stripe lifecycle remains
+  unverified.
+- Product Slice pages are currently English-only.
 
 ## Data and trust boundaries
 
-| Data or secret | Source | Storage/use | Readers/writers | Guard | Risk |
-|---|---|---|---|---|---|
-| email/password | login forms | auth provider/database | server actions + auth adapter | Zod + rate limit | High |
-| session cookie | auth adapter | browser/server | middleware/server components | provider behavior | High |
-| profiles/notes | authenticated user | Postgres or explicit demo memory | owner-scoped app flows | user ID filters | High |
-| service credentials | environment | adapter initialization | server only | `.env` policy | High |
-| billing state | Stripe/noop adapter | external/local response | authenticated user | env gate | High |
+| Data | Storage/use | Readers/writers | Guard | Risk |
+|---|---|---|---|---|
+| credentials/session | auth provider and cookies | auth actions/middleware | validation, rate limit, provider | High |
+| Product Slice definitions | versioned JSON | build/runtime parser and CLI | strict registry schema | Medium |
+| Product Slice records | JSONB Postgres or explicit demo memory | current owner and selected slice | server validation + owner/slice filters | High |
+| profiles/notes | Postgres or demo memory | owner-scoped flows | user ID filters | High |
+| service credentials | environment | server adapters | env policy | High |
+| billing state | Stripe/noop facade | authenticated user | env gate | High |
 
 ## Build, test, release, rollback
 
 | Capability | Command/workflow | Current result | Gap |
 |---|---|---|---|
-| Install | `pnpm install --frozen-lockfile` | Pass in CI run 22 | none observed |
-| Unit tests | `pnpm test` | Pass in CI run 22 | no repository coverage threshold |
-| Build | `pnpm build` | Pass in CI run 22 | none observed |
-| Demo E2E | CI `E2E / demo mode` | Pass | limited to demo journey |
-| Portable E2E | CI `E2E / portable-pg` | Failed on initial run and failed-job rerun | Failure detail/artifact not retained; issue #3 |
-| AI workflow | `pnpm check:ai` / dedicated Action | Pass before this dogfood change | capability truth not yet checked mechanically |
-| Deploy | docs + `check:deploy` | configuration check only | no production deployment inspected |
-| Rollback | Git/PR + deployment-specific procedures | not exercised | environment-specific |
+| Unit and contract checks | `pnpm test` | Pass on PR #5 | no coverage threshold |
+| Slice CLI | `pnpm test:slices` | Pass | only starter contract shape covered |
+| Build | `pnpm build` | Pass | none observed |
+| Demo slice E2E | `E2E / demo mode` | Pass | memory is process-local by design |
+| Slice Postgres isolation | `Product Slice / portable-pg` | Pass | not a browser/session test |
+| Full portable browser E2E | `E2E / portable-pg` | Failing | issue #3; failure artifacts still weak |
+| Generated project | AI workflow Action | Pass | no published package path yet |
+| Deploy | docs + `check:deploy` | configuration check only | production not inspected |
 
 ## Architecture decisions and constraints
 
-- Product code should remain in `apps/web`; foundation ports live in packages.
-- Vendor-specific calls remain behind adapters/facades.
-- Security, auth, data, billing, production, and destructive actions require
+- Product Slice Engine is a validation accelerator, not an arbitrary no-code
+  platform.
+- Supported field types remain intentionally narrow: text, textarea, select.
+- Configured database failures must surface; only absent database config enables
+  memory mode.
+- Generic records remain scoped by both owner ID and slice ID.
+- Deployed migrations remain append-only.
+- Security, auth, billing, production, destructive data, merge, and deploy need
   explicit gates.
-- Agents must implement one bounded issue and open a draft PR rather than merge.
-- Repository knowledge should be structured, linked, and mechanically checked.
+- Agents deliver one bounded issue in a draft PR and update durable memory.
 
 ## Known hotspots
 
-| Area | Signal | Impact | Evidence | Confidence |
-|---|---|---|---|---|
-| Documentation truth | roadmap and development plan disagree about completed capabilities | agents can plan obsolete work | active docs vs current code | High |
-| Notes DB fallback | broad catches fall through to memory | configured persistence failures can be hidden | `notes-store.ts` | High |
-| Portable E2E reliability | initial run and failed-job rerun failed | merge signal and auth confidence are weakened | GitHub Actions run 22 / issue #3 | High |
-| Product definition | root `IDEA.md` still defines a demo shell | research may optimize the wrong product | `IDEA.md` | High |
-| Completion gate | main CI runs test/build but not root `pnpm verify` | local and remote gates can drift | workflow/package scripts | High |
-| TTFP claim | no recent measured artifact | north-star claim is not proven | docs only | Medium |
+| Area | Signal | Impact | Confidence |
+|---|---|---|---|
+| Portable auth E2E | repeated failure | blocks full authenticated journey confidence | High |
+| Notes DB fallback | broad catches use memory | can hide persistence failure | High |
+| Product Slice JSONB | flexible generic payload | relational/query complexity can outgrow it | High |
+| Product Slice i18n | pages use English copy | inconsistent VI/EN experience | High |
+| TTFP | no measured first-slice benchmark | breakthrough speed claim is not quantified | High |
+| Product definition | root `IDEA.md` remains demo-oriented | discovery can target the wrong product | High |
 
 ## Blind spots
 
-- No production, analytics, support, customer interview, or cost data.
-- No live Supabase, OAuth, Resend, S3, Stripe, or deployment verification.
-- Not every package implementation was read symbol by symbol.
-- Exact portable-pg E2E failure is unknown until issue #3 retains artifacts.
-- Dependency advisories and licenses were not audited in this cycle.
+- No production usage, analytics, support, interview, conversion, or cost data.
+- No live Supabase, OAuth, Resend, S3, Stripe, or deploy verification.
+- No measurement yet for config/CLI-to-working-slice time.
+- No evidence yet for relationships, update flows, filters, files, or background
+  work in the generic engine.
+- Full authenticated browser isolation remains blocked by issue #3.
 
 ## Freshness log
 
 | Section | Last checked | Next refresh trigger |
 |---|---|---|
+| Product Slice Engine | 2026-07-22 | every contract/runtime or verification change |
 | Product/repository map | 2026-07-22 | product definition or package boundary changes |
 | Auth/notes journeys | 2026-07-22 | issue #3 or data-store changes |
 | Capability status | 2026-07-22 | every capability-affecting PR |

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "project": "shipkit",
   "lastVerified": "2026-07-22",
-  "verificationScope": "Repository evidence paths and CI state on pull request #1; production usage and analytics are not available.",
+  "verificationScope": "Repository evidence and pull request #5 checks; production usage, analytics, live third-party services, and the unresolved Better Auth portable E2E path are outside the verified scope.",
   "capabilities": [
     {
       "id": "public-landing",
@@ -10,12 +10,8 @@
       "status": "implemented",
       "verificationStatus": "passing",
       "summary": "Localized public landing page with JSON-LD, navigation, and app entry points.",
-      "evidence": [
-        "apps/web/src/app/page.tsx"
-      ],
-      "checks": [
-        "CI: E2E / demo mode"
-      ]
+      "evidence": ["apps/web/src/app/page.tsx"],
+      "checks": ["CI: E2E / demo mode"]
     },
     {
       "id": "email-password-auth",
@@ -29,9 +25,7 @@
         "apps/web/src/app/actions/auth.ts",
         "apps/web/e2e/auth-portable.spec.ts"
       ],
-      "checks": [
-        "CI: E2E / portable-pg failed on initial run and failed-job rerun (issue #3)"
-      ]
+      "checks": ["CI: E2E / portable-pg remains failing; issue #3 owns diagnosis"]
     },
     {
       "id": "oauth-auth",
@@ -43,22 +37,43 @@
         "apps/web/src/app/login/login-form.tsx",
         "apps/web/src/app/actions/auth.ts"
       ],
-      "checks": [
-        "Manual provider configuration required"
-      ]
+      "checks": ["Manual provider configuration required"]
     },
     {
       "id": "protected-app-shell",
       "category": "product",
       "status": "implemented",
       "verificationStatus": "unstable",
-      "summary": "Protected app shell exposes session, profile, notes, billing, locale switching, and demo mode.",
-      "evidence": [
-        "apps/web/src/app/app/page.tsx"
-      ],
+      "summary": "Protected app shell exposes sessions, Product Slices, profile, notes, billing, locale switching, and demo mode.",
+      "evidence": ["apps/web/src/app/app/page.tsx"],
       "checks": [
         "CI: E2E / demo mode passes",
-        "CI: E2E / portable-pg fails repeatedly (issue #3)"
+        "CI: E2E / portable-pg remains failing under issue #3"
+      ]
+    },
+    {
+      "id": "product-slice-engine",
+      "category": "product",
+      "status": "implemented",
+      "verificationStatus": "unstable",
+      "summary": "Declarative contracts produce server-validated create, list, and delete workflows with explicit demo storage and owner-scoped Postgres records.",
+      "evidence": [
+        "product/slices.json",
+        "apps/web/src/lib/product-slices.ts",
+        "apps/web/src/lib/product-records-store.ts",
+        "apps/web/src/app/app/slices/page.tsx",
+        "apps/web/src/app/app/slices/[sliceId]/page.tsx",
+        "apps/web/src/app/actions/product-slices.ts",
+        "packages/db/sql/0005_product_records.sql",
+        "scripts/create-product-slice.mjs",
+        "apps/web/e2e/product-slices.spec.ts",
+        "docs/PRODUCT_SLICE_ENGINE.md"
+      ],
+      "checks": [
+        "CI: definition, record, memory isolation, CLI, and production build checks pass",
+        "CI: demo browser create/list/delete passes",
+        "CI: Product Slice / portable-pg owner and slice isolation passes",
+        "Full auth-dependent portable browser path remains blocked by issue #3"
       ]
     },
     {
@@ -71,9 +86,7 @@
         "apps/web/src/lib/notes-store.ts",
         "apps/web/e2e/notes-isolation.spec.ts"
       ],
-      "checks": [
-        "CI: E2E / portable-pg failed on initial run and failed-job rerun (issue #3)"
-      ]
+      "checks": ["CI: E2E / portable-pg remains failing under issue #3"]
     },
     {
       "id": "localization",
@@ -86,9 +99,7 @@
         "apps/web/src/app/login/page.tsx",
         "apps/web/src/app/app/page.tsx"
       ],
-      "checks": [
-        "CI: E2E / demo mode"
-      ]
+      "checks": ["CI: E2E / demo mode"]
     },
     {
       "id": "welcome-email",
@@ -96,12 +107,8 @@
       "status": "implemented",
       "verificationStatus": "not-run",
       "summary": "Successful sign-up sends a non-blocking welcome email through the configured MailPort.",
-      "evidence": [
-        "apps/web/src/app/actions/auth.ts"
-      ],
-      "checks": [
-        "Unit or integration delivery assertion not yet recorded"
-      ]
+      "evidence": ["apps/web/src/app/actions/auth.ts"],
+      "checks": ["Unit or integration delivery assertion not yet recorded"]
     },
     {
       "id": "billing",
@@ -113,9 +120,7 @@
         "apps/web/src/app/app/billing/page.tsx",
         "apps/web/package.json"
       ],
-      "checks": [
-        "Manual Stripe configuration required"
-      ]
+      "checks": ["Manual Stripe configuration required"]
     },
     {
       "id": "health-endpoint",
@@ -123,26 +128,22 @@
       "status": "implemented",
       "verificationStatus": "passing",
       "summary": "A lightweight health endpoint reports service state and selected auth adapter.",
-      "evidence": [
-        "apps/web/src/app/api/health/route.ts"
-      ],
-      "checks": [
-        "Production build passes"
-      ]
+      "evidence": ["apps/web/src/app/api/health/route.ts"],
+      "checks": ["Production build passes"]
     },
     {
       "id": "project-generator",
       "category": "dx",
       "status": "implemented",
       "verificationStatus": "passing",
-      "summary": "The generator copies the foundation and AI workflow, seeds product/project-model files, and avoids recursive self-copy.",
+      "summary": "The generator copies the foundation, AI workflow, and Product Slice Engine, rewrites identity, and avoids recursive self-copy.",
       "evidence": [
         "scripts/create-shipkit.mjs",
-        "scripts/test-create-shipkit.mjs"
+        "scripts/test-create-shipkit.mjs",
+        "product/slices.json",
+        "scripts/create-product-slice.mjs"
       ],
-      "checks": [
-        "AI workflow check: generator integration test"
-      ]
+      "checks": ["AI workflow check: generated-project integration test"]
     },
     {
       "id": "ai-engineering-workflow",
@@ -158,9 +159,7 @@
         "scripts/check-ai-workflow.mjs",
         ".github/workflows/ai-workflow-check.yml"
       ],
-      "checks": [
-        "AI workflow check"
-      ]
+      "checks": ["AI workflow check"]
     }
   ]
 }
