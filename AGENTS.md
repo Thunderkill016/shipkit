@@ -8,10 +8,12 @@ smallest verifiable change that satisfies the current task.
 Read only the context needed for the task:
 
 1. `IDEA.md` — product scope and MVP.
-2. `AI_WORKFLOW.md` — delivery, discovery, and improvement loops.
-3. `ARCHITECTURE.md` — when changing boundaries, data flow, or packages.
-4. The active plan in `docs/ai/plans/`, when one exists.
-5. The nearest path-specific instruction under `.github/instructions/`.
+2. `docs/ai/PROJECT_MODEL.md` — current evidence-backed map, coverage, and blind spots.
+3. `docs/CAPABILITIES.json` — current capability and verification state.
+4. `AI_WORKFLOW.md` — delivery, discovery, and improvement loops.
+5. `ARCHITECTURE.md` — when changing boundaries, data flow, or packages.
+6. The active plan in `docs/ai/plans/`, when one exists.
+7. The nearest path-specific instruction under `.github/instructions/`.
 
 For open-ended requests such as “understand and improve this project,” read
 `docs/ai/AUTONOMOUS_IMPROVEMENT.md`. For uncertain ideas, market research, or
@@ -42,7 +44,8 @@ Use a fresh agent session for independent review when practical.
 Do not immediately clean up or rewrite the repository.
 
 1. Declare the objective and autonomy level. Default to A2: research and plan.
-2. Build or refresh an evidence-backed project model.
+2. Read and refresh `docs/ai/PROJECT_MODEL.md`; read
+   `docs/CAPABILITIES.json` before ranking work.
 3. Validate the baseline and trace critical journeys.
 4. Create a health report and rank improvement candidates.
 5. Select one bounded candidate.

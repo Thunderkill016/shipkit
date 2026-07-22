@@ -37,7 +37,9 @@ improve it.”
 ```text
 Set objective and autonomy level
       ↓
-Build an evidence-backed project model
+Read current project model and capability state
+      ↓
+Refresh an evidence-backed project model
       ↓
 Validate baseline and trace critical journeys
       ↓
@@ -52,8 +54,9 @@ Plan → implement if permitted → verify → draft PR
 Measure outcome and update project memory
 ```
 
-Read `docs/ai/AUTONOMOUS_IMPROVEMENT.md`. Default to research and planning
-(A2), not broad implementation, when autonomy is not explicit.
+Read `docs/ai/PROJECT_MODEL.md`, `docs/CAPABILITIES.json`, and
+`docs/ai/AUTONOMOUS_IMPROVEMENT.md`. Default to research and planning (A2), not
+broad implementation, when autonomy is not explicit.
 
 ## Discovery loop
 
@@ -88,6 +91,8 @@ product code.
 | Need | Source |
 |---|---|
 | Product goal | `IDEA.md` |
+| Current project map, coverage, and blind spots | `docs/ai/PROJECT_MODEL.md` |
+| Current capability and verification state | `docs/CAPABILITIES.json` |
 | Agent rules | `AGENTS.md` |
 | Architecture | `ARCHITECTURE.md` |
 | Open-ended project improvement | `docs/ai/AUTONOMOUS_IMPROVEMENT.md` |
