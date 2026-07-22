@@ -17,7 +17,8 @@ if (!name || name.startsWith("-")) {
 Usage:
   pnpm create -- <name>
 
-Copies the Shipkit foundation into a new folder and seeds IDEA.md.
+Copies the Shipkit foundation, AI workflow, and GitHub templates into a new
+folder, then seeds IDEA.md.
 `);
   process.exit(name ? 1 : 0);
 }
@@ -103,7 +104,9 @@ TODO
 
 ## Notes for agents
 
-Read AGENTS.md. Implement vertical slices under apps/web/src/app/app/.
+Read AGENTS.md and AI_WORKFLOW.md before coding.
+For non-trivial work, start from a GitHub Issue and save a plan under
+docs/ai/plans/. Implement one verified vertical slice at a time.
 `;
 
 fs.writeFileSync(join(dest, "IDEA.md"), idea);
@@ -122,10 +125,19 @@ console.log(`
 
   cd ${name}
   pnpm install
+
+  # 1. Define the product
   # edit IDEA.md
+
+  # 2. Read the working system
+  # open AI_WORKFLOW.md and AGENTS.md
+  pnpm check:ai
+
+  # 3. Configure and run
   cp .env.example apps/web/.env.local
   pnpm doctor
   pnpm dev
 
-Happy vibe shipping.
+Use a GitHub Issue as the task prompt. Run pnpm verify before every PR.
+Happy verified shipping.
 `);
