@@ -5,6 +5,8 @@ on:
     paths:
       - "AGENTS.md"
       - "AI_WORKFLOW.md"
+      - "WHITEPAPER.md"
+      - "spec/**"
       - "docs/CAPABILITIES.json"
       - "docs/ai/**"
       - "prompts/**"
@@ -12,6 +14,7 @@ on:
       - ".github/**"
       - "scripts/check-ai-workflow.mjs"
       - "scripts/check-capabilities.mjs"
+      - "scripts/check-pres-spec.mjs"
       - "scripts/test-capabilities.mjs"
       - "scripts/create-shipkit.mjs"
       - "scripts/test-create-shipkit.mjs"
@@ -30,5 +33,6 @@ jobs:
         with:
           node-version: 20
       - run: node scripts/check-ai-workflow.mjs
+      - run: node scripts/check-pres-spec.mjs
       - run: node scripts/test-capabilities.mjs
       - run: node scripts/test-create-shipkit.mjs
