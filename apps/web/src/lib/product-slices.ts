@@ -108,6 +108,7 @@ export const ProductSliceRegistrySchema = z
 export type ProductSliceField = z.infer<typeof ProductSliceFieldSchema>;
 export type ProductSliceDefinition = z.infer<typeof ProductSliceDefinitionSchema>;
 export type ProductSliceRegistry = z.infer<typeof ProductSliceRegistrySchema>;
+export type ProductRecordData = Record<string, string>;
 
 export const productSliceRegistry = ProductSliceRegistrySchema.parse(rawRegistry);
 
@@ -119,7 +120,9 @@ export function getProductSlice(id: string): ProductSliceDefinition | null {
   return productSliceRegistry.slices.find((slice) => slice.id === id) ?? null;
 }
 
-export function buildProductRecordSchema(slice: ProductSliceDefinition) {
+export function buildProductRecordSchema(
+  slice: ProductSliceDefinition
+): z.ZodType<ProductRecordData> {
   const shape: Record<string, z.ZodTypeAny> = {};
 
   for (const field of slice.fields) {
@@ -136,21 +139,24 @@ export function buildProductRecordSchema(slice: ProductSliceDefinition) {
     }
 
     if (field.required) {
-      schema = schema.refine((value) => value.length > 0, `${field.label} is required`);
+      schema = schema.refine(
+        (value) => typeof value === "string" && value.length > 0,
+        `${field.label} is required`
+      );
     } else {
-      schema = schema.optional().transform((value) => value ?? "");
+      schema = schema.optional().transform((value) => String(value ?? ""));
     }
 
     shape[field.id] = schema;
   }
 
-  return z.object(shape).strict();
+  return z.object(shape).strict() as z.ZodType<ProductRecordData>;
 }
 
 export function readProductRecordInput(
   slice: ProductSliceDefinition,
   formData: FormData
-): Record<string, string> {
+): ProductRecordData {
   return Object.fromEntries(
     slice.fields.map((field) => [
       field.id,
