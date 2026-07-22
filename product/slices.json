@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "slices": [
+    {
+      "id": "feedback",
+      "title": "Feedback Inbox",
+      "description": "Capture, review, and prioritize product feedback without building a custom CRUD screen first.",
+      "submitLabel": "Add feedback",
+      "emptyState": "No feedback yet — add the first signal above.",
+      "fields": [
+        {
+          "id": "summary",
+          "label": "Summary",
+          "type": "text",
+          "required": true,
+          "maxLength": 120,
+          "placeholder": "What did the user need?"
+        },
+        {
+          "id": "details",
+          "label": "Details",
+          "type": "textarea",
+          "required": false,
+          "maxLength": 2000,
+          "placeholder": "Context, evidence, and exact wording"
+        },
+        {
+          "id": "priority",
+          "label": "Priority",
+          "type": "select",
+          "required": true,
+          "defaultValue": "medium",
+          "options": [
+            { "value": "low", "label": "Low" },
+            { "value": "medium", "label": "Medium" },
+            { "value": "high", "label": "High" }
+          ]
+        }
+      ]
+    }
+  ]
+}

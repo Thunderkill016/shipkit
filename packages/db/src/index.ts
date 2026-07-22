@@ -1,10 +1,13 @@
 export {
   profiles,
   notes,
+  productRecords,
   type Profile,
   type NewProfile,
   type NoteRow,
   type NewNote,
+  type ProductRecordRow,
+  type NewProductRecord,
 } from "./schema";
 
 /**

@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 /**
  * Canonical profile row — maps to Supabase `profiles` or plain Postgres.
@@ -26,7 +26,23 @@ export const notes = pgTable("notes", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+/**
+ * Product Slice Engine records. A slice definition owns validation and rendering;
+ * rows remain isolated by user_id + slice_id. JSON keeps the first product slice
+ * cheap and reversible while product evidence is still emerging.
+ */
+export const productRecords = pgTable("product_records", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("user_id").notNull(),
+  sliceId: text("slice_id").notNull(),
+  data: jsonb("data").$type<Record<string, string>>().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 export type Profile = typeof profiles.$inferSelect;
 export type NewProfile = typeof profiles.$inferInsert;
 export type NoteRow = typeof notes.$inferSelect;
 export type NewNote = typeof notes.$inferInsert;
+export type ProductRecordRow = typeof productRecords.$inferSelect;
+export type NewProductRecord = typeof productRecords.$inferInsert;
