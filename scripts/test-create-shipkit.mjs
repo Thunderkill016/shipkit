@@ -30,7 +30,12 @@ try {
   const required = [
     "AGENTS.md",
     "AI_WORKFLOW.md",
+    "WHITEPAPER.md",
     "IDEA.md",
+    "spec/PRES-1.md",
+    "spec/CONFORMANCE.md",
+    "spec/schema/pres-cycle.schema.json",
+    "spec/examples/minimal-cycle.json",
     "docs/CAPABILITIES.json",
     "docs/ai/PROJECT_MODEL.md",
     "docs/ai/AUTONOMOUS_IMPROVEMENT.md",
@@ -39,6 +44,7 @@ try {
     ".agents/skills/improve-project/SKILL.md",
     ".github/ISSUE_TEMPLATE/improvement.yml",
     "scripts/check-capabilities.mjs",
+    "scripts/check-pres-spec.mjs",
   ];
 
   for (const file of required) await access(join(generated, file));
@@ -68,9 +74,10 @@ try {
   }
 
   run(process.execPath, [join(generated, "scripts/check-ai-workflow.mjs")], generated);
+  run(process.execPath, [join(generated, "scripts/check-pres-spec.mjs")], generated);
 
   console.log(
-    "Shipkit generator OK: workflow, capability registry, and project model copied correctly."
+    "Shipkit generator OK: workflow, PRES standard, capability registry, and project model copied correctly."
   );
 } finally {
   await rm(sandbox, { recursive: true, force: true });
