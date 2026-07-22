@@ -4,10 +4,9 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, agent/ai-engineering-workflow]
 
 env:
-  # Stable host for cookies + Playwright (P2 e2e harden)
   PLAYWRIGHT_HOST: 127.0.0.1
   PORT: "3000"
 
@@ -26,6 +25,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
+      - run: pnpm test:slices
       - run: pnpm build
       - run: pnpm doctor || true
       - run: pnpm check:deploy || true

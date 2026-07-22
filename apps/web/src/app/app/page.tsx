@@ -73,21 +73,24 @@ export default async function AppHomePage() {
         </div>
 
         <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted">
-          <p className="font-medium text-foreground">{t("app.vibeNext")}</p>
+          <p className="font-medium text-foreground">From idea to executable slice</p>
           <ol className="mt-3 list-decimal space-y-2 pl-5">
-            <li>
-              Edit <code className="text-foreground">IDEA.md</code>
-            </li>
-            <li>
-              Agent: <em className="text-foreground">Read IDEA.md + AGENTS.md. Next MVP under /app.</em>
-            </li>
-            <li>
-              Routes in <code className="text-foreground">src/app/app/</code>
-            </li>
+            <li>Edit <code className="text-foreground">IDEA.md</code></li>
+            <li>Define a workflow in <code className="text-foreground">product/slices.json</code></li>
+            <li>Run <code className="text-foreground">pnpm slice:new</code> or extend with custom code</li>
           </ol>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
+          <Link
+            href="/app/slices"
+            className="group rounded-xl border border-accent/40 bg-accent/5 p-5 text-sm transition hover:border-accent"
+          >
+            <p className="font-medium text-foreground transition group-hover:text-accent">
+              Product Slice Engine →
+            </p>
+            <p className="mt-2 text-muted">Config → validation → owner-scoped working product flow.</p>
+          </Link>
           <Link
             href="/app/notes"
             className="group rounded-xl border border-border bg-card p-5 text-sm transition-colors hover:border-accent"

@@ -39,6 +39,8 @@ try {
     ".agents/skills/improve-project/SKILL.md",
     ".github/ISSUE_TEMPLATE/improvement.yml",
     "scripts/check-capabilities.mjs",
+    "scripts/create-product-slice.mjs",
+    "product/slices.json",
   ];
 
   for (const file of required) await access(join(generated, file));
@@ -67,10 +69,16 @@ try {
     throw new Error("Generated capability verification state was not reset.");
   }
 
+  const slices = JSON.parse(await readFile(join(generated, "product/slices.json"), "utf8"));
+  if (!Array.isArray(slices.slices) || slices.slices.length === 0) {
+    throw new Error("Generated project did not inherit the Product Slice Engine contract.");
+  }
+
   run(process.execPath, [join(generated, "scripts/check-ai-workflow.mjs")], generated);
+  run(process.execPath, [join(generated, "scripts/test-create-product-slice.mjs")], generated);
 
   console.log(
-    "Shipkit generator OK: workflow, capability registry, and project model copied correctly."
+    "Shipkit generator OK: workflow, capability registry, project model, and Product Slice Engine copied correctly."
   );
 } finally {
   await rm(sandbox, { recursive: true, force: true });
