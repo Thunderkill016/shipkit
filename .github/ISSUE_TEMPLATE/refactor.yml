@@ -1,0 +1,33 @@
+name: Refactor or cleanup
+description: Improve structure without silently changing behavior.
+title: "[Refactor]: "
+body:
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Problem and evidence
+      description: Cite duplication, file size, coupling, repeated defects, or measured pain.
+    validations:
+      required: true
+  - type: textarea
+    id: preserved
+    attributes:
+      label: Behavior that must remain unchanged
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Smallest safe scope
+    validations:
+      required: true
+  - type: textarea
+    id: characterization
+    attributes:
+      label: Characterization and verification
+      value: |
+        - [ ] Existing behavior is covered before structural changes
+        - [ ] Each extraction is independently testable
+        - [ ] `pnpm verify` passes
+    validations:
+      required: true
