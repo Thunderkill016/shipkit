@@ -1,51 +1,59 @@
-# Vibe coding with Shipkit
+# Vibe coding with engineering controls
 
-## The loop
+Shipkit keeps the speed of AI-assisted building while adding explicit scope,
+verification, and review.
+
+## Default loop
 
 ```text
-1. Write / update IDEA.md     ← what you're building
-2. pnpm doctor && pnpm dev    ← foundation running
-3. Tell the agent:            ← implement ONLY product scope
-   "Read IDEA.md + AGENTS.md.
-    Implement the next MVP slice.
-    Do not change adapters unless asked."
-4. Click through /app         ← verify
-5. Commit small               ← keep diffs reviewable
+1. Update IDEA.md or create a GitHub Issue
+2. Ask the agent to explore without editing
+3. Define acceptance criteria
+4. Save a plan for non-trivial work
+5. Implement one small slice
+6. Run focused checks, then pnpm verify
+7. Review the diff in a fresh session
+8. Open a PR and merge only with evidence
 ```
 
-## What you should vibe
+The complete system is indexed in [`AI_WORKFLOW.md`](../AI_WORKFLOW.md).
 
-- Landing copy and sections  
-- Dashboard features  
-- Domain tables + UI  
-- Business rules  
+## Good work to delegate
 
-## What you should not vibe-rewrite
+- product UI and copy;
+- isolated features with clear acceptance criteria;
+- tests for established behavior;
+- bounded bug fixes;
+- documentation;
+- mechanical refactors protected by tests.
 
-- Auth protocol (use `getAuth()` / AuthPort)  
-- Security header package (extend carefully)  
-- Random new frameworks mid-project  
+## Work requiring a risk gate
+
+- auth or authorization;
+- database migrations;
+- billing, secrets, production, or external integrations;
+- broad refactors;
+- dependency or framework replacement.
+
+For these tasks, require a written plan and manual review before merge.
 
 ## Prompt starters
 
-**MVP slice**
+### Explore
 
-> Read `IDEA.md` and `AGENTS.md`. Implement the next unchecked MVP item.  
-> Add routes under `apps/web/src/app/app/`. Validate inputs with Zod.  
-> Do not add new npm dependencies unless necessary.
+> Read `AGENTS.md`, `IDEA.md`, and the relevant code. Do not edit files.
+> Explain current behavior with file evidence, uncertainties, and the smallest
+> safe change.
 
-**Data model**
+### Implement
 
-> From IDEA.md, propose tables beyond `profiles`.  
-> Add SQL under `packages/db/sql/` and TypeScript schema.  
-> Document user isolation (who can read/write which rows).
+> Follow the accepted plan. Keep the diff within scope, add or update tests,
+> run focused checks, then `pnpm verify`. Report evidence and remaining risk.
 
-**Ship check**
+### Review
 
-> Walk PRODUCTION_CHECKLIST.md for my preset.  
-> List blockers only.
+> Review the branch as an independent engineer. Do not edit. Find correctness,
+> security, regression, architecture, and test-quality problems. Cite file and
+> line, severity, and reproduction steps.
 
-## Why this is faster
-
-Agents thrash when the stack is undefined.  
-Shipkit fixes stack + security + deploy shape so prompts stay about **your idea**.
+Reusable complete prompts live in [`prompts/`](../prompts/).
