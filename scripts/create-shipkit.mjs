@@ -154,6 +154,29 @@ try {
   /* ignore */
 }
 
+try {
+  const registryPath = join(dest, "docs/CAPABILITIES.json");
+  const registry = JSON.parse(fs.readFileSync(registryPath, "utf8"));
+  registry.project = name;
+  registry.inheritedFrom = "shipkit";
+  registry.lastVerified = new Date().toISOString().slice(0, 10);
+  registry.verificationScope =
+    "Scaffold evidence paths were copied from Shipkit; generated-product behavior has not been verified.";
+  registry.capabilities = registry.capabilities.map((capability) => ({
+    ...capability,
+    verificationStatus: "not-run",
+    checks: ["Run project-specific verification after setup"],
+  }));
+  fs.writeFileSync(registryPath, JSON.stringify(registry, null, 2) + "\n");
+} catch (error) {
+  console.error(
+    `Could not rewrite docs/CAPABILITIES.json: ${
+      error instanceof Error ? error.message : String(error)
+    }`
+  );
+  process.exit(1);
+}
+
 console.log(`
 ✦ Created ${name}
 
@@ -163,7 +186,7 @@ console.log(`
   # 1. Define the product
   # edit IDEA.md
 
-  # 2. Validate the workflow
+  # 2. Validate the workflow and inherited capability evidence
   pnpm check:ai
 
   # 3. Ask AI to model and audit the project before broad changes

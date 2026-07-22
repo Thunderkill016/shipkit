@@ -1,10 +1,13 @@
 import { readFile, access } from "node:fs/promises";
+import "./check-capabilities.mjs";
 
 const required = [
   "AGENTS.md",
   "AI_WORKFLOW.md",
   "IDEA.md",
   "ARCHITECTURE.md",
+  "docs/CAPABILITIES.json",
+  "docs/ai/PROJECT_MODEL.md",
   "docs/ai/OPERATING_MODEL.md",
   "docs/ai/TASK_LIFECYCLE.md",
   "docs/ai/CONTEXT_ENGINEERING.md",
@@ -40,6 +43,7 @@ const required = [
   ".github/ISSUE_TEMPLATE/research.yml",
   ".github/copilot-instructions.md",
   ".github/pull_request_template.md",
+  "scripts/check-capabilities.mjs",
   "scripts/create-shipkit.mjs",
   "scripts/test-create-shipkit.mjs",
 ];

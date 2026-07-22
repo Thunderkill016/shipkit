@@ -2,58 +2,110 @@
 
 ## Goal
 
-Let people **vibe features** while the foundation stays boring and correct.
+Let builders delegate product slices to AI while the foundation remains
+predictable, testable, and replaceable at explicit boundaries.
 
 ```text
-┌─────────────────────────────────────────────┐
-│  IDEA.md  →  agent / human implements       │
-│  features in apps/web (product UI)          │
-└───────────────────┬─────────────────────────┘
-                    │ uses
-┌───────────────────▼─────────────────────────┐
-│  Kernel packages (@shipkit/*)               │
-│  config · security · db · auth contracts    │
-└───────────────────┬─────────────────────────┘
-                    │ implemented by
-┌───────────────────▼─────────────────────────┐
-│  Adapters                                   │
-│  supabase auth · (better-auth next)         │
-│  postgres URL · deploy recipes              │
-└─────────────────────────────────────────────┘
+IDEA.md / GitHub Issue
+          ↓
+apps/web product routes and server actions
+          ↓
+@shipkit/* ports and shared packages
+          ↓
+apps/web/src/lib/adapters/*
+          ↓
+Postgres / Supabase / Better Auth / S3 / Resend / Stripe
 ```
 
-## Packages
+## Repository units
 
-| Package | Role for vibe coders |
-|---------|----------------------|
-| `@shipkit/config` | Env schema, preset IDs — “what’s configured?” |
-| `@shipkit/security` | Don’t reinvent CSP / rate limit / password schema |
-| `@shipkit/db` | Canonical `profiles` schema — extend for your domain |
-| `@shipkit/auth` | `AuthPort` — swap providers without rewriting pages |
-| `@shipkit/storage` | `StoragePort` — S3-compatible uploads (adapters later) |
-| `@shipkit/mail` | `MailPort` — transactional email (+ console stub) |
+| Area | Responsibility |
+|---|---|
+| `apps/web` | Next.js App Router application, product UI, server actions, adapter selection |
+| `packages/auth` | AuthPort contract |
+| `packages/config` | Environment schema and preset identifiers |
+| `packages/db` | Drizzle schemas and SQL migrations |
+| `packages/security` | Validation, headers, password schema, and rate limiting |
+| `packages/storage` | StoragePort plus local and S3-compatible adapters |
+| `packages/mail` | MailPort plus console and Resend adapters |
+| `packages/payment` | PaymentPort and Stripe/noop behavior |
+| `packages/i18n` | Vietnamese and English dictionaries |
+| `packages/logger` | Logger abstraction |
+| `scripts` | Setup, diagnostics, migration, verification, and project generation |
+| `docs/ai` | Repository memory for agents: project model, plans, research, and improvements |
 
-## App adapter
+## Application surface
 
-`apps/web` — Next.js:
+Current routes include:
 
-- `/` landing  
-- `/login` auth  
-- `/app` protected shell (your product lives here)  
-- `src/lib/adapters/*` only place for vendor SDKs  
+- `/` — localized public landing;
+- `/login` — email/password and env-gated OAuth entry;
+- `/app` — authenticated or demo shell;
+- `/app/notes` — Postgres notes with memory fallback;
+- `/app/profile` — profile and storage pattern;
+- `/app/billing` — env-gated Stripe/noop pattern;
+- `/api/health` — lightweight health response;
+- `/api/auth/[...all]` — Better Auth endpoint.
 
-## Presets
+## Dependency and vendor boundaries
 
-| Preset | When |
-|--------|------|
-| `supabase-full` | Fastest managed auth+DB |
-| `portable-pg` | Own Postgres (Docker/Neon/Railway…) |
+- Product UI and server actions depend on ports or app-level facades.
+- Vendor SDK calls belong under `apps/web/src/lib/adapters/**` or a narrowly
+  named integration facade.
+- Auth is selected through `getAuth()` and supports Supabase or Better Auth.
+- Database writes must validate input and scope records to the current user.
+- Deployed migrations are append-only.
+- Demo fallbacks must be visible to users and must not hide configured-service
+  failures.
 
-## Extending for your idea
+## Critical journeys
 
-1. Write `IDEA.md` (who, problem, MVP screens, data).  
-2. Add tables next to `profiles` + isolation rules.  
-3. Add routes under `/app/...`.  
-4. Keep imports: UI → ports → adapters.  
+### Generated product
 
-Agents: follow `AGENTS.md`. Humans: same.
+```text
+pnpm create -- name
+→ copy foundation and AI system
+→ seed IDEA.md and PROJECT_MODEL.md
+→ rewrite project identity and verification state
+→ run generated workflow checks
+```
+
+### Email signup
+
+```text
+/login
+→ Zod validation + rate limit
+→ AuthPort signup
+→ session cookie through selected adapter
+→ non-blocking MailPort welcome message
+→ /app
+```
+
+### Notes
+
+```text
+/app/notes
+→ authenticated/demo user identity
+→ validated server action
+→ user-scoped Postgres store or explicit demo fallback
+→ rendered user-owned notes
+```
+
+## Verification
+
+- Root scripts define install, typecheck, lint, tests, build, diagnostics, and
+  AI-workflow checks.
+- GitHub Actions runs Test & Build, demo E2E, portable-pg E2E, and the AI
+  workflow/generator checks.
+- Current claim status belongs in `docs/CAPABILITIES.json`.
+- Current architecture coverage and blind spots belong in
+  `docs/ai/PROJECT_MODEL.md`.
+
+## Known risks
+
+- Portable-pg E2E is currently failing repeatedly; see issue #3.
+- Notes currently catch database errors broadly and can fall back to memory.
+- OAuth, mail delivery, Stripe lifecycle, production deploy, and Supabase live
+  behavior require environment-specific verification.
+- Root `IDEA.md` still describes a demo product and needs a human product
+  decision.

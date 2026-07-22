@@ -31,12 +31,14 @@ try {
     "AGENTS.md",
     "AI_WORKFLOW.md",
     "IDEA.md",
+    "docs/CAPABILITIES.json",
     "docs/ai/PROJECT_MODEL.md",
     "docs/ai/AUTONOMOUS_IMPROVEMENT.md",
     "docs/ai/DISCOVERY_RESEARCH.md",
     "prompts/00-improve-project.md",
     ".agents/skills/improve-project/SKILL.md",
     ".github/ISSUE_TEMPLATE/improvement.yml",
+    "scripts/check-capabilities.mjs",
   ];
 
   for (const file of required) await access(join(generated, file));
@@ -51,9 +53,25 @@ try {
     throw new Error("Generated project model was not seeded correctly.");
   }
 
+  const registry = JSON.parse(
+    await readFile(join(generated, "docs/CAPABILITIES.json"), "utf8")
+  );
+  if (registry.project !== name || registry.inheritedFrom !== "shipkit") {
+    throw new Error("Generated capability registry identity was not rewritten.");
+  }
+  if (
+    !registry.capabilities.every(
+      (capability) => capability.verificationStatus === "not-run"
+    )
+  ) {
+    throw new Error("Generated capability verification state was not reset.");
+  }
+
   run(process.execPath, [join(generated, "scripts/check-ai-workflow.mjs")], generated);
 
-  console.log("Shipkit generator OK: workflow and project model copied correctly.");
+  console.log(
+    "Shipkit generator OK: workflow, capability registry, and project model copied correctly."
+  );
 } finally {
   await rm(sandbox, { recursive: true, force: true });
 }

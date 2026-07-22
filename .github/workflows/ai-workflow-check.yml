@@ -5,11 +5,13 @@ on:
     paths:
       - "AGENTS.md"
       - "AI_WORKFLOW.md"
+      - "docs/CAPABILITIES.json"
       - "docs/ai/**"
       - "prompts/**"
       - ".agents/**"
       - ".github/**"
       - "scripts/check-ai-workflow.mjs"
+      - "scripts/check-capabilities.mjs"
       - "scripts/create-shipkit.mjs"
       - "scripts/test-create-shipkit.mjs"
       - "package.json"

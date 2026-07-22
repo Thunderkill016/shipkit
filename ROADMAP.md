@@ -1,80 +1,68 @@
 # Roadmap
 
-> **Nguồn sự thật:**  
-> - Code audit: [`docs/DEVELOPMENT_PLAN.md`](./docs/DEVELOPMENT_PLAN.md)  
-> - **Mốc thị trường (bắt buộc):** [`docs/COMPETITIVE_BENCHMARK.md`](./docs/COMPETITIVE_BENCHMARK.md)  
->
-> Ưu tiên theo **gap vs Open SaaS / MakerKit / ShipFast**, không chỉ theo cảm tính.
+> Last verified: 2026-07-22  
+> Machine-readable status: [`docs/CAPABILITIES.json`](./docs/CAPABILITIES.json)  
+> Current model: [`docs/ai/PROJECT_MODEL.md`](./docs/ai/PROJECT_MODEL.md)  
+> Ranked backlog: [`docs/ai/improvements/INDEX.md`](./docs/ai/improvements/INDEX.md)
 
-## v0.1 — Foundation ✅
+The roadmap describes direction. It must not be used as proof that a capability
+works; use the registry and current checks for that.
 
-- Monorepo kernel + Next adapter  
-- Landing / login / app shell  
-- Supabase auth adapter  
-- Security headers + Zod + rate limit  
-- IDEA.md + AGENTS.md + vibe docs  
-- Docker Postgres + doctor  
+## Shipped foundation
 
-## v0.2 — Portable auth + quality ✅ (gần hoàn)
+- pnpm monorepo with a Next.js App Router application;
+- public landing, login, protected/demo app shell, profile, notes, and billing
+  example surfaces;
+- Supabase and Better Auth selection through AuthPort;
+- Postgres schema/migrations and portable-pg setup;
+- security, storage, mail, payment, i18n, and logger packages;
+- Vercel/Docker recipes, setup wizard, doctor, health endpoint, and generator;
+- unit/build checks, demo E2E, portable-pg E2E definitions, and AI workflow
+  validation;
+- repository-first AI delivery, research, independent review, and autonomous
+  improvement system.
 
-- [x] Better Auth + Drizzle + AUTH_ADAPTER switch  
-- [x] Agent skills + create CLI  
-- [x] Unit tests + Playwright demo e2e  
-- [x] Auth rate limit + Upstash factory  
-- [x] CI: test/build + e2e demo + portable-pg service job  
-- [x] E2E signup→session assert (portable-pg) — `e2e/auth-portable.spec.ts`  
-- [x] Middleware Better Auth: `getSessionCookie` (edge-safe official)  
+“Shipped” means code and repository evidence exist. Environment-specific
+verification is recorded separately in `docs/CAPABILITIES.json`.
 
-## v0.3 — Product completeness (partial)
+## Current reliability gate
 
-- [x] StoragePort + local/S3 adapters (profile upload uses storage)  
-- [x] MailPort + console/Resend + **welcome mail on signup**  
-- [x] Profile page + store (DB + memory fallback)  
-- [x] SEO helpers + JsonLd  
-- [x] Notes persist Postgres + user isolation (memory fallback)  
-- [x] Payment: Stripe adapter + `/app/billing` (env-gated)  
-- [x] Wire i18n vi/en (landing, login, app + switcher)  
-- [x] Landing pricing + FAQ (ShipFast shell)  
-- [x] E2E notes isolation + i18n smoke  
-- [x] `pnpm db:migrate`
+The portable-pg auth/isolation job failed on the initial PR #1 run and failed
+again on rerun. Issue #3 is the highest-priority repair. Until it passes, the
+portable path is implemented but not reliably verified.
 
-## v0.4 — Đủ xài (usable) ✅
+## Near term
 
-Mức **dùng được mỗi ngày** cho vibe product — không claim “best-in-class vs MakerKit”.
+1. Diagnose and repair the repeated portable-pg E2E failure.
+2. Stop hiding configured-database failures behind the notes memory fallback.
+3. Keep capability status and evidence machine-verifiable.
+4. Align CI and `pnpm verify`.
+5. Replace the demo root `IDEA.md` with Shipkit’s actual product definition.
+6. Measure time-to-first-product and remove the largest measured delay.
 
-- [x] `pnpm ready` one-path  
-- [x] `docs/QUICKSTART.md`  
-- [x] Demo / portable / supabase presets rõ  
-- [x] Auth + notes + profile + billing (optional Stripe)  
-- [x] `/api/health`  
-- [x] Doctor không fail oan ở demo  
+## Before v1.0
 
-## v1.0 — Best-in-class OSS kit (chưa đạt)
+- required CI checks reliably pass;
+- capability claims match code and current verification;
+- generated-project workflow remains covered end to end;
+- at least one primary setup path has measured TTFP evidence;
+- one generated project demonstrates a real domain slice without foundation
+  rewrites;
+- production/integration claims clearly distinguish code presence from live
+  verification.
 
-Chỉ claim v1.0 khi đủ DoD trong `docs/DEVELOPMENT_PLAN.md` + benchmark score ≥ 4.2.
+## Later, only with evidence
 
-- [ ] Admin tối thiểu / showcase  
-- [ ] App adapter #2 (optional)  
-- [ ] npm create-shipkit publish  
-
-## P2 — ShipFast TTP + ops (done this sprint)
-
-- [x] Doctor v3 checklist + score  
-- [x] `pnpm setup -- --preset=...` env wizard  
-- [x] `pnpm check:deploy` production gates  
-- [x] `vercel.json` + deploy button docs  
-- [x] Optional Sentry (DSN + instrumentation + logger)  
-- [x] E2E harden (127.0.0.1, retries, demo vs auth split)  
-
-## Later
-
-- [ ] App adapter #2 (Nuxt **hoặc** TanStack) — sau kernel ổn  
-- [ ] npm `create-shipkit` publish  
+- standalone published `create-shipkit`;
+- admin or showcase applications;
+- a second app adapter;
+- team/multi-tenant features;
+- deeper billing and operational integrations.
 
 ## Principles
 
-1. Vibe speed &gt; feature count  
-2. Security baseline never regresses  
-3. One polished path before five half paths  
-4. Research → implement → test → ship  
-5. **Docs must not claim more than code**  
+1. Outcome and trust over feature count.
+2. One polished path before several partial paths.
+3. Security and user isolation cannot regress.
+4. Research before uncertain product or technical bets.
+5. Active docs may not claim more than code and verification.
