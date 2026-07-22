@@ -12,6 +12,7 @@ on:
       - ".github/**"
       - "scripts/check-ai-workflow.mjs"
       - "scripts/check-capabilities.mjs"
+      - "scripts/test-capabilities.mjs"
       - "scripts/create-shipkit.mjs"
       - "scripts/test-create-shipkit.mjs"
       - "package.json"
@@ -29,4 +30,5 @@ jobs:
         with:
           node-version: 20
       - run: node scripts/check-ai-workflow.mjs
+      - run: node scripts/test-capabilities.mjs
       - run: node scripts/test-create-shipkit.mjs

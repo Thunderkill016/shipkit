@@ -25,9 +25,11 @@ const allowedCategories = new Set([
 
 const errors = [];
 let registry;
+let packageJson;
 
 try {
   registry = JSON.parse(await readFile(registryPath, "utf8"));
+  packageJson = JSON.parse(await readFile(resolve(root, "package.json"), "utf8"));
 } catch (error) {
   console.error(
     `Capability registry could not be parsed: ${
@@ -40,6 +42,11 @@ try {
 if (registry.schemaVersion !== 1) errors.push("schemaVersion must equal 1");
 if (typeof registry.project !== "string" || !registry.project.trim()) {
   errors.push("project must be a non-empty string");
+}
+if (packageJson?.name !== registry.project) {
+  errors.push(
+    `project "${registry.project}" must match package.json name "${packageJson?.name ?? "missing"}"`
+  );
 }
 if (!/^\d{4}-\d{2}-\d{2}$/.test(registry.lastVerified ?? "")) {
   errors.push("lastVerified must use YYYY-MM-DD");

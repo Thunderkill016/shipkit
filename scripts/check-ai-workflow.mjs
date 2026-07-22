@@ -44,6 +44,7 @@ const required = [
   ".github/copilot-instructions.md",
   ".github/pull_request_template.md",
   "scripts/check-capabilities.mjs",
+  "scripts/test-capabilities.mjs",
   "scripts/create-shipkit.mjs",
   "scripts/test-create-shipkit.mjs",
 ];
