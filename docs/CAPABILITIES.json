@@ -1,6 +1,7 @@
 {
   "schemaVersion": 1,
-  "project": "shipkit-evolution-engine",
+  "project": "shipkit",
+  "primaryProduct": "Shipkit Evolution Engine",
   "lastVerified": "2026-07-23",
   "verificationScope": "Repository evidence and GitHub Actions on draft pull request #10. Production use, product-market fit, complete sandboxing, external research quality and positive recursive improvement are not claimed.",
   "capabilities": [
