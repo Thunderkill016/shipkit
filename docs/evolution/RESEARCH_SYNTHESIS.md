@@ -8,6 +8,11 @@ repository. This program uses a reproducible source map, prioritizes primary
 sources and high-signal implementations, records contradictions, and expands the
 map when new evidence changes an architectural decision.
 
+This synthesis explains the extracted principles. The system-by-system comparison,
+source ledger, licenses, explicit decisions, limitations, and falsification tests live in
+[`COMPARATIVE_ANALYSIS.md`](./COMPARATIVE_ANALYSIS.md). A project name without those records
+is not accepted as completed research.
+
 ## Source domains and extracted principles
 
 ### Durable execution
@@ -27,8 +32,7 @@ calls, web research, and shell execution are external activities.
 
 ### Software agents and sandboxes
 
-Studied: OpenHands, OpenHands Software Agent SDK, SWE-agent, mini-swe-agent,
-Codex-style repository agents, and OpenHands Index.
+Studied: OpenHands, Codex CLI, SWE-agent, mini-SWE-agent, OpenSandbox, and OpenHands Index.
 
 Extract:
 
@@ -38,13 +42,13 @@ Extract:
 - agent runtime and project-improvement governance are different layers;
 - broad benchmark coverage is more useful than one headline score.
 
-Evolution Engine implication: bring-your-own agent and sandbox; own the lifecycle,
-not the code-generation model.
+Evolution Engine implication: bring your own agent and dedicated sandbox; Shipkit owns the
+lifecycle, authorization, evidence, and verdict rather than the code-generation model or
+sandbox runtime.
 
 ### Agent orchestration
 
-Studied: LangGraph, AutoGen/Microsoft Agent Framework, A2A, MCP, and emerging
-agent-governance gap research.
+Studied: LangGraph, Microsoft Agent Framework, A2A, and MCP.
 
 Extract:
 
@@ -155,18 +159,17 @@ The defensible assets are:
 The moat must not depend on secretly storing user source code or locking users to
 one model provider.
 
-## Primary references
+## Research acceptance rule
 
-- Temporal durable execution and event history documentation
-- LangGraph stateful/durable agent orchestration
-- OpenHands and OpenHands Software Agent SDK
-- SWE-agent and SWE-bench family
-- Open Policy Agent
-- in-toto Attestation Framework and SLSA
-- OpenTelemetry semantic conventions and GenAI conventions
-- MCP and A2A specifications
-- Self-Refine, Reflexion, Voyager
-- NIST AI RMF and secure software/supply-chain guidance
+A material architecture or product decision is not research-complete until it records:
 
-Exact source URLs and access dates will be maintained in the evidence ledger as
-individual architecture decisions are implemented.
+- a primary source and review date;
+- reviewed release, tag, commit, or specification version where relevant;
+- license and integration implications;
+- strengths, limitations, and contradictory evidence;
+- an explicit adopt/adapt/integrate/defer/reject decision;
+- a test or benchmark capable of disproving that decision.
+
+The current ledger and comparison baseline are maintained in
+[`COMPARATIVE_ANALYSIS.md`](./COMPARATIVE_ANALYSIS.md). Material implementation decisions
+will be promoted into versioned ADRs.
