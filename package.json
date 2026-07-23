@@ -7,7 +7,7 @@
   "packageManager": "pnpm@9.15.0",
   "scripts": {
     "ready": "node scripts/ready.mjs",
-    "dev": "pnpm --filter @shipkit/web dev",
+    "dev": "pnpm --filter @shipkit/evolution-core build && pnpm --filter @shipkit/web dev",
     "build": "pnpm --filter @shipkit/evolution-core build && pnpm --filter @shipkit/web build",
     "start": "pnpm --filter @shipkit/web start",
     "lint": "pnpm --filter @shipkit/web lint",
