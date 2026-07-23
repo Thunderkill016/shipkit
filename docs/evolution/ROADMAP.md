@@ -6,7 +6,7 @@ Product definition: [`../../IDEA.md`](../../IDEA.md)
 
 Shipkit is one product. This roadmap sequences implementation by dependency and safety while retaining the full destination: workspace, application foundation, evolution kernel, research, execution, sandbox, verification, release, deployment, measurement, learning and interoperability.
 
-The current implementation reaches repository assessment (`created → observed → modeled`) and includes an application foundation. It does not yet connect all modules into one complete user-visible cycle.
+The current implementation reaches a reviewed repository research decision and typed execution handoff (`created → observed → modeled → diagnosed → researched → decided → planned`) and includes an application foundation. It does not yet connect sandboxed implementation, release, measurement and learning into one complete user-visible cycle.
 
 ## Roadmap rules
 
@@ -28,7 +28,8 @@ The current implementation reaches repository assessment (`created → observed 
 - [x] shared security, database, mail, storage and payment packages;
 - [x] Vercel and Docker delivery recipes;
 - [x] project generator and AI engineering workflow;
-- [x] demo and portable PostgreSQL browser E2E.
+- [x] demo and portable PostgreSQL browser E2E;
+- [x] read-only evolution cycle, research run, review, opportunity, experiment and handoff views backed by official CLI state.
 
 ### Required integration
 
@@ -36,7 +37,7 @@ The current implementation reaches repository assessment (`created → observed 
 - [ ] product objective, brief, roadmap and experiment editing;
 - [ ] repository attach/create onboarding;
 - [ ] human approval and risk-review surfaces;
-- [ ] claim, source, contradiction and uncertainty inspection;
+- [ ] claim evidence spans, full source details, contradiction and uncertainty inspection;
 - [ ] agent execution timeline and cost view;
 - [ ] verification, release and rollback views;
 - [ ] product metrics and learning history;
@@ -88,7 +89,8 @@ Exit: every later module can rely on durable, versioned, crash-safe and reviewab
 - [x] structural auth, database, deployment, secret and payment boundaries;
 - [x] temporary-workspace checks with timeout, output bounds and reduced environment;
 - [x] separate research, execution and verification readiness;
-- [x] proof on Shipkit and a pinned unrelated repository.
+- [x] proof on Shipkit and a pinned unrelated repository;
+- [x] deterministic repository model consumed by the research decision flow.
 
 ### Required product understanding
 
@@ -98,8 +100,8 @@ Exit: every later module can rely on durable, versioned, crash-safe and reviewab
 - [ ] decision, experiment and incident history ingestion;
 - [ ] authorized analytics, support and user-research signals;
 - [ ] code-to-product-feature and feature-to-outcome mapping;
-- [ ] blind-spot and evidence-coverage reports;
-- [ ] readiness dimensions for research, execution, verification, release and measurement.
+- [ ] blind-spot and evidence-coverage reports beyond the repository baseline;
+- [ ] readiness dimensions for release and measurement.
 
 Exit: Shipkit understands both the codebase and the product context required to make responsible decisions.
 
@@ -107,57 +109,68 @@ Exit: Shipkit understands both the codebase and the product context required to 
 
 ### D1 — decision framing
 
-- [ ] typed `ResearchBrief` with owner, deadline, assumptions, constraints, evidence thresholds and protected outcomes;
-- [ ] typed `ResearchPlan` with questions, dependencies, coverage, source strategy, budgets, checkpoints and stopping rules;
-- [ ] convert vague objectives into decision-changing questions;
-- [ ] workspace review for high-risk or high-cost plans.
+- [x] typed `ResearchBrief` with owner, deadline, assumptions, constraints, evidence thresholds and protected outcomes;
+- [x] typed `ResearchPlan` with questions, coverage, source strategy, budgets and stopping rules;
+- [x] deterministic conversion of a modeled repository objective into decision-changing repository questions;
+- [ ] dependency-aware plans and checkpoints for adaptive external research;
+- [ ] workspace authoring/review for high-risk or high-cost plans.
 
 ### D2 — modern retrieval
 
-- [ ] repository/internal evidence adapters;
-- [ ] public web, paper, repository, specification, competitor, changelog, incident and dataset adapters;
+- [x] repository/internal evidence adapter using fresh snapshot, checks and scorecard;
+- [x] reproducible `QueryRecord` with exact query, rationale, tool and result references for repository research;
+- [x] authority, directness, freshness, applicability, independence, conflict and limitation scoring;
+- [x] bounded query, source, time and monetary budget accounting;
+- [ ] public web, paper, specification, competitor, changelog, incident and dataset adapters;
 - [ ] authorized private-source adapters under data governance;
-- [ ] reproducible `QueryRecord` with exact queries, aliases, filters, parents, rationale, tool and results;
 - [ ] adaptive reformulation, citation chasing, entity resolution and multilingual/domain search;
-- [ ] negative, failure, postmortem and falsification search;
-- [ ] authority, directness, freshness, applicability, independence, conflict and limitation scoring.
+- [ ] negative, failure, postmortem and falsification search over external sources;
+- [ ] prompt-injection and hostile-source defenses.
 
 ### D3 — claims and contradictions
 
-- [ ] typed `SourceRecord`, `ClaimRecord` and `ContradictionRecord`;
+- [x] typed `SourceRecord`, `ClaimRecord` and `ContradictionRecord`;
+- [x] confidence, uncertainty and expiry fields;
+- [x] preserve disagreement instead of silently selecting a favored answer;
+- [x] prevent repository-only evidence from supporting user-problem claims;
+- [x] require every repository research claim to resolve to persisted supporting sources;
 - [ ] exact evidence spans, transformations and calculation provenance;
-- [ ] observation/interpretation/estimate/calculation/recommendation claim types;
-- [ ] confidence, uncertainty, applicability and expiry;
-- [ ] source circularity, citation laundering and stale-version detection;
-- [ ] preserve disagreement instead of silently selecting a favored answer.
+- [ ] richer observation/interpretation/estimate/calculation/recommendation claim taxonomy;
+- [ ] source circularity, citation laundering and stale-version detection.
 
 ### D4 — product discovery
 
+- [x] repository research explicitly records that repository evidence cannot prove user demand;
+- [x] opportunity portfolio includes direct user research as a distinct reversible experiment when it is the largest evidence gap;
 - [ ] typed user-research records and consent boundaries;
 - [ ] observed recent behavior rather than hypothetical preference only;
 - [ ] interviews, workflow observation, support, analytics, churn, non-user, sales and accessibility evidence;
-- [ ] outcome/problem/opportunity/solution/experiment mapping;
 - [ ] reach, frequency, severity, strategic fit and constraints;
 - [ ] problem validation before expensive implementation.
 
 ### D5 — synthesis and review
 
-- [ ] separate citation/adversarial reviewer;
-- [ ] report reconstruction from atomic claims;
-- [ ] at least three distinct opportunities;
-- [ ] expected value, evidence, fit, urgency, cost, risk, reversibility and learning value shown separately;
-- [ ] typed `DecisionRecord` and `ExperimentRecord`;
-- [ ] explicit stop reason or `inconclusive` result;
-- [ ] persisted handoff to planning/execution.
+- [x] distinct deterministic reviewer actor required for repository research;
+- [x] reviewer checks budget, source support, user-evidence boundary, contradiction visibility, opportunity portfolio, rejected alternatives, scope separation and stop reason;
+- [x] at least three distinct opportunities;
+- [x] expected outcome, evidence, cost, risk, uncertainty, reversibility and learning value remain inspectable;
+- [x] typed `DecisionRecord`, `ExperimentRecord`, `ResearchRunRecord` and `ResearchEvaluationRecord`;
+- [x] explicit stop reason and durable automated `inconclusive` result;
+- [x] persisted handoff to planning/execution;
+- [ ] exact external citation precision/completeness and calculation verification;
+- [ ] alternative causal explanation and full report reconstruction checks for external research.
 
 ### D6 — research orchestration and evaluation
 
-- [ ] single-worker baseline;
+- [x] deterministic single-worker repository baseline;
+- [x] durable query/source/time/cost usage and coverage gaps;
+- [x] Shipkit dogfood run with journal reload and passing independent review;
+- [x] tests for insufficient budget, reviewer separation and unsupported user claims;
 - [ ] bounded parallel research for genuinely independent branches;
 - [ ] compare deterministic, single-worker, multi-worker and human-assisted configurations;
-- [ ] retrieval correctness, coverage, citation precision/completeness and contradiction recall;
-- [ ] decision usefulness, recommendation survival, avoided waste, cost and latency;
-- [ ] prompt-injection and hostile-source fixtures;
+- [ ] autonomous research proof on an unrelated real product;
+- [ ] retrieval correctness, external citation precision/completeness and contradiction recall benchmarks;
+- [ ] decision usefulness, recommendation survival, avoided waste, cost and latency across real users;
 - [ ] research skill registry only after baseline evidence exists.
 
 Exit: Shipkit produces reproducible, reviewable product decisions and a typed experiment ready for governed implementation.
@@ -285,9 +298,9 @@ Exit: local, repository and hosted surfaces present the same Shipkit product and
 ### Milestone 0 — identity and contracts
 
 - [x] one unified product definition;
-- [ ] update all active documents and machine-readable metadata;
-- [ ] map module contracts and ownership;
-- [ ] define integrated acceptance language.
+- [x] update active documents and machine-readable metadata;
+- [x] map module contracts and ownership;
+- [x] define integrated acceptance language.
 
 ### Milestone 1 — durable product understanding
 
@@ -295,7 +308,7 @@ Kernel hardening + workspace onboarding + repository/product model.
 
 ### Milestone 2 — research-to-decision
 
-Workspace objective → research intelligence → reviewed experiment → execution handoff.
+Repository objective → bounded autonomous repository research → independent review → experiment → execution handoff. Public-web and user-research expansion remains open.
 
 ### Milestone 3 — decision-to-change
 
@@ -317,40 +330,11 @@ Shipkit reaches its intended v1 only when:
 
 - one product workspace operates the complete lifecycle;
 - a project can be created or attached;
-- research selects a defensible experiment;
+- research selects a defensible experiment using repository, external and direct user evidence as applicable;
 - at least two interchangeable agents can implement it in a real sandbox;
 - independent verification can accept or reject it;
 - release/deployment requires exact approval;
 - technical and product outcomes are measured;
 - rollback is exercised;
 - later learning is causally evaluated;
-- all states and material claims can be reconstructed from durable evidence.
-
-## Product metrics
-
-- setup to attached/created product workspace;
-- time to first decision-changing evidence;
-- time from accepted experiment to verified change;
-- time from release to measurable outcome;
-- cycle recovery and migration success;
-- false-allow and false-block rates;
-- citation quality and contradiction recall;
-- execution success, cost, duration and intervention;
-- verification disagreement and defect escape rate;
-- deployment and rollback reliability;
-- recommendation survival and avoided waste;
-- repeat complete-cycle use;
-- measured benefit or harm from learning.
-
-## Current priority order
-
-1. Synchronize the unified product definition across repository artifacts.
-2. Complete persistence and policy hardening.
-3. Define shared module contracts and workspace integration skeleton.
-4. Implement the research-to-decision milestone.
-5. Build real sandbox and execution adapters in parallel with workspace handoff.
-6. Complete independent verification and draft-PR delivery.
-7. Add authorized release/deployment and outcome measurement.
-8. Add measured learning, interoperability and hosted collaboration.
-
-No listed workstream is abandoned. Priorities express dependencies and risk, not a change in final product direction.
+- the complete cycle is proven on Shipkit and unrelated real products.
