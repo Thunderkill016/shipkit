@@ -20,7 +20,8 @@ reviewable and linked to implementation decisions.
 - [x] atomic JSON snapshot and append-only journal;
 - [x] recovery from missing/corrupt snapshot and interrupted trailing write;
 - [x] stale-writer rejection and checksum tamper detection;
-- [x] local CLI for init, start, status, show/resume, and evidence-backed advance;
+- [x] local CLI for init, start, status, show/resume, inspect, and evidence-backed advance;
+- [x] compiled CLI dogfood on Shipkit in CI;
 - [ ] explicit event-schema migration fixtures across released versions;
 - [ ] kill-process integration test around every persistence boundary.
 
@@ -28,20 +29,24 @@ Exit: a full cycle can stop/restart and complete without any LLM.
 
 ## Phase 2 — repository perception and evidence
 
-- [ ] portable project scanner;
-- [ ] journey and trust-boundary model;
-- [ ] evidence registry with hashes/provenance;
-- [ ] configurable check runner;
-- [ ] human-readable status/scorecard.
+- [x] portable bounded project scanner;
+- [x] package manager, manifest, language, source, test, docs, CI, and product-signal discovery;
+- [x] structural trust-boundary discovery for auth, database, deployment, secrets, and payments;
+- [x] content-addressed JSON/file evidence registry with SHA-256;
+- [x] secret-path, outside-root, symlink, size, truncation, and tamper safety tests;
+- [x] check command discovery from project manifests;
+- [ ] safe configurable check runner with timeout and sanitized output;
+- [ ] human-readable project model and scorecard;
+- [ ] prove the scanner on a second unrelated real repository.
 
 Exit: A2 audit works on Shipkit and a second unrelated repository.
 
 ## Phase 3 — research and opportunity intelligence
 
-- [ ] internal evidence collector for issues, CI, docs, decisions, and product signals;
-- [ ] external-source adapter contract for web, papers, repositories, and user research;
-- [ ] source freshness, applicability, contradiction, and confidence records;
-- [ ] parallel research worker plan with bounded budgets;
+- [ ] internal evidence collector for issues, CI, docs, decisions, analytics, and user signals;
+- [ ] external-source adapter contract for web, papers, repositories, competitors, and user research;
+- [ ] source freshness, applicability, contradiction, confidence, and expiry records;
+- [ ] parallel research worker plan with bounded budgets and stop conditions;
 - [ ] opportunity/hypothesis portfolio rather than a single generated answer;
 - [ ] evaluator-backed candidate ranking and smallest decision-changing experiment.
 
