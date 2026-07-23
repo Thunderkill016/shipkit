@@ -175,6 +175,7 @@ duplicateSlots.sessions[1].participantId = "P01";
 expectArtifactsInvalid({ state: duplicateSlots }, "participantId must equal P02");
 
 const prematureStart = structuredClone(state);
+prematureStart.technicalGate.status = "pending-merge";
 prematureStart.sessions[0].status = "in-progress";
 prematureStart.sessions[0].startedAt = "2026-07-24T01:00:00.000Z";
 prematureStart.status = "in-progress";

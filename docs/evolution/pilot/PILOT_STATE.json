@@ -5,7 +5,7 @@
   "status": "not-started",
   "technicalGate": {
     "pullRequest": 31,
-    "status": "pending-merge"
+    "status": "ready"
   },
   "clockStartedAt": null,
   "externalCompletedAudits": 0,

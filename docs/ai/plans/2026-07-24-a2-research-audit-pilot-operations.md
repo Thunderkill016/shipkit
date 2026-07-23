@@ -25,8 +25,8 @@ Git.
   pre-session capture and outcome protocol.
 - Issue #14 comment `5060506682` — external audits remain 0/6 and the pilot
   clock has not started.
-- PR #31 — required public repository-search baseline; merge remains a human
-  gate.
+- PR #31 — required public repository-search baseline; merged as `8b39e29` on
+  2026-07-24 and the technical gate is now ready.
 
 ## Acceptance criteria
 
@@ -54,7 +54,7 @@ Git.
 - starting the two-week clock;
 - inventing session results;
 - modifying the research engine;
-- merging PR #31 without explicit authorization;
+- merging any additional pull request without explicit authorization;
 - merge, deployment, paid services or production writes.
 
 ## Implementation slices

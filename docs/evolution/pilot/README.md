@@ -8,7 +8,7 @@ and is not part of the external sample.
 
 - External audits: **0/6**.
 - Pilot clock: **not started**.
-- Technical gate: PR #31 must be merged before the first session starts.
+- Technical gate: **ready** — PR #31 merged as `8b39e29`.
 - Product gate: technical success never counts as decision value by itself.
 
 `A2_RESEARCH_AUDIT_PROTOCOL.json` is the fixed protocol.
@@ -32,7 +32,7 @@ ambiguous consent answer stops the session.
 
 ## Operator sequence
 
-1. Verify PR #31 is merged and set `technicalGate.status` to `ready`.
+1. Confirm `technicalGate.status` remains `ready`; PR #31 is merged.
 2. Select an eligible participant and assign the next `P0N`/`R0N` pair.
 3. Keep direct identity, repository URL and raw notes outside Git.
 4. Save consent and the pre-audit decision before revealing a recommendation.
