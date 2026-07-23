@@ -27,12 +27,28 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
       - run: pnpm build
-      - name: Evolution CLI dogfood
-        run: node scripts/test-evolution-cli.mjs
-      - name: Evolution external repository proof
-        run: node scripts/test-evolution-external-repo.mjs
       - run: pnpm doctor || true
       - run: pnpm check:deploy || true
+
+  evolution-engine-proof:
+    name: Evolution Engine Proof
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build Evolution Engine
+        run: pnpm --filter @shipkit/evolution-core build
+      - name: Dogfood Shipkit assessment
+        run: node scripts/test-evolution-cli.mjs
+      - name: Assess pinned external repository
+        run: node scripts/test-evolution-external-repo.mjs
 
   e2e-demo:
     name: E2E / demo mode
