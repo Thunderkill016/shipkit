@@ -3,16 +3,17 @@
   "project": "shipkit",
   "primaryProduct": "Shipkit",
   "lastVerified": "2026-07-23",
-  "verificationScope": "Repository evidence and GitHub Actions on draft pull request #10. Several modules exist independently, but a complete integrated cycle from product objective through sandboxed implementation, release, measured outcome and learning is not yet claimed.",
+  "verificationScope": "Repository evidence and GitHub Actions on draft pull request #10. Typed research-to-decision records, a parameter-bound execution handoff and a read-only web workspace are now integrated through the same durable cycle. Autonomous retrieval, independent research review, sandboxed implementation, release, measured outcome and learning are not yet claimed.",
   "capabilities": [
     {
       "id": "integrated-product-workspace",
       "category": "product",
       "status": "partial",
       "verificationStatus": "passing",
-      "summary": "The Next.js workspace and shared product packages provide the current human-facing foundation for product setup, auth, data, security, integrations and future lifecycle control surfaces.",
+      "summary": "The Next.js workspace reads official Evolution Core CLI output and now exposes durable cycles, research counts, contradictions, opportunities, decisions, experiments and execution handoffs without creating a second state store.",
       "evidence": [
-        "apps/web",
+        "apps/web/src/app/app/page.tsx",
+        "apps/web/src/app/app/evolution/page.tsx",
         "packages/auth",
         "packages/db",
         "packages/security",
@@ -21,13 +22,14 @@
         "packages/payment"
       ],
       "checks": [
+        "CI: production build",
         "CI: E2E / demo mode",
-        "CI: E2E / portable-pg",
-        "Production build"
+        "CI: E2E / portable-pg"
       ],
       "limitations": [
-        "Research, execution, verification, release and learning are not yet exposed through one unified workspace",
-        "Current app features are a foundation rather than the final Shipkit lifecycle interface"
+        "The workspace is currently read-only for evolution records",
+        "Research bundle authoring, approvals, execution controls, release and learning surfaces are not yet implemented",
+        "The local CLI must be built and accessible to the server workspace"
       ]
     },
     {
@@ -160,16 +162,29 @@
     {
       "id": "research-intelligence",
       "category": "research",
-      "status": "planned",
-      "verificationStatus": "not-run",
-      "summary": "Modern internal, external and product research will create reproducible sources, atomic claims, contradictions, opportunities and experiments inside the same product cycle.",
+      "status": "partial",
+      "verificationStatus": "passing",
+      "summary": "Typed briefs, plans, queries, sources, claims, contradictions, opportunity portfolios, decisions, reversible experiments and parameter-bound execution handoffs now persist inside one Shipkit cycle.",
       "evidence": [
-        "docs/evolution/RESEARCH_CAPABILITY.md",
-        "docs/evolution/COMPARATIVE_ANALYSIS.md",
-        "docs/evolution/ROADMAP.md"
+        "packages/evolution-core/src/research-records.ts",
+        "packages/evolution-core/src/research.ts",
+        "packages/evolution-core/src/research.test.ts",
+        "packages/evolution-core/src/research-cli.test.ts",
+        "packages/evolution-core/src/cli.ts",
+        "apps/web/src/app/app/evolution/page.tsx",
+        "docs/evolution/RESEARCH_CAPABILITY.md"
       ],
       "checks": [
-        "No complete research-to-decision product workflow yet"
+        "Unit tests: typed research-to-execution handoff",
+        "CLI test: persist and reload planned research cycle",
+        "CI: production build",
+        "CI: Evolution Engine Proof"
+      ],
+      "limitations": [
+        "The research bundle is supplied manually as JSON rather than produced by an autonomous source adapter",
+        "No independent citation or adversarial reviewer is integrated yet",
+        "No real-user decision-value proof exists yet",
+        "The execution handoff is not yet consumed by a sandbox or agent adapter"
       ]
     },
     {
