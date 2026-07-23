@@ -13,6 +13,7 @@ import {
 import { inspectRepository } from "./repository.js";
 
 const temporaryRoots: string[] = [];
+const IMMUTABLE_IMAGE = `sha256:${"a".repeat(64)}`;
 
 async function projectWithScript(script: string): Promise<string> {
   const root = await mkdtemp(join(tmpdir(), "shipkit-check-project-"));
@@ -89,7 +90,10 @@ describe("safe check runner", () => {
       runDiscoveredChecks(snapshot, {
         projectRoot,
         checkNames: ["test"],
-        backend: new DockerExecutionBackend({ probe: async () => false }),
+        backend: new DockerExecutionBackend({
+          image: IMMUTABLE_IMAGE,
+          probe: async () => false,
+        }),
       })
     ).rejects.toThrow(/refusing to run untrusted checks/);
   });
