@@ -136,6 +136,20 @@ describe("research-repository CLI", () => {
       verdict: "pass",
       unsupportedClaimIds: [],
     });
+    expect(output.evaluation.checks.every((check: { passed: boolean }) => check.passed)).toBe(true);
+    expect(output.evaluation.checks.map((check: { id: string }) => check.id)).toEqual(
+      expect.arrayContaining([
+        "separate-reviewer",
+        "budget-compliance",
+        "source-support",
+        "user-evidence",
+        "opportunity-portfolio",
+        "decision-preservation",
+        "scope-separation",
+        "contradiction-visibility",
+        "stop-reason",
+      ])
+    );
     expect(output.records.opportunities).toHaveLength(3);
     expect(output.records.claims.some((claim: { claimType: string }) => claim.claimType === "user-problem")).toBe(false);
     expect(output.executionHandoff.parameterDigest).toMatch(/^[a-f0-9]{64}$/);
