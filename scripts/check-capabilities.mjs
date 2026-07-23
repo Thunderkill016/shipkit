@@ -21,6 +21,13 @@ const allowedCategories = new Set([
   "platform",
   "dx",
   "research",
+  "evolution-core",
+  "policy",
+  "persistence",
+  "evidence",
+  "perception",
+  "verification",
+  "reference-product",
 ]);
 
 const errors = [];
@@ -47,6 +54,9 @@ if (packageJson?.name !== registry.project) {
   errors.push(
     `project "${registry.project}" must match package.json name "${packageJson?.name ?? "missing"}"`
   );
+}
+if (typeof registry.primaryProduct !== "string" || registry.primaryProduct.trim().length < 3) {
+  errors.push("primaryProduct must name the repository's primary product");
 }
 if (!/^\d{4}-\d{2}-\d{2}$/.test(registry.lastVerified ?? "")) {
   errors.push("lastVerified must use YYYY-MM-DD");
@@ -101,6 +111,9 @@ for (const [index, capability] of (registry.capabilities ?? []).entries()) {
   if (!Array.isArray(capability.checks) || capability.checks.length === 0) {
     errors.push(`${prefix}.checks must record verification or its absence`);
   }
+  if (capability.limitations !== undefined && !Array.isArray(capability.limitations)) {
+    errors.push(`${prefix}.limitations must be an array when present`);
+  }
 
   for (const evidencePath of capability.evidence) {
     if (
@@ -131,5 +144,5 @@ if (errors.length) {
 }
 
 console.log(
-  `Capability registry OK: ${registry.capabilities.length} claims for ${registry.project}.`
+  `Capability registry OK: ${registry.capabilities.length} claims for ${registry.project} (${registry.primaryProduct}).`
 );

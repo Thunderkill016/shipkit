@@ -1,169 +1,317 @@
 # Project model — Shipkit
 
-Status: verified snapshot  
-Last verified: 2026-07-22  
-Coverage: product intent, repository units, generator, auth, notes, i18n, billing, health, CI, and AI workflow  
-Autonomy level used: A3
+Status: active verified snapshot  
+Last verified: 2026-07-23  
+Product: Shipkit — one integrated AI-native product development system  
+Current safe autonomy ceiling: A2 for arbitrary repositories; A3 remains experimental and trusted-only
 
-This is a compact evidence-backed map. It does not claim production, analytics,
-Supabase-live, OAuth-provider, Resend-delivery, Stripe-webhook, or deploy-runtime
-coverage.
+This model distinguishes local implementation, cross-module integration and experimentally proven product value. It does not claim production use, complete sandbox isolation, a finished research workflow, end-to-end deployment governance or positive recursive improvement.
 
-## Product
+## Unified product identity
 
-- Mission: reduce repeated foundation work so AI-assisted builders can reach a
-  verified product slice quickly without replacing auth, security, data, or
-  deploy architecture.
-- Current target: builders launching small web products with AI coding agents.
-- Core outcome: a stranger can start from the kit, configure a primary path, and
-  complete a domain action quickly.
-- Current product ambiguity: root `IDEA.md` describes a demo product rather than
-  Shipkit itself; this remains a human product decision.
-- Evidence: `README.md`, `IDEA.md`, `ROADMAP.md`, `ARCHITECTURE.md`.
+Shipkit carries a product through one lifecycle:
+
+```text
+objective and workspace
+→ understand repository and product
+→ research opportunities
+→ choose an experiment
+→ implement through governed agents
+→ verify independently
+→ release and deploy explicitly
+→ measure outcomes
+→ learn under evidence
+```
+
+The Evolution Engine is the deterministic control core. The web workspace, application foundation, generator, shared packages, research system, sandbox, agents, verification, deployment and learning capabilities are modules of the same product.
+
+## Users
+
+- solo developers using coding agents;
+- product and engineering teams coordinating human and AI work;
+- open-source maintainers;
+- builders who need a ready product foundation and governed development lifecycle.
+
+Initial validation may focus on developers already using coding agents, but this is a beachhead rather than the final product boundary.
 
 ## Repository structure
 
-| Area | Purpose | Entry points | Boundary | Evidence | Confidence |
-|---|---|---|---|---|---|
-| `apps/web` | Next.js product adapter | routes under `src/app` | vendor integrations through app adapters/facades | `apps/web/package.json` | High |
-| `packages/auth` | AuthPort | package exports | app chooses Supabase or Better Auth | `ARCHITECTURE.md` | Medium |
-| `packages/db` | Drizzle schema and SQL | schemas/migrations | forward migrations | `packages/db` | High |
-| `packages/security` | validation, headers, rate limits | package exports | security must not be weakened | `AGENTS.md` | High |
-| `packages/storage`, `mail`, `payment` | external-service ports | package exports | env-gated adapters | app integration files | Medium |
-| `scripts` | setup, diagnostics, generation, verification | root package scripts | dependency-free control tooling where practical | `package.json` | High |
-| `docs/ai` | durable agent memory | workflow index, plans, research, improvements | active claims require evidence | `AI_WORKFLOW.md` | High |
+| Area | Unified product role | Current boundary | Confidence |
+| --- | --- | --- | --- |
+| `apps/web` | human-facing product workspace and application foundation | currently exposes starter/product capabilities, not the complete lifecycle | High |
+| `packages/evolution-core` | deterministic lifecycle, policy, persistence, evidence, inspection and CLI | no model or paid API required | High |
+| shared `packages/*` | auth, DB, security, mail, storage, payment and delivery capabilities | vendor calls behind adapters | High |
+| `docs/evolution` | architecture, research, comparison, governance and integrated roadmap | decisions require evidence and falsification tests | High |
+| `.shipkit` at runtime | shared durable cycle and evidence state | must remain outside committed source | High |
+| `scripts` | onboarding, generator, diagnostics, dogfood and verification | tooling must remain bounded and attributable | High |
+| generated project | a user product workspace created by Shipkit | receives its own identity while retaining Shipkit tooling | High |
 
-## Runtime and deployment units
+## Module map
 
-- Primary runtime: Next.js 15 application in `apps/web`.
-- Supported auth selections: Supabase SSR and Better Auth.
-- Portable data path: PostgreSQL through Drizzle.
-- Demo path: no configured auth/database, with visible demo behavior.
-- Deployment recipes: Vercel and Docker.
-- External integrations represented in code: Supabase, Better Auth, Postgres,
-  S3-compatible storage, Resend, Stripe, and optional observability.
+### Product Workspace and Foundation
 
-## Critical journey traces
+Implemented:
 
-### Generate a product
+- Next.js web application;
+- localized landing/login/protected surfaces;
+- Supabase and Better Auth paths;
+- PostgreSQL data and user-isolation tests;
+- security, mail, storage and payment ports;
+- Vercel and Docker recipes;
+- generated-project workflow.
 
-```text
-pnpm create -- name
-→ copy repository foundation
-→ seed IDEA.md and docs/ai/PROJECT_MODEL.md
-→ rewrite package identity
-→ validate generated workflow
-```
+Integration gaps:
 
-- Evidence: `scripts/create-shipkit.mjs`, `scripts/test-create-shipkit.mjs`.
-- Verification: AI workflow check run 7 passed.
-- Risk found during workflow development: recursive self-copy when destination is
-  inside the source; fixed and covered by the generator integration test.
+- cycle dashboard;
+- research/claim/contradiction review;
+- opportunity and experiment approval;
+- agent execution controls;
+- verification and release surfaces;
+- outcome and learning history.
 
-### Email/password signup
+### Evolution Kernel
+
+Implemented flow:
 
 ```text
-/login → localized LoginForm → signUpAction
-→ Zod validation → rate limit → AuthPort signup
-→ non-blocking MailPort welcome message → /app
+init
+→ start created cycle
+→ inspect and register baseline evidence
+→ observed
+→ assess checks and readiness
+→ modeled
+→ status/show/resume/recover
 ```
 
-- Evidence: `apps/web/src/app/login/page.tsx`,
-  `apps/web/src/app/login/login-form.tsx`, `apps/web/src/app/actions/auth.ts`.
-- Trust boundary: credentials cross a server action and selected auth adapter.
-- Current signal: the portable-pg E2E failed on PR #1 and failed again when the failed job was rerun; issue #3 tracks diagnosis.
-- Unknown: exact failing test/assertion because the CI run retained no accessible
-  Playwright artifact.
+Implemented commands:
 
-### Notes
+- `pnpm evolve -- init`
+- `pnpm evolve -- start`
+- `pnpm evolve -- inspect`
+- `pnpm evolve -- assess`
+- `pnpm evolve -- status`
+- `pnpm evolve -- show` / `resume`
+- `pnpm evolve -- advance`
+
+Kernel guarantees currently include:
+
+- explicit legal stages and terminal outcomes;
+- immutable transition results and append-only history;
+- A0–A4 autonomy and R0–R4 risk;
+- exact cycle/action/scope approvals with policy version, expiry and revocation;
+- synchronized journal and atomic snapshot;
+- corrupt/stale snapshot and partial-write recovery;
+- per-cycle lock and stale-writer rejection;
+- content-addressed evidence blobs and contextual occurrences.
+
+Remaining kernel gaps:
+
+- schema migration fixtures;
+- kill-process and multi-process stress proof;
+- approval parameter digests;
+- independent versioned package boundary;
+- signed provenance beyond unkeyed corruption detection.
+
+### Project and Product Understanding
+
+Implemented:
+
+- Git, package managers, manifests and languages;
+- source, tests, documentation and CI;
+- package checks;
+- product signals;
+- structural auth, database, deployment, secret and payment boundaries;
+- inventory truncation;
+- separate research, execution and verification readiness.
+
+Planned:
+
+- product brief and objective records;
+- architecture/component and user-journey models;
+- analytics, support and user research under authorization;
+- environments, deployments, incidents and operational state;
+- feature-to-outcome mapping and blind-spot reporting.
+
+### Research Intelligence
+
+Planned shared records:
+
+- `ResearchBrief`;
+- `ResearchPlan`;
+- `QueryRecord`;
+- `SourceRecord`;
+- `ClaimRecord`;
+- `ContradictionRecord`;
+- `OpportunityRecord`;
+- `DecisionRecord`;
+- `ExperimentRecord`.
+
+Required behavior:
+
+- decision-changing questions before broad search;
+- repository, internal, web, paper, specification, competitor and user evidence;
+- reproducible query history;
+- source authority, freshness, applicability and conflict metadata;
+- exact evidence spans and calculations;
+- visible contradictions and uncertainty;
+- independent citation/adversarial review;
+- at least three opportunities and a reversible experiment;
+- typed handoff to execution.
+
+### Execution and Sandbox
+
+Current temporary-workspace checks:
+
+- select discovered package scripts;
+- execute without a shell;
+- use source copies;
+- apply timeout and output limits;
+- reduce environment variables and redact common secret forms;
+- never install dependencies.
+
+They are not a security sandbox:
+
+- network isolation is not enforced;
+- filesystem writes are not fully contained;
+- process containment is incomplete;
+- host `node_modules` may be linked.
+
+Planned:
+
+- capability-negotiated `ExecutionBackend`;
+- trusted-local and real sandbox implementations;
+- generic command baseline;
+- Codex, OpenHands and additional coding-agent adapters;
+- isolated branch/worktree;
+- approved parameter-bound plan;
+- progress, cost and artifact records;
+- draft PR and rollback plan.
+
+### Verification, Release and Operations
+
+Planned:
+
+- independent verifier separate from implementer;
+- test, lint, type, build, security and policy packs;
+- regression and adversarial checks;
+- GitHub Action and PR scorecard;
+- provenance and attestations;
+- authorized release/deployment adapters;
+- Vercel and Docker operational paths;
+- database migration and environment checks;
+- release evidence, rollback and incident records.
+
+### Measurement and Learning
+
+Planned:
+
+- technical, UX, adoption, retention, conversion, reliability and cost metrics;
+- experiment exposure/comparison;
+- keep, iterate, reject and rollback decisions;
+- memory and skill records with scope and expiry;
+- actual later-cycle consumption;
+- paired evaluation with and without learning;
+- promotion and retirement based on measured benefit or harm.
+
+## Integrated lifecycle records
+
+Expected typed handoffs:
+
+| Boundary | Records |
+| --- | --- |
+| workspace → kernel | `ObjectiveRecord`, `ProductBrief`, approval request |
+| understanding → research | `ProjectSnapshot`, readiness and blind spots |
+| research → decision | source, claim, contradiction and opportunity records |
+| decision → execution | `DecisionRecord`, `ExperimentRecord`, plan and rollback |
+| execution → verification | attempts, changes, logs, costs and artifacts |
+| verification → release | verdict, unresolved risks and attestation |
+| release → measurement | release/environment record and experiment exposure |
+| measurement → learning | outcome comparison and learning proposal |
+
+## Readiness model
+
+The unified product must distinguish:
+
+- `researchReadiness`;
+- `executionReadiness`;
+- `verificationReadiness`;
+- `releaseReadiness`;
+- `measurementReadiness`;
+- `autonomyCeiling`;
+- `evidenceConfidence`.
+
+A repository may be ready for research while blocked for execution or release.
+
+## Current integration milestone
 
 ```text
-/app/notes → user identity → validated action
-→ notes store → Postgres when available, memory fallback otherwise
-→ user-scoped list/write/delete
+workspace objective
+→ inspect and assess
+→ research plan and reproducible search
+→ sources, claims and contradictions
+→ opportunities and decision
+→ reversible experiment
+→ persisted execution handoff
 ```
 
-- Evidence: `apps/web/src/lib/notes-store.ts`,
-  `apps/web/e2e/notes-isolation.spec.ts`.
-- Authorization: every query/mutation includes user ID.
-- Reliability risk: all database errors are caught and silently fall back to
-  memory, including errors other than an intentionally absent demo database.
+This is the next slice of the complete Shipkit lifecycle, not a separate final product.
 
-### Localization
+## Verification baseline
 
-```text
-request locale → getI18n → translated strings → LocaleSwitcher
-```
+Latest verified PR #10 checks before this model update:
 
-- Evidence: landing, login, and app-shell pages.
-- Verification: demo-mode E2E passed in PR #1 CI run 22.
+- Test & Build;
+- Evolution Engine Proof;
+- demo-mode browser E2E;
+- portable PostgreSQL auth and user-isolation E2E;
+- AI workflow and capability registry checks.
 
-### Billing
+Passing CI proves compatibility with the tested repository state, not complete integration or product usefulness.
 
-```text
-/app/billing → current user → PaymentPort
-→ Stripe adapter when configured, noop/free state otherwise
-```
+## Product integration gaps
 
-- Evidence: `apps/web/src/app/app/billing/page.tsx`, payment facade/package.
-- Blind spot: webhook lifecycle and live Stripe environment are not verified.
+- no single workspace operates the complete lifecycle;
+- no completed research-to-decision flow through the interface;
+- no real untrusted sandbox or coding-agent delivery;
+- no independent full verification-to-release flow;
+- no deployment governed by the durable cycle;
+- no product-outcome measurement linked to a released experiment;
+- no causally evaluated learning from a later comparable cycle;
+- no external user has yet demonstrated repeat complete-cycle use.
 
-## Data and trust boundaries
+## Priority order
 
-| Data or secret | Source | Storage/use | Readers/writers | Guard | Risk |
-|---|---|---|---|---|---|
-| email/password | login forms | auth provider/database | server actions + auth adapter | Zod + rate limit | High |
-| session cookie | auth adapter | browser/server | middleware/server components | provider behavior | High |
-| profiles/notes | authenticated user | Postgres or explicit demo memory | owner-scoped app flows | user ID filters | High |
-| service credentials | environment | adapter initialization | server only | `.env` policy | High |
-| billing state | Stripe/noop adapter | external/local response | authenticated user | env gate | High |
+1. Keep one unified product identity and module map.
+2. Complete persistence, policy and evidence hardening.
+3. Define shared typed contracts and workspace integration skeleton.
+4. Implement research-to-decision through the workspace.
+5. Build real sandbox and interchangeable agent execution.
+6. Add independent verification, draft PR and rollback.
+7. Add authorized release/deployment and outcome measurement.
+8. Add measured learning, MCP/A2A interoperability and hosted team operation.
 
-## Build, test, release, rollback
+This order expresses dependency and safety. It does not remove any module from the intended product.
 
-| Capability | Command/workflow | Current result | Gap |
-|---|---|---|---|
-| Install | `pnpm install --frozen-lockfile` | Pass in CI run 22 | none observed |
-| Unit tests | `pnpm test` | Pass in CI run 22 | no repository coverage threshold |
-| Build | `pnpm build` | Pass in CI run 22 | none observed |
-| Demo E2E | CI `E2E / demo mode` | Pass | limited to demo journey |
-| Portable E2E | CI `E2E / portable-pg` | Failed on initial run and failed-job rerun | Failure detail/artifact not retained; issue #3 |
-| AI workflow | `pnpm check:ai` / dedicated Action | Pass before this dogfood change | capability truth not yet checked mechanically |
-| Deploy | docs + `check:deploy` | configuration check only | no production deployment inspected |
-| Rollback | Git/PR + deployment-specific procedures | not exercised | environment-specific |
+## Workstream tracking
 
-## Architecture decisions and constraints
+- #11 — persistence crash, migration and multi-process proof;
+- #12 — fail-closed sandbox execution backends;
+- #13 — research-to-decision integrated milestone;
+- #14 — real-user decision-value validation;
+- #15 — independent/versioned Evolution Core package.
 
-- Product code should remain in `apps/web`; foundation ports live in packages.
-- Vendor-specific calls remain behind adapters/facades.
-- Security, auth, data, billing, production, and destructive actions require
-  explicit gates.
-- Agents must implement one bounded issue and open a draft PR rather than merge.
-- Repository knowledge should be structured, linked, and mechanically checked.
+These issues are modules and prerequisites of the single Shipkit product, not separate product directions.
 
-## Known hotspots
+## Hard constraints
 
-| Area | Signal | Impact | Evidence | Confidence |
-|---|---|---|---|---|
-| Documentation truth | roadmap and development plan disagree about completed capabilities | agents can plan obsolete work | active docs vs current code | High |
-| Notes DB fallback | broad catches fall through to memory | configured persistence failures can be hidden | `notes-store.ts` | High |
-| Portable E2E reliability | initial run and failed-job rerun failed | merge signal and auth confidence are weakened | GitHub Actions run 22 / issue #3 | High |
-| Product definition | root `IDEA.md` still defines a demo shell | research may optimize the wrong product | `IDEA.md` | High |
-| Completion gate | main CI runs test/build but not root `pnpm verify` | local and remote gates can drift | workflow/package scripts | High |
-| TTFP claim | no recent measured artifact | north-star claim is not proven | docs only | Medium |
-
-## Blind spots
-
-- No production, analytics, support, customer interview, or cost data.
-- No live Supabase, OAuth, Resend, S3, Stripe, or deployment verification.
-- Not every package implementation was read symbol by symbol.
-- Exact portable-pg E2E failure is unknown until issue #3 retains artifacts.
-- Dependency advisories and licenses were not audited in this cycle.
-
-## Freshness log
-
-| Section | Last checked | Next refresh trigger |
-|---|---|---|
-| Product/repository map | 2026-07-22 | product definition or package boundary changes |
-| Auth/notes journeys | 2026-07-22 | issue #3 or data-store changes |
-| Capability status | 2026-07-22 | every capability-affecting PR |
-| CI baseline | 2026-07-22 | latest PR head/check result |
+- Shipkit is one product and one lifecycle;
+- modules may not create conflicting product definitions;
+- models and agents cannot mutate accepted state directly;
+- approval must match exact cycle, action, scope and parameters;
+- source content is data, not instruction;
+- implementation cannot accept its own work without independent verification;
+- no implicit merge, deploy, spending, secret access or production write;
+- contradictions and rejected candidates remain visible;
+- module integration must use shared typed records and evidence;
+- learning promotion requires later consumption and measured benefit;
+- documentation may not claim more than code, integration tests and user evidence prove.

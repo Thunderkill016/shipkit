@@ -16,7 +16,7 @@ export default async function AppHomePage() {
   const avatarUrl = profile?.avatarUrl ?? null;
 
   return (
-    <div className="mx-auto min-h-screen max-w-2xl px-6 py-10">
+    <div className="mx-auto min-h-screen max-w-3xl px-6 py-10">
       <header className="flex items-center justify-between border-b border-border pb-6">
         <div>
           <p className="text-xs text-accent">{t("app.tagline")}</p>
@@ -50,6 +50,29 @@ export default async function AppHomePage() {
           </div>
         )}
 
+        <Link
+          href="/app/evolution"
+          className="group block rounded-2xl border border-accent/50 bg-accent/5 p-6 transition-colors hover:border-accent"
+        >
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-accent">
+                Unified product lifecycle
+              </p>
+              <h2 className="mt-2 text-xl font-semibold text-foreground group-hover:text-accent">
+                Open Evolution Workspace
+              </h2>
+              <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
+                Review durable cycles, research sources, claims, contradictions, opportunity decisions,
+                reversible experiments, and the typed handoff to governed execution.
+              </p>
+            </div>
+            <span className="rounded-full border border-accent/40 px-3 py-1 text-xs text-accent">
+              same CLI state →
+            </span>
+          </div>
+        </Link>
+
         <div className="rounded-xl border border-border bg-card p-5">
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted">
@@ -73,17 +96,12 @@ export default async function AppHomePage() {
         </div>
 
         <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted">
-          <p className="font-medium text-foreground">{t("app.vibeNext")}</p>
+          <p className="font-medium text-foreground">Current integrated workflow</p>
           <ol className="mt-3 list-decimal space-y-2 pl-5">
-            <li>
-              Edit <code className="text-foreground">IDEA.md</code>
-            </li>
-            <li>
-              Agent: <em className="text-foreground">Read IDEA.md + AGENTS.md. Next MVP under /app.</em>
-            </li>
-            <li>
-              Routes in <code className="text-foreground">src/app/app/</code>
-            </li>
+            <li>Create an objective and durable cycle.</li>
+            <li>Inspect and assess the repository.</li>
+            <li>Prepare a research bundle with three opportunities.</li>
+            <li>Review the selected experiment and execution handoff in the workspace.</li>
           </ol>
         </div>
 

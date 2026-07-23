@@ -17,8 +17,9 @@ if (!name || name.startsWith("-")) {
 Usage:
   pnpm create -- <name>
 
-Copies the Shipkit foundation, AI workflow, research system, and GitHub
-templates into a new folder, then seeds IDEA.md and PROJECT_MODEL.md.
+Copies the Starter Kit foundation and embedded Evolution Engine tooling into a new
+folder, then gives the generated project its own README, IDEA.md, ROADMAP.md,
+PROJECT_MODEL.md, package identity, and capability registry.
 `);
   process.exit(name ? 1 : 0);
 }
@@ -38,10 +39,12 @@ const skip = new Set([
   "node_modules",
   ".next",
   ".git",
+  ".shipkit",
   "dist",
   "coverage",
   ".turbo",
   "test-results",
+  "artifacts",
 ]);
 
 function copyDirSync(src, out) {
@@ -63,111 +66,198 @@ function copyDirSync(src, out) {
 
 copyDirSync(root, dest);
 
-const idea = `# Product idea — ${name}
+const starterTemplate = fs.readFileSync(join(root, "templates/STARTER_IDEA.md"), "utf8");
+const idea = starterTemplate
+  .replace("# Product idea (copy into a generated starter project)", `# Product idea — ${name}`)
+  .replace("My product", name);
 
-> Fill this before coding. Agents read this first.
+const readme = `# ${name}
 
-## Working title
+A product project generated from Shipkit's Starter Kit foundation.
 
-${name}
+## Define the product first
 
-## One sentence
+Edit [IDEA.md](./IDEA.md) before asking an agent to build broad features. The generated
+project owns its product direction; Shipkit Evolution Engine is included as optional local
+audit tooling and is not the product being built.
 
-TODO: what does this product do?
+## Run locally
 
-## Who is it for?
+\`\`\`bash
+pnpm install
 
-TODO
+# UI/demo path
+pnpm ready
+pnpm dev
 
-## Problem
+# Portable PostgreSQL path
+pnpm ready -- --preset=portable-pg
+pnpm db:up
+pnpm db:migrate
+pnpm dev
+\`\`\`
 
-TODO
+Open http://localhost:3000.
 
-## Solution (MVP)
+## Product workflow
 
-1. Landing
-2. Auth
-3. Core action: TODO
-4. Deploy
+1. Define users, problem, outcome and MVP in \`IDEA.md\`.
+2. Run \`pnpm check:ai\` to validate repository workflow records.
+3. Run \`pnpm evolve -- init\` and a read-only A0-A2 audit when useful.
+4. Implement one bounded vertical slice.
+5. Run \`pnpm verify\` before a pull request.
 
-## Out of scope
+## Included foundation
 
-- Payments (until needed)
-- Multi-tenant orgs
+- Next.js app with landing, authentication and protected app shell;
+- portable PostgreSQL or Supabase paths;
+- security, mail, storage and optional billing adapters;
+- Vitest and Playwright checks;
+- repository-first AI workflow;
+- embedded Shipkit Evolution Engine CLI for local inspection and governed audits.
 
-## MVP checklist
+Passing checks proves technical compatibility, not product value. Validate the user problem
+and measure the intended outcome.
+`;
 
-- [ ] Replace landing copy with brand
-- [ ] Core feature #1
-- [ ] Core feature #2
-- [ ] Production checklist
+const roadmap = `# ${name} roadmap
 
-## Data
+> Product source of truth: [IDEA.md](./IDEA.md)  
+> Capability evidence: [docs/CAPABILITIES.json](./docs/CAPABILITIES.json)
 
-| Entity | Fields | Who can access |
-|--------|--------|----------------|
-| profiles | id, email | owner |
+## Gate 0 — define and validate the problem
 
-## Notes for agents
+- [ ] identify the primary user and recent real behaviour;
+- [ ] record frequency, severity and current workaround;
+- [ ] define the desired measurable outcome;
+- [ ] reject or revise weak assumptions before expensive implementation.
 
-Read AGENTS.md and AI_WORKFLOW.md before coding.
-Use prompts/00-improve-project.md for an evidence-backed project audit.
-Use prompts/00-discover-opportunity.md before building an uncertain idea.
-For non-trivial delivery, start from a GitHub Issue and save a plan under
-docs/ai/plans/. Implement one verified vertical slice at a time.
+## Gate 1 — first vertical slice
+
+- [ ] one core user action works end to end;
+- [ ] authentication and data boundaries are explicit where required;
+- [ ] deterministic checks cover the critical path;
+- [ ] a real user can complete the core action.
+
+## Gate 2 — product outcome proof
+
+- [ ] measure the intended user or business outcome;
+- [ ] record contradictory evidence and failure cases;
+- [ ] keep, iterate or rollback based on evidence;
+- [ ] avoid adding infrastructure that does not change a current decision.
+
+## Operating rules
+
+1. Product evidence before feature count.
+2. One complete path before several partial paths.
+3. Passing tests is not proof of demand.
+4. Agents may propose work but do not own product truth or production authority.
+5. Use Shipkit Evolution Engine in A0-A2 mode for read-only inspection and research until higher autonomy is explicitly justified.
 `;
 
 const projectModel = `# Project model — ${name}
 
 Status: not audited  
 Last verified: never  
-Coverage: no repository investigation recorded
+Coverage: no project-specific repository investigation recorded
 
-This file becomes the compact evidence-backed map of the product and codebase.
-An agent must refresh it using docs/ai/templates/PROJECT_MODEL.md before claiming
-whole-project understanding or starting an open-ended improvement cycle.
+This file becomes the compact evidence-backed map of the generated product and codebase.
+An agent must refresh it before claiming whole-project understanding or starting open-ended
+improvement work.
 
 ## Product
 
-See IDEA.md. Product claims are not yet verified against implementation.
+See \`IDEA.md\`. Product claims are not yet verified against user evidence or implementation.
 
-## Repository coverage
+## Repository foundation
 
-No journeys, modules, trust boundaries, tests, deployments, or blind spots have
-been mapped yet.
+The repository was generated from Shipkit and contains a Next.js Starter Kit plus embedded
+Evolution Engine audit tooling. Inherited code presence is not verification of this product.
+
+## Unknowns
+
+- target-user evidence;
+- critical journey and domain entities;
+- project-specific trust boundaries;
+- production configuration;
+- product outcome metrics;
+- current technical and product risks.
 
 ## Next action
 
-Run prompts/00-improve-project.md at autonomy level A0, A1, or A2 before asking
-an agent to autonomously improve this project.
+Define \`IDEA.md\`, then run a bounded A0-A2 repository audit before broad implementation.
 `;
 
 fs.writeFileSync(join(dest, "IDEA.md"), idea);
+fs.writeFileSync(join(dest, "README.md"), readme);
+fs.writeFileSync(join(dest, "ROADMAP.md"), roadmap);
 fs.writeFileSync(join(dest, "docs/ai/PROJECT_MODEL.md"), projectModel);
 
 try {
   const pkgPath = join(dest, "package.json");
   const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
   pkg.name = name;
+  pkg.description = `${name} — generated product project with Shipkit Starter Kit and Evolution Engine audit tooling.`;
   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
-} catch {
-  /* ignore */
+} catch (error) {
+  console.error(
+    `Could not rewrite package.json: ${error instanceof Error ? error.message : String(error)}`
+  );
+  process.exit(1);
 }
 
 try {
   const registryPath = join(dest, "docs/CAPABILITIES.json");
-  const registry = JSON.parse(fs.readFileSync(registryPath, "utf8"));
-  registry.project = name;
-  registry.inheritedFrom = "shipkit";
-  registry.lastVerified = new Date().toISOString().slice(0, 10);
-  registry.verificationScope =
-    "Scaffold evidence paths were copied from Shipkit; generated-product behavior has not been verified.";
-  registry.capabilities = registry.capabilities.map((capability) => ({
-    ...capability,
-    verificationStatus: "not-run",
-    checks: ["Run project-specific verification after setup"],
-  }));
-  fs.writeFileSync(registryPath, JSON.stringify(registry, null, 2) + "\n");
+  const generatedRegistry = {
+    schemaVersion: 1,
+    project: name,
+    primaryProduct: name,
+    inheritedFrom: "shipkit",
+    lastVerified: new Date().toISOString().slice(0, 10),
+    verificationScope:
+      "Foundation files were copied from Shipkit. Generated-product behavior, configuration, user value and production operation have not been verified.",
+    capabilities: [
+      {
+        id: "starter-foundation",
+        category: "reference-product",
+        status: "partial",
+        verificationStatus: "not-run",
+        summary:
+          "Next.js product foundation with authentication, data, security and delivery adapters copied for project-specific validation.",
+        evidence: [
+          "apps/web",
+          "packages/auth",
+          "packages/db",
+          "packages/security",
+          "IDEA.md",
+        ],
+        checks: ["Run project-specific unit, build and browser verification after setup"],
+        limitations: [
+          "Copied code presence is not verification",
+          "Product-specific journeys and outcomes are not defined yet",
+        ],
+      },
+      {
+        id: "evolution-audit-tooling",
+        category: "evolution-core",
+        status: "partial",
+        verificationStatus: "not-run",
+        summary:
+          "Embedded Shipkit Evolution Engine tooling is available for local read-only repository inspection and governed audit cycles.",
+        evidence: [
+          "packages/evolution-core",
+          "docs/evolution/ARCHITECTURE.md",
+          "docs/evolution/DATA_GOVERNANCE.md",
+        ],
+        checks: ["Run pnpm test and a project-specific A0-A2 audit before relying on the tooling"],
+        limitations: [
+          "Untrusted repository checks still require an external sandbox",
+          "A2 Research Audit implementation is incomplete",
+        ],
+      },
+    ],
+  };
+  fs.writeFileSync(registryPath, JSON.stringify(generatedRegistry, null, 2) + "\n");
 } catch (error) {
   console.error(
     `Could not rewrite docs/CAPABILITIES.json: ${
@@ -186,18 +276,17 @@ console.log(`
   # 1. Define the product
   # edit IDEA.md
 
-  # 2. Validate the workflow and inherited capability evidence
+  # 2. Validate repository records
   pnpm check:ai
 
-  # 3. Ask AI to model and audit the project before broad changes
-  # use prompts/00-improve-project.md with A0, A1, or A2
+  # 3. Inspect before broad changes
+  pnpm evolve -- init
+  # run an A0-A2 audit; do not grant production authority
 
   # 4. Configure and run
-  cp .env.example apps/web/.env.local
-  pnpm doctor
+  pnpm ready
   pnpm dev
 
 Use a GitHub Issue as the delivery prompt. Run pnpm verify before every PR.
-Use research evidence, not novelty, before building a breakthrough idea.
-Happy verified shipping.
+Use user and research evidence, not novelty alone, before building uncertain features.
 `);

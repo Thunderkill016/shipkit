@@ -1,68 +1,246 @@
-# Roadmap
+# Shipkit integrated product roadmap
 
-> Last verified: 2026-07-22  
-> Machine-readable status: [`docs/CAPABILITIES.json`](./docs/CAPABILITIES.json)  
-> Current model: [`docs/ai/PROJECT_MODEL.md`](./docs/ai/PROJECT_MODEL.md)  
-> Ranked backlog: [`docs/ai/improvements/INDEX.md`](./docs/ai/improvements/INDEX.md)
+> Product source of truth: [`IDEA.md`](./IDEA.md)  
+> Detailed implementation plan: [`docs/evolution/ROADMAP.md`](./docs/evolution/ROADMAP.md)  
+> Machine-readable capability evidence: [`docs/CAPABILITIES.json`](./docs/CAPABILITIES.json)
 
-The roadmap describes direction. It must not be used as proof that a capability
-works; use the registry and current checks for that.
+Shipkit is one product. The repository does not contain a primary product competing with a secondary product. It contains modules that must integrate into one lifecycle:
 
-## Shipped foundation
+```text
+workspace and product foundation
+→ understand and research
+→ decide and experiment
+→ implement through agents
+→ verify and release
+→ measure and learn
+```
 
-- pnpm monorepo with a Next.js App Router application;
-- public landing, login, protected/demo app shell, profile, notes, and billing
-  example surfaces;
-- Supabase and Better Auth selection through AuthPort;
-- Postgres schema/migrations and portable-pg setup;
-- security, storage, mail, payment, i18n, and logger packages;
-- Vercel/Docker recipes, setup wizard, doctor, health endpoint, and generator;
-- unit/build checks, demo E2E, portable-pg E2E definitions, and AI workflow
-  validation;
-- repository-first AI delivery, research, independent review, and autonomous
-  improvement system.
+Implementation is sequenced by safety and dependency. Sequencing does not remove any module from the final product.
 
-“Shipped” means code and repository evidence exist. Environment-specific
-verification is recorded separately in `docs/CAPABILITIES.json`.
+## Unified workstreams
 
-## Current reliability gate
+### A. Product workspace and foundation
 
-The portable-pg auth/isolation job failed on the initial PR #1 run and failed
-again on rerun. Issue #3 is the highest-priority repair. Until it passes, the
-portable path is implemented but not reliably verified.
+- product brief, roadmap, opportunity, experiment and approval surfaces;
+- generated application foundation;
+- auth, user data, security, mail, storage and payment modules;
+- local setup, Vercel and Docker delivery paths;
+- one UI for research, execution, verification, release and learning.
 
-## Near term
+### B. Evolution kernel
 
-1. Diagnose and repair the repeated portable-pg E2E failure.
-2. Stop hiding configured-database failures behind the notes memory fallback.
-3. Keep capability status and evidence machine-verifiable.
-4. Align CI and `pnpm verify`.
-5. Replace the demo root `IDEA.md` with Shipkit’s actual product definition.
-6. Measure time-to-first-product and remove the largest measured delay.
+- durable cycles and legal transitions;
+- policy, risk and exact approvals;
+- evidence gates, recovery, rollback and replay;
+- stable schemas and portable package boundary.
 
-## Before v1.0
+### C. Research intelligence
 
-- required CI checks reliably pass;
-- capability claims match code and current verification;
-- generated-project workflow remains covered end to end;
-- at least one primary setup path has measured TTFP evidence;
-- one generated project demonstrates a real domain slice without foundation
-  rewrites;
-- production/integration claims clearly distinguish code presence from live
-  verification.
+- repository, internal, web, paper, competitor and user research;
+- reproducible search, source quality and citation tracking;
+- claims, contradictions, uncertainty and expiry;
+- opportunity portfolios and experiment selection.
 
-## Later, only with evidence
+### D. Execution and sandbox
 
-- standalone published `create-shipkit`;
-- admin or showcase applications;
-- a second app adapter;
-- team/multi-tenant features;
-- deeper billing and operational integrations.
+- command, Codex, OpenHands and other agent adapters;
+- isolated workspaces and branches;
+- filesystem, process, dependency, secret, network and resource containment;
+- draft PR delivery and rollback preparation.
 
-## Principles
+### E. Verification, delivery and operations
 
-1. Outcome and trust over feature count.
-2. One polished path before several partial paths.
-3. Security and user isolation cannot regress.
-4. Research before uncertain product or technical bets.
-5. Active docs may not claim more than code and verification.
+- independent technical and security review;
+- CI, benchmark, provenance and attestations;
+- authorized release, deployment and rollback;
+- GitHub Action, MCP/A2A interoperability and optional telemetry.
+
+### F. Measurement and learning
+
+- technical, UX, adoption, retention, conversion and cost outcomes;
+- keep, iterate, reject and rollback decisions;
+- memory and skill consumption tracking;
+- paired evaluation, promotion, expiry and retirement.
+
+## Current verified foundation
+
+- deterministic evolution state machine and legal transitions;
+- A0–A4 autonomy and R0–R4 risk model;
+- exact cycle/action/scope approvals;
+- append-only journal, atomic snapshot recovery and serialized writers;
+- content-addressed evidence blobs and contextual occurrences;
+- bounded repository inspection and trust-boundary discovery;
+- temporary-workspace checks and readiness model;
+- typed research briefs, plans, runs, queries, sources, claims and contradictions;
+- deterministic repository/internal single-worker research adapter;
+- bounded query, source, time and cost accounting with explicit stopping reasons;
+- durable completed or `inconclusive` research outcomes;
+- independent deterministic research evaluation with a distinct reviewer actor;
+- repository-only user-demand claim rejection and visible research limitations;
+- three-opportunity portfolios, decision and reversible experiment records;
+- parameter-bound `ExecutionHandoff` persisted through the same cycle;
+- CLI commands to run repository research, prepare manual handoffs and inspect research state;
+- read-only `/app/evolution` workspace showing runs, coverage, stopping reasons and review verdicts;
+- Next.js product foundation, auth, PostgreSQL, security and delivery recipes;
+- product generator and AI workflow;
+- CLI and CI dogfood on Shipkit plus assessment proof on an unrelated repository;
+- demo and portable PostgreSQL E2E paths.
+
+“Verified” means repository code and current CI evidence exist. It does not imply public-web research quality, direct user evidence, product-market fit, secure untrusted execution, production operation or measured self-improvement.
+
+## Integration milestone 0 — one product identity
+
+- [x] define Shipkit as one integrated product;
+- [x] define the Evolution Engine as the control core rather than a separate product;
+- [x] define the web foundation and generator as product modules rather than disposable dogfood;
+- [x] preserve independent product definitions for projects generated by Shipkit;
+- [x] synchronize README, package metadata, capability registry, project model, architecture, issue and PR descriptions;
+- [x] map planned capabilities to product workstreams and tracked issues.
+
+Exit: every active document describes one Shipkit product and no capability is implicitly abandoned.
+
+## Integration milestone 1 — trustworthy foundation
+
+- [x] exact approval scope, expiry, revocation and policy version;
+- [x] writer serialization and stale-writer rejection;
+- [x] separate evidence blobs from contextual occurrences;
+- [x] evidence digest verification;
+- [ ] event-schema migration fixtures;
+- [ ] kill-process and multi-process persistence proof;
+- [ ] content-level secret detection and enforceable data governance;
+- [ ] independently buildable/versioned evolution core;
+- [ ] independent persistence, policy and API review.
+
+Exit: the shared lifecycle is durable enough for every later module to rely on it.
+
+## Integration milestone 2 — research and decision loop
+
+```text
+workspace objective
+→ inspect and assess
+→ decision brief and coverage map
+→ bounded repository or external research
+→ atomic claims and contradictions
+→ independent research review
+→ three or more opportunities
+→ transparent ranking
+→ reversible experiment
+→ persisted execution handoff
+```
+
+- [x] typed `ResearchBrief`, `ResearchPlan`, `ResearchRunRecord`, `QueryRecord`, `SourceRecord`, `ClaimRecord`, `ContradictionRecord`, `ResearchEvaluationRecord`, `OpportunityRecord`, `DecisionRecord`, `ExperimentRecord` and `ExecutionHandoff`;
+- [x] append research records through legal immutable cycle transitions;
+- [x] deterministic repository/internal single-worker source adapter;
+- [x] validate at least three opportunities before accepting a decision bundle;
+- [x] enforce repository coverage, query, source and time budgets;
+- [x] persist usage, coverage gaps and explicit stopping reasons;
+- [x] create an automated durable `inconclusive` outcome when minimum evidence or budget is insufficient;
+- [x] require a distinct independent reviewer before repository research can enter `decided`;
+- [x] reject repository-only `user-problem` claims without direct user-research evidence;
+- [x] preserve contradictory evidence, rejected alternatives and reviewer limitations;
+- [x] bind the execution handoff to an experiment and SHA-256 parameter digest;
+- [x] CLI `research-repository`, `prepare-handoff` and `research-show` over the shared durable store;
+- [x] workspace views for research usage, coverage, stop reason, reviewer checks, sources, claims, contradictions, opportunities, decisions, experiments and execution scope;
+- [x] Shipkit dogfood proof for autonomous repository research and journal reload;
+- [ ] public web, paper, specification, competitor, changelog, incident and dataset adapters;
+- [ ] adaptive query reformulation, citation chasing, entity resolution and hostile-source defenses;
+- [ ] exact evidence spans, transformations and calculation provenance;
+- [ ] product discovery and consented user-research evidence ingestion;
+- [ ] independent external citation verification beyond the deterministic repository reviewer;
+- [ ] workspace authoring, review and approval of research plans and decisions;
+- [ ] autonomous research proof on an unrelated real product;
+- [ ] real-user decision-value validation.
+
+Current boundary: Shipkit can autonomously make bounded repository-readiness decisions and explicitly identify questions that require user or external evidence. It cannot yet autonomously browse the public web or prove user demand.
+
+Exit: Shipkit can decide what to build and preserve why, while preparing a typed handoff to execution.
+
+## Integration milestone 3 — governed implementation
+
+- stable `ExecutionBackend` capability contract;
+- trusted-local and real sandbox backends;
+- generic command adapter;
+- Codex and OpenHands adapters, followed by additional agent clients;
+- isolated branch/worktree delivery;
+- approved plan and parameter-bound execution;
+- draft PR, change evidence and rollback plan;
+- live execution progress in the same product workspace.
+
+Exit: at least two interchangeable agent clients implement the same accepted experiment without owning cycle state or acceptance.
+
+## Integration milestone 4 — independent verification and release
+
+- independent code, test, security and policy reviewer boundaries;
+- project-specific verification packs;
+- benchmark comparison against baselines;
+- GitHub Action and PR scorecard;
+- provenance and in-toto-compatible attestations;
+- authorized release/deployment adapters;
+- environment-specific rollback;
+- release and deployment views in the workspace.
+
+Exit: a selected change can move from decision to verified and explicitly authorized release through one cycle.
+
+## Integration milestone 5 — product measurement
+
+- experiment exposure and comparison contracts;
+- UX, adoption, retention, conversion, reliability and cost evaluators;
+- analytics, support and user-research ingestion under data governance;
+- technical and product verdicts reported separately;
+- keep, iterate, reject and rollback records;
+- outcome dashboards attached to the original decision and change.
+
+Exit: Shipkit can reject technically passing work when real product evidence does not support it.
+
+## Integration milestone 6 — measured learning and continuous evolution
+
+- memory and skill registry with provenance, scope, risk and expiry;
+- actual later-cycle consumption tracking;
+- comparable runs with and without proposed learning;
+- skill promotion, versioning, retirement and harmful-learning detection;
+- research, planning, execution and verification skill packs;
+- controlled meta-improvement experiments;
+- no positive-recursion claim without causal evidence.
+
+Exit: at least one accepted learning measurably improves a later comparable complete product cycle.
+
+## Integration milestone 7 — complete product distribution
+
+- unified local workspace;
+- standalone CLI and libraries;
+- reusable GitHub Action;
+- MCP server and A2A interoperability where useful;
+- self-hosted deployment;
+- hosted team history, policy, benchmark and collaboration service;
+- organization-level access, approvals and audit history;
+- generator and application foundation integrated into onboarding.
+
+Exit: users experience Shipkit as one product across local, repository and hosted surfaces.
+
+## Cross-product metrics
+
+- time from product objective to first useful evidence;
+- time from accepted experiment to verified change;
+- time from verified change to measured outcome;
+- cycle recovery without state loss;
+- unsafe action false-allow and false-block rates;
+- citation quality, contradiction recall and research coverage;
+- research budget use, stop quality and reviewer rejection rate;
+- agent task success, cost, duration and intervention rate;
+- recommendation survival and implementation waste avoided;
+- release and rollback reliability;
+- repeat use across complete cycles;
+- measured benefit or harm from promoted learning.
+
+## Operating principles
+
+1. One product, many modules, one shared lifecycle.
+2. Every module remains in the destination architecture unless evidence explicitly rejects it.
+3. Dependencies determine build order; they do not redefine product direction.
+4. Research, execution, verification, release and learning must connect through typed durable handoffs.
+5. A module working in isolation is not complete integration.
+6. Temporary workspaces are not security sandboxes.
+7. Passing checks is not proof of user value.
+8. Repository evidence is not proof of user demand or current external facts.
+9. Simpler baselines must be measured, but complexity may be added when the integrated product requires it.
+10. Documentation must distinguish planned, implemented, integrated and experimentally proven capability.

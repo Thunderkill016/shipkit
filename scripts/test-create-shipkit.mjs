@@ -1,10 +1,10 @@
 import { access, mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const root = resolve(join(fileURLToPath(import.meta.url), "../.."));
 const sandbox = await mkdtemp(join(tmpdir(), "shipkit-create-"));
 const name = "generated-product";
 const generated = join(sandbox, name);
@@ -31,6 +31,8 @@ try {
     "AGENTS.md",
     "AI_WORKFLOW.md",
     "IDEA.md",
+    "README.md",
+    "ROADMAP.md",
     "docs/CAPABILITIES.json",
     "docs/ai/PROJECT_MODEL.md",
     "docs/ai/AUTONOMOUS_IMPROVEMENT.md",
@@ -44,8 +46,23 @@ try {
   for (const file of required) await access(join(generated, file));
 
   const pkg = JSON.parse(await readFile(join(generated, "package.json"), "utf8"));
-  if (pkg.name !== name) {
-    throw new Error(`Expected generated package name ${name}, received ${pkg.name}`);
+  if (pkg.name !== name || !pkg.description.includes(name)) {
+    throw new Error("Generated package identity was not rewritten.");
+  }
+
+  const idea = await readFile(join(generated, "IDEA.md"), "utf8");
+  if (!idea.includes(`Product idea — ${name}`) || idea.includes("product source of truth\n\nShipkit Evolution Engine")) {
+    throw new Error("Generated IDEA.md still carries the source repository product identity.");
+  }
+
+  const readme = await readFile(join(generated, "README.md"), "utf8");
+  if (!readme.startsWith(`# ${name}`) || !readme.includes("generated from Shipkit")) {
+    throw new Error("Generated README was not rewritten for the generated product.");
+  }
+
+  const roadmap = await readFile(join(generated, "ROADMAP.md"), "utf8");
+  if (!roadmap.includes(`# ${name} roadmap`) || roadmap.includes("Primary product: **Shipkit Evolution Engine**")) {
+    throw new Error("Generated roadmap still carries Shipkit's primary roadmap identity.");
   }
 
   const model = await readFile(join(generated, "docs/ai/PROJECT_MODEL.md"), "utf8");
@@ -56,7 +73,11 @@ try {
   const registry = JSON.parse(
     await readFile(join(generated, "docs/CAPABILITIES.json"), "utf8")
   );
-  if (registry.project !== name || registry.inheritedFrom !== "shipkit") {
+  if (
+    registry.project !== name ||
+    registry.primaryProduct !== name ||
+    registry.inheritedFrom !== "shipkit"
+  ) {
     throw new Error("Generated capability registry identity was not rewritten.");
   }
   if (
@@ -66,11 +87,14 @@ try {
   ) {
     throw new Error("Generated capability verification state was not reset.");
   }
+  if (registry.capabilities.some((capability) => capability.id === "evolution-state-machine")) {
+    throw new Error("Generated product inherited source-repository capability claims verbatim.");
+  }
 
   run(process.execPath, [join(generated, "scripts/check-ai-workflow.mjs")], generated);
 
   console.log(
-    "Shipkit generator OK: workflow, capability registry, and project model copied correctly."
+    "Shipkit generator OK: generated product identity, workflow, capabilities, and project model are independent."
   );
 } finally {
   await rm(sandbox, { recursive: true, force: true });

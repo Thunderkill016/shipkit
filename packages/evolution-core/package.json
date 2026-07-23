@@ -1,0 +1,21 @@
+{
+  "name": "@shipkit/evolution-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "shipkit-evolve": "./dist/cli.js",
+    "shipkit-research-public": "./dist/public-cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "typecheck": "pnpm --dir ../../apps/web exec tsc -p ../../packages/evolution-core/tsconfig.json --noEmit",
+    "build": "pnpm --dir ../../apps/web exec tsc -p ../../packages/evolution-core/tsconfig.build.json",
+    "test": "pnpm --dir ../../apps/web exec vitest run --root ../.. packages/evolution-core/src"
+  }
+}
