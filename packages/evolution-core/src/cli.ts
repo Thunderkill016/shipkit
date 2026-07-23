@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 
 import { basename, resolve } from "node:path";
+import { runDiscoveredChecks } from "./check-runner.js";
 import { EvidenceRegistry } from "./evidence.js";
 import { EvolutionStore } from "./persistence.js";
+import { authorizeAction } from "./policy.js";
 import { inspectRepository } from "./repository.js";
+import { createProjectScorecard } from "./scorecard.js";
 import { createCycle, transitionCycle } from "./state-machine.js";
 import {
   AUTONOMY_LEVELS,
@@ -34,6 +37,8 @@ Usage:
   shipkit-evolve init [--root .shipkit]
   shipkit-evolve start --objective "..." [--id repo:cycle] [--autonomy A2] [--risk R1]
   shipkit-evolve inspect [cycle-id] [--project-root .] [--actor shipkit-inspector]
+  shipkit-evolve assess <cycle-id> [--project-root .] [--check test]...
+    [--timeout-ms 120000] [--max-output-bytes 65536] [--actor shipkit-assessor]
   shipkit-evolve status [--root .shipkit]
   shipkit-evolve show <cycle-id> [--root .shipkit]
   shipkit-evolve resume <cycle-id> [--root .shipkit]
@@ -43,6 +48,7 @@ Usage:
     [--verification-passed]
 
 The CLI never calls a model, merges, deploys, reads secrets, or writes production by itself.
+Repository checks are selected only from discovered package scripts and run in temporary source copies.
 `;
 
 function parseArgs(argv: string[]): ParsedArgs {
@@ -79,6 +85,16 @@ function required(args: ParsedArgs, key: string): string {
   const value = one(args, key)?.trim();
   if (!value) throw new Error(`--${key} is required`);
   return value;
+}
+
+function optionalPositiveInteger(args: ParsedArgs, key: string): number | undefined {
+  const value = one(args, key);
+  if (value === undefined) return undefined;
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new Error(`--${key} must be a positive integer`);
+  }
+  return parsed;
 }
 
 function parseArtifacts(values: string[]): Partial<Record<ArtifactBucket, string[]>> {
@@ -203,6 +219,58 @@ export async function runEvolutionCli(
       cycle = await store.save(previous, next);
     }
     printJson(io, { evidence, snapshot, cycle });
+    return 0;
+  }
+
+  if (command === "assess") {
+    const cycleId = parsed.positionals[1];
+    if (!cycleId) throw new Error("assess requires a cycle ID");
+    const previous = await store.load(cycleId);
+    if (previous.stage !== "observed") {
+      throw new Error(`assess requires an observed cycle; current stage is ${previous.stage}`);
+    }
+    const authorization = authorizeAction({
+      autonomy: previous.autonomy,
+      risk: previous.risk,
+      action: "run-checks",
+      approvals: previous.approvals,
+    });
+    if (!authorization.allowed) throw new Error(authorization.reason);
+
+    const projectRoot = projectRootFrom(parsed);
+    const snapshot = await inspectRepository(projectRoot);
+    const checkReport = await runDiscoveredChecks(snapshot, {
+      projectRoot,
+      checkNames: parsed.options.get("check") ?? [],
+      timeoutMs: optionalPositiveInteger(parsed, "timeout-ms"),
+      maxOutputBytes: optionalPositiveInteger(parsed, "max-output-bytes"),
+    });
+    const scorecard = createProjectScorecard(snapshot, checkReport);
+    const registry = new EvidenceRegistry(store.rootDir, projectRoot);
+    const snapshotEvidence = await registry.registerJson("project-snapshot", snapshot);
+    const checkEvidence = await registry.registerJson("check-report", checkReport);
+    const scorecardEvidence = await registry.registerJson("project-scorecard", scorecard);
+    const next = transitionCycle(previous, "modeled", {
+      actor: one(parsed, "actor")?.trim() || "shipkit-assessor",
+      reason: "Built a repository model from isolated checks and an evidence-backed scorecard",
+      addArtifacts: {
+        baseline: [`evidence:${snapshotEvidence.id}`, `evidence:${checkEvidence.id}`],
+        model: [`evidence:${scorecardEvidence.id}`],
+      },
+    });
+    const cycle = await store.save(previous, next);
+    printJson(io, {
+      authorization,
+      evidence: {
+        snapshot: snapshotEvidence,
+        checks: checkEvidence,
+        scorecard: scorecardEvidence,
+      },
+      snapshot,
+      checkReport,
+      scorecard,
+      cycle,
+    });
     return 0;
   }
 
