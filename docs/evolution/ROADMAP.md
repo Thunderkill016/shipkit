@@ -1,260 +1,226 @@
 # Evolution Engine build roadmap
 
 Status: active  
-Issue: #9
+Issue: #9  
+Primary product definition: [`../../IDEA.md`](../../IDEA.md)
 
-## Phase 0 — research map and invariants
+This roadmap separates the long-term product thesis from the next proof. The current implementation reaches repository assessment (`created → observed → modeled`). It does not yet complete the A2 Research Audit or autonomous product R&D promise.
 
+## Gate 0 — product coherence and research foundation
+
+### Completed
+
+- [x] establish Evolution Engine as the primary Shipkit product;
+- [x] define the Starter Kit as a dogfood/reference product rather than the roadmap owner;
+- [x] make root `IDEA.md` the product source of truth;
+- [x] preserve a separate generated-project idea template;
 - [x] maintain a living primary-source and implementation map;
-- [x] record architectural extracts, contradictions, licenses, and rejected patterns;
-- [x] define kernel invariants before adding agent integrations;
-- [x] compare durable workflow, coding-agent, sandbox, protocol, policy, provenance,
-  observability, benchmark, research-agent, product-discovery, and learning systems through one
-  common framework;
-- [x] record explicit adopt/adapt/integrate/defer/reject decisions and falsification tests;
-- [x] define research as a first-class product capability in `RESEARCH_CAPABILITY.md`;
-- [ ] pin a reviewed tag, release, commit, paper, or specification version for every dependency,
-  research method, benchmark, or integration candidate before implementation begins;
-- [ ] convert material comparison and research-architecture decisions into versioned ADRs as their
-  implementation starts.
+- [x] compare workflow, coding-agent, sandbox, protocol, policy, provenance, observability, benchmark, research-agent, product-discovery and learning systems through one framework;
+- [x] record adopt/adapt/integrate/defer/reject decisions and falsification tests;
+- [x] define research as a first-class product capability in `RESEARCH_CAPABILITY.md`.
 
-Exit: product thesis, architecture, threat model, benchmark strategy,
-`COMPARATIVE_ANALYSIS.md`, and `RESEARCH_CAPABILITY.md` are reviewable and linked to implementation
-decisions. A project or research method named without a source, decision, limitation, and
-falsifiable test does not satisfy this phase.
+### Remaining
 
-## Phase 1 — deterministic kernel
+- [ ] pin a reviewed tag, release, commit, paper or specification version before each external integration begins;
+- [ ] convert material architecture decisions into versioned ADRs when implementation starts;
+- [ ] validate the beachhead user and A2 Research Audit problem with real developers;
+- [ ] keep README, package metadata, capability registry, project model and issue/PR descriptions synchronized.
+
+Exit: one coherent product identity, one beachhead user, one MVP definition and inspectable research decisions. A named project or method without a source, limitation, decision and falsifiable test does not satisfy this gate.
+
+## Gate 1 — deterministic kernel safety
+
+### Completed foundation
 
 - [x] state machine and immutable transitions;
-- [x] A0–A4/R0–R4 policy decisions;
-- [x] scoped approvals and protected actions;
-- [x] atomic JSON snapshot and append-only journal;
+- [x] A0–A4 autonomy and R0–R4 risk decisions;
+- [x] protected actions and exact cycle/scope approval matching;
+- [x] approval ID, policy version, expiry and revocation state;
+- [x] atomic JSON snapshot and synchronized append-only journal;
 - [x] recovery from missing/corrupt snapshot and interrupted trailing write;
-- [x] stale-writer rejection and checksum tamper detection;
-- [x] local CLI for init, start, status, show/resume, inspect, assess, and evidence-backed advance;
-- [x] compiled CLI dogfood on Shipkit in CI;
+- [x] per-cycle writer lock, competing-writer serialization and stale-writer rejection;
+- [x] checksum-based accidental corruption detection;
+- [x] local CLI for init, start, inspect, assess, status, show/resume and evidence-backed advance;
+- [x] compiled CLI dogfood on Shipkit in CI.
+
+### Remaining safety proof
+
 - [ ] explicit event-schema migration fixtures across released versions;
-- [ ] kill-process integration test around every persistence boundary.
+- [ ] kill-process integration tests around journal append, file sync, snapshot write, rename and directory sync;
+- [ ] multi-process persistence stress tests across supported operating systems;
+- [ ] lock-lease recovery tests after forced process termination;
+- [ ] define the boundary between corruption detection and signed cryptographic provenance;
+- [ ] independent persistence and policy review.
 
-Exit: a full cycle can stop/restart and complete without any LLM.
+Exit: committed state survives crashes and competing processes without duplicate accepted transitions. A3/A4 remains experimental until the remaining safety proof is complete.
 
-## Phase 2 — repository perception and evidence
+## Gate 2 — repository perception, evidence and execution boundary
+
+### Completed foundation
 
 - [x] portable bounded project scanner;
-- [x] package manager, manifest, language, source, test, docs, CI, and product-signal discovery;
-- [x] structural trust-boundary discovery for auth, database, deployment, secrets, and payments;
-- [x] content-addressed JSON/file evidence registry with SHA-256;
-- [x] secret-path, outside-root, symlink, size, truncation, and tamper safety tests;
-- [x] check command discovery from project manifests;
-- [x] bounded configurable check runner with timeout, output limits, and secret sanitization;
-- [x] evidence-backed project model and human-readable readiness scorecard;
-- [x] prove inspection and assessment on a pinned unrelated real repository;
-- [ ] enforce network isolation and filesystem write containment for untrusted repositories;
-- [ ] define dependency isolation that does not link host `node_modules` into the check workspace.
+- [x] package manager, manifest, language, source, test, docs, CI and product-signal discovery;
+- [x] structural trust-boundary discovery for auth, database, deployment, secrets and payments;
+- [x] SHA-256 content-addressed evidence blobs;
+- [x] distinct evidence occurrences for contextual kind/source/capture metadata;
+- [x] read-time digest and byte-length verification;
+- [x] secret-path, outside-root, symlink, size and truncation tests;
+- [x] discovered package-script execution without a shell;
+- [x] timeout, output bounds, reduced environment and common secret sanitization;
+- [x] scorecard with separate research, execution and verification readiness;
+- [x] explicit A2 autonomy ceiling for the current read-only product surface;
+- [x] proof on Shipkit and a pinned unrelated repository.
 
-Exit: an A2 audit works on Shipkit and a pinned unrelated repository. Execution of
-untrusted repository scripts still requires an external sandbox until the remaining
-isolation controls are implemented.
+### Remaining containment work
 
-## Phase 3 — research capability and opportunity intelligence
+- [ ] stable execution-backend contract;
+- [ ] explicit capability negotiation for filesystem, process, dependency, secret and network containment;
+- [ ] fail closed when requested isolation is unavailable;
+- [ ] eliminate host `node_modules` links for untrusted execution;
+- [ ] adversarial fixtures for host writes, secret inheritance, symlinks, process trees, output floods, timeout and egress;
+- [ ] content-level secret detection and data-retention policy;
+- [ ] independent sandbox/security review.
 
-### 3A — decision framing and research planning
+Exit: repository inspection remains portable; untrusted script execution occurs only in a backend that proves the requested containment. Until then, checks are described as **temporary-workspace checks**, not isolated or sandboxed checks.
 
-- [ ] typed `ResearchBrief` with decision owner, deadline, assumptions, constraints, evidence
-  thresholds, protected outcomes, and information value;
-- [ ] typed `ResearchPlan` with question decomposition, dependency graph, coverage map, source
-  strategy, budgets, checkpoints, and explicit stop conditions;
-- [ ] transform vague objectives into decision-changing questions before any broad search begins;
-- [ ] distinguish breadth-first branches that can run in parallel from depth-first dependent work;
-- [ ] human-review checkpoint for high-cost, high-risk, or poorly scoped research plans.
+## Gate 3 — A2 Research Audit MVP
 
-### 3B — modern search and retrieval skills
+First usable product:
 
-- [ ] internal evidence collectors for issues, CI, docs, decisions, support, analytics, sales and
-  prior user research;
-- [ ] external-source adapters for web, papers, repositories, specifications, competitors,
-  changelogs, incidents, datasets and authenticated sources;
-- [ ] reproducible `QueryRecord` ledger with aliases, synonyms, filters, parent queries, rationale,
-  result identifiers, and query reformulation history;
-- [ ] citation chasing, entity resolution, negative/falsification queries, failure/postmortem search,
-  and multilingual/domain-specific search strategies;
-- [ ] adaptive search loop: inspect evidence, measure coverage, identify gaps, revise strategy, and
-  search again;
-- [ ] source-type routing so private/internal questions are not incorrectly sent to public web tools;
-- [ ] source quality scoring for authority, directness, freshness, applicability, independence,
-  conflicts of interest and known limitations.
+```text
+inspect → assess → decision brief → bounded research
+→ atomic claims → contradiction review → 3 opportunities
+→ transparent ranking → smallest reversible experiment
+```
 
-### 3C — product discovery research
+The MVP does not modify product code.
 
-- [ ] convert team opinions and feature requests into testable research questions and assumptions;
-- [ ] typed `UserResearchRecord` with participant criteria, consent boundary, method, observed
-  behaviour, notes, findings, limitations, and evidence links;
-- [ ] ingest interviews, contextual observation, support tickets, search logs, analytics, churn,
-  non-user, sales and accessibility evidence;
-- [ ] validate the user problem before solution design and validate proposed solutions before
-  expensive implementation;
-- [ ] maintain an opportunity map connecting desired outcomes, user needs, problems, candidate
-  solutions and experiments;
-- [ ] separate observed behaviour from stated preference and separate loud feedback from reach,
-  frequency, severity and strategic fit;
-- [ ] continue user research through discovery, alpha, beta and live operation rather than treating
-  it as a one-time phase.
+### 3A — minimum durable records
 
-### 3D — claims, provenance and contradiction
+- [ ] `ResearchBrief`: decision owner, deadline, assumptions, constraints, evidence thresholds and protected outcomes;
+- [ ] `ResearchPlan`: questions, dependencies, coverage map, source strategy, budget, checkpoints and stopping rules;
+- [ ] `QueryRecord`: exact query, aliases, filters, parent query, rationale, tool and result identifiers;
+- [ ] `SourceRecord`: canonical identity, version, publisher, access date, license, source class, digest, authority, freshness and applicability;
+- [ ] `ClaimRecord`: atomic claim, evidence spans, claim type, confidence, uncertainty, expiry and supporting/contradicting sources;
+- [ ] `ContradictionRecord`: conflicting claims, suspected cause, affected decision and resolution state;
+- [ ] `OpportunityRecord`: problem, evidence, alternatives, expected outcome, risk, cost, uncertainty, ranking rationale and smallest experiment.
 
-- [ ] typed `SourceRecord`, `ClaimRecord`, and `ContradictionRecord`;
-- [ ] preserve source identity, version, author/publisher, access date, license, scope, integrity and
-  evidence digest;
-- [ ] record claim type: observation, interpretation, estimate, calculation or recommendation;
-- [ ] bind every material claim to exact evidence locations and transformations;
-- [ ] record freshness, applicability, confidence, uncertainty and expiry;
-- [ ] triangulate official claims, code, independent reproduction, user evidence and product data;
-- [ ] preserve contradictory evidence and explain disagreements instead of silently selecting the
-  source that supports the current hypothesis;
-- [ ] detect source circularity, citation laundering, stale versions and unsupported claim elevation.
+### 3B — single-worker research baseline
 
-### 3E — bounded orchestration and research safety
+- [ ] transform vague objectives into decision-changing questions before searching;
+- [ ] decompose questions into breadth-first and depth-first branches;
+- [ ] route public, private and repository questions to appropriate sources;
+- [ ] preserve query reformulation and citation-chasing history;
+- [ ] search for failures, limitations, postmortems and falsifying evidence;
+- [ ] score source authority, directness, freshness, applicability, independence and conflict of interest;
+- [ ] enforce time, token, search, document and monetary budgets;
+- [ ] stop on evidence threshold, diminishing returns, experiment superiority, exhausted budget or explicit inconclusive result.
 
-- [ ] single-worker research baseline with explicit time, token, search, document and monetary
-  budgets;
-- [ ] bounded parallel-worker plan with clear division of labour, output schemas, duplicate-work
-  avoidance, stop conditions and escalation rules;
-- [ ] scale effort to decision value and query complexity rather than spawning agents by default;
-- [ ] prove parallel research improves coverage or latency enough to justify coordination and token
-  costs over the single-worker baseline;
-- [ ] treat web pages, repositories and documents as hostile inputs rather than executable
-  instructions;
-- [ ] browsing and code-execution isolation, prompt-injection resistance, privacy minimisation,
-  connected-source authorization and protected credential boundaries;
-- [ ] retain complete `ResearchRun` trajectories, failures, budgets and stop reasons.
+### 3C — evidence review and synthesis
 
-### 3F — adversarial review and synthesis
+- [ ] reconstruct reports from atomic claims rather than narrative-only output;
+- [ ] preserve contradictory evidence instead of silently choosing a preferred source;
+- [ ] detect circular sourcing, citation laundering, stale versions and claims beyond evidence;
+- [ ] run a separate reviewer for material claims and calculations;
+- [ ] produce at least three distinct opportunities;
+- [ ] keep evidence strength, expected value, strategic fit, urgency, cost, risk and learning value separately inspectable;
+- [ ] recommend the smallest reversible experiment when it has more information value than further desk research.
 
-- [ ] independent research reviewer that searches for contrary evidence, alternative explanations,
-  missing populations, source bias, faulty calculations and claims beyond evidence;
-- [ ] citation verification and unsupported-claim checks separate from report generation;
-- [ ] opportunity/hypothesis portfolio rather than a single generated answer;
-- [ ] require every opportunity to identify comparable external mechanisms, rejected alternatives,
-  supporting and contradicting evidence, expected outcome, risk, reversibility and cost;
-- [ ] evaluator-backed candidate ranking that keeps evidence strength, expected value, strategic fit,
-  urgency, cost, risk and learning value separately inspectable;
-- [ ] smallest decision-changing experiment selected when experimentation has higher information
-  value than more desk research;
-- [ ] explicit `inconclusive` result when evidence thresholds cannot be met.
+### 3D — product discovery and real-user proof
 
-### 3G — research evaluation and skill learning
+- [ ] convert feature requests into problem and behaviour questions;
+- [ ] gather recent observed behaviour from users, non-users, churned users and constrained users;
+- [ ] triangulate interviews with issues, support, analytics, search logs, sales or workflow observation where available;
+- [ ] validate the problem before expensive solution implementation;
+- [ ] test the A2 Audit with real developers on Shipkit and at least one unrelated product;
+- [ ] measure whether recommendations changed, confirmed or prevented a development decision;
+- [ ] measure repeat use across later cycles.
 
-- [ ] typed `ResearchEvaluation` covering correctness, coverage, citation precision/completeness,
-  source quality, contradiction recall, freshness, decision usefulness, cost, latency and human
-  review;
-- [ ] retrieval benchmarks inspired by BrowseComp and DeepSearchQA;
-- [ ] report/evidence benchmarks using atomic verifiable rubrics and per-claim citation checks;
-- [ ] product-decision benchmark measuring problem validation, opportunity quality, experiment
-  survival, avoided waste and product outcome rather than report prose alone;
-- [ ] compare deterministic workflow, single researcher, bounded parallel researchers and
-  human-assisted configurations;
-- [ ] research-skill registry for query transformations, source maps, decomposition templates,
-  failure patterns and domain research packs;
-- [ ] promote a research skill only after later comparable runs consume it and demonstrate measured
-  improvement; expire or retire stale and harmful skills.
+### 3E — evaluation
 
-Exit: for two unrelated products, the engine produces inspectable research plans, reproducible
-search trajectories, verified atomic claims, visible contradictions, user-validated problems, and
-at least three evidence-backed opportunities. A human can explain why the selected experiment
-outranks alternatives, which sources and comparable systems informed it, what remains uncertain,
-and why the research stopped. The bounded research architecture must beat its simpler baseline on
-at least one relevant quality metric without unacceptable cost, latency, safety or reliability
-regression.
+- [ ] retrieval correctness and coverage under bounded budgets;
+- [ ] citation precision and completeness;
+- [ ] source quality and freshness accuracy;
+- [ ] contradiction recall and unsupported-claim rate;
+- [ ] human-review agreement and uncertainty communication;
+- [ ] opportunity diversity and recommendation survival after experiments;
+- [ ] time to decision-changing evidence, cost and implementation waste avoided;
+- [ ] compare against a deterministic workflow and one human-assisted baseline.
 
-## Phase 4 — execution adapters
+### Deferred until the MVP proves value
+
+- parallel research workers;
+- research-skill promotion;
+- automated domain research packs;
+- broad authenticated-source ingestion;
+- multi-agent research orchestration.
+
+Parallel work is added only after it beats the single-worker baseline on a suitable task after cost and coordination failures are counted.
+
+Exit: two unrelated products produce inspectable plans, reproducible search trajectories, verified claims, visible contradictions, user-grounded problems, three opportunities and a defensible experiment choice. At least one real user confirms decision value.
+
+## Gate 4 — bounded A3 execution
+
+Only after Gate 3 demonstrates value:
 
 - [ ] stable agent adapter contract;
-- [ ] Codex/CLI subprocess adapter;
-- [ ] OpenHands adapter;
-- [ ] generic command adapter;
-- [ ] sandbox capability negotiation;
+- [ ] generic command adapter as the minimal baseline;
+- [ ] one coding-agent adapter;
+- [ ] dedicated sandbox backend and capability negotiation;
+- [ ] isolated branch delivery;
+- [ ] draft PR only;
+- [ ] independent technical verification and rollback plan;
+- [ ] compare success, cost, duration, safety and portability against the minimal command baseline.
+
+Exit: one scoped task can be implemented through two interchangeable clients without either client owning cycle state, policy or evidence acceptance. No automatic merge or deploy.
+
+## Gate 5 — interoperability and portable trust
+
 - [ ] MCP tools/resources over kernel operations;
-- [ ] compare every adapter against a minimal command baseline for success, cost, duration,
-  safety, and portability.
-
-Exit: the same persisted cycle is consumed by at least two agent clients, and added adapter
-complexity demonstrates measurable value over the minimal baseline.
-
-## Phase 5 — verification and attestations
-
-- [ ] independent reviewer boundary;
-- [ ] OpenTelemetry-compatible traces/metrics;
+- [ ] reusable GitHub Action and draft-PR scorecard;
+- [ ] optional OpenTelemetry-compatible traces and metrics;
 - [ ] in-toto-compatible cycle attestation;
-- [ ] GitHub Action and draft-PR scorecard;
-- [ ] policy packs for common repository classes.
+- [ ] policy packs only when they demonstrate value over the local policy module;
+- [ ] independent verifier for evidence and attestation claims.
 
-Exit: claims are portable and independently inspectable.
+Exit: different clients consume the same persisted cycle and portable claims are independently inspectable.
 
-## Phase 6 — product outcome measurement
+## Gate 6 — product outcome measurement
 
-- [ ] technical, UX, adoption, retention, conversion, cost, and uncertainty evaluators;
+- [ ] technical, UX, adoption, retention, conversion, cost and uncertainty evaluators;
 - [ ] experiment exposure and comparison contracts;
-- [ ] keep/iterate/rollback decision records;
+- [ ] keep, iterate, reject and rollback decision records;
 - [ ] separate product-value evidence from code-quality evidence.
 
-Exit: a technically passing change can still be rejected when product evidence does not
-support it.
+Exit: a technically passing change can be rejected when user or product evidence does not support it.
 
-## Phase 7 — learning foundry
+## Gate 7 — measured learning
 
-- [ ] memory/skill registry with expiry and applicability metadata;
+- [ ] memory and skill registry with provenance, applicability, risk and expiry;
 - [ ] record actual later-cycle consumption;
-- [ ] paired with/without meta-change experiments;
-- [ ] benchmark tasks pinned by repository/environment;
-- [ ] cost, duration, success, regression, and uncertainty reports;
-- [ ] retire harmful or stale memories automatically after evidence review.
+- [ ] paired comparable cycles with and without each proposed learning;
+- [ ] success, regression, cost, duration and uncertainty reports;
+- [ ] retire harmful, stale or over-specialized learning;
+- [ ] permit no positive-recursion claim before causal later-cycle evidence.
 
-Exit: at least one controlled meta-change improves later comparable cycles; only
-then may Shipkit consider an E3 positive-recursive claim.
-
-## Comparative benchmark program
-
-- durability: kill every persistence boundary and verify deterministic recovery;
-- portability: three unrelated repositories, multiple package managers, and at least two languages;
-- execution: two agent adapters plus one minimal command baseline;
-- containment: hostile filesystem, process, secret, output, timeout, egress and prompt-injection fixtures;
-- policy: allow, deny, and approval cases across every autonomy/risk combination;
-- evidence: tamper, substitution, contradiction, expiry and unsupported-claim cases;
-- research retrieval: hard-to-find facts, exhaustive multi-step lists, query reformulation and
-  coverage under bounded budgets;
-- research reporting: atomic correctness, citation precision/completeness, source quality,
-  contradiction recall and uncertainty communication;
-- discovery: validated user problems, opportunity quality, experiment survival and avoided waste;
-- outcome: technical checks and product/user evaluators reported separately;
-- learning: comparable later cycles with and without each promoted memory, research skill or
-  meta-change;
-- economics: success, regressions, cost, duration, retries, tool calls and human interventions;
-- explainability: durable artifacts alone explain research scope, selection, authorization,
-  evidence, uncertainty and verdict.
+Exit: at least one controlled process change improves a later comparable cycle without unacceptable protected-metric regression.
 
 ## Product metrics
 
-- time from install to first inspected project model;
-- time from decision brief to first decision-changing evidence;
-- research coverage and unsupported-claim rate;
-- citation precision, completeness and primary-source ratio;
-- contradiction discovery and unresolved-gap visibility;
-- percentage of opportunities grounded in direct user evidence;
-- percentage of research recommendations that survive experiments;
-- implementation waste avoided through problem or solution invalidation;
-- percentage of cycles resumed without state loss;
-- invalid/unsafe action block rate and false-block rate;
-- verified outcome rate by task/repository/agent/model;
-- cost and duration per verified improvement;
-- percentage of retained memories and research skills actually consumed later;
-- measured lift or harm from each promoted meta-change;
-- user ability to explain selection, authorization, evidence and verdict.
+- setup to first inspected model;
+- committed-cycle recovery without state loss;
+- false-allow and false-block rates;
+- research coverage, citation quality and contradiction recall;
+- percentage of recommendations surviving experiments;
+- implementation waste avoided;
+- cost and duration per verified decision or improvement;
+- repeated use by the same developer;
+- measured lift or harm from promoted learning.
 
-## Distribution after core proof
+## Distribution only after core proof
 
 - standalone CLI package;
 - reusable GitHub Action;
 - MCP server;
-- self-hosted local dashboard;
-- hosted enterprise history/policy/benchmark service only after local-first value
-  is proven.
+- local dashboard;
+- hosted history/policy/benchmark service only after local-first value is proven.
