@@ -7,6 +7,7 @@ import {
   readdir,
   rename,
   rm,
+  stat,
 } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
 import {
@@ -17,6 +18,8 @@ import {
 } from "./types.js";
 
 const STORE_SCHEMA_VERSION = 1 as const;
+const LOCK_TIMEOUT_MS = 5_000;
+const STALE_LOCK_MS = 30_000;
 
 export class EvolutionStoreError extends Error {
   constructor(message: string) {
@@ -112,6 +115,20 @@ async function exists(path: string): Promise<boolean> {
   }
 }
 
+async function syncDirectory(path: string): Promise<void> {
+  if (process.platform === "win32") return;
+  try {
+    const handle = await open(path, "r");
+    try {
+      await handle.sync();
+    } finally {
+      await handle.close();
+    }
+  } catch {
+    // Some filesystems do not permit syncing directory descriptors.
+  }
+}
+
 async function atomicWriteJson(path: string, value: unknown): Promise<void> {
   await mkdir(dirname(path), { recursive: true });
   const temporary = `${path}.${process.pid}.${randomUUID()}.tmp`;
@@ -125,6 +142,7 @@ async function atomicWriteJson(path: string, value: unknown): Promise<void> {
 
   try {
     await rename(temporary, path);
+    await syncDirectory(dirname(path));
   } catch (error) {
     await rm(temporary, { force: true });
     throw error;
@@ -133,6 +151,7 @@ async function atomicWriteJson(path: string, value: unknown): Promise<void> {
 
 async function appendJournal(path: string, record: JournalRecord): Promise<void> {
   await mkdir(dirname(path), { recursive: true });
+  const existed = await exists(path);
   const handle = await open(path, "a", 0o600);
   try {
     await handle.writeFile(`${JSON.stringify(record)}\n`, "utf8");
@@ -140,6 +159,40 @@ async function appendJournal(path: string, record: JournalRecord): Promise<void>
   } finally {
     await handle.close();
   }
+  if (!existed) await syncDirectory(dirname(path));
+}
+
+async function acquireLock(path: string): Promise<() => Promise<void>> {
+  await mkdir(dirname(path), { recursive: true });
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < LOCK_TIMEOUT_MS) {
+    try {
+      const handle = await open(path, "wx", 0o600);
+      await handle.writeFile(
+        `${JSON.stringify({ pid: process.pid, acquiredAt: new Date().toISOString() })}\n`,
+        "utf8"
+      );
+      await handle.sync();
+      return async () => {
+        await handle.close();
+        await rm(path, { force: true });
+      };
+    } catch (error) {
+      const code = (error as NodeJS.ErrnoException).code;
+      if (code !== "EEXIST") throw error;
+      try {
+        const details = await stat(path);
+        if (Date.now() - details.mtimeMs > STALE_LOCK_MS) {
+          await rm(path, { force: true });
+          continue;
+        }
+      } catch {
+        continue;
+      }
+      await new Promise((resolvePromise) => setTimeout(resolvePromise, 20));
+    }
+  }
+  throw new EvolutionStoreError(`timed out acquiring cycle lock: ${path}`);
 }
 
 function directoryName(cycleId: string): string {
@@ -177,6 +230,7 @@ export class EvolutionStore {
       cycleDir,
       statePath: join(cycleDir, "state.json"),
       journalPath: join(cycleDir, "events.jsonl"),
+      lockPath: join(cycleDir, ".write.lock"),
     };
   }
 
@@ -193,14 +247,19 @@ export class EvolutionStore {
   async create(cycle: EvolutionCycle): Promise<EvolutionCycle> {
     await this.initializeProject();
     const paths = this.paths(cycle.cycleId);
-    if ((await exists(paths.statePath)) || (await exists(paths.journalPath))) {
-      throw new EvolutionStoreError(`cycle already exists: ${cycle.cycleId}`);
-    }
     await mkdir(paths.cycleDir, { recursive: true });
-    const record = this.makeRecord(cycle, 0);
-    await appendJournal(paths.journalPath, record);
-    await atomicWriteJson(paths.statePath, record);
-    return cycle;
+    const release = await acquireLock(paths.lockPath);
+    try {
+      if ((await exists(paths.statePath)) || (await exists(paths.journalPath))) {
+        throw new EvolutionStoreError(`cycle already exists: ${cycle.cycleId}`);
+      }
+      const record = this.makeRecord(cycle, 0);
+      await appendJournal(paths.journalPath, record);
+      await atomicWriteJson(paths.statePath, record);
+      return cycle;
+    } finally {
+      await release();
+    }
   }
 
   async save(previous: EvolutionCycle, next: EvolutionCycle): Promise<EvolutionCycle> {
@@ -211,18 +270,22 @@ export class EvolutionStore {
       throw new EvolutionStoreError("save requires exactly one new transition");
     }
 
-    const current = await this.load(previous.cycleId);
-    if (checksumCycle(current) !== checksumCycle(previous)) {
-      throw new EvolutionStoreError(
-        `stale cycle state for ${previous.cycleId}; reload before writing`
-      );
-    }
-
     const paths = this.paths(next.cycleId);
-    const record = this.makeRecord(next, next.history.length);
-    await appendJournal(paths.journalPath, record);
-    await atomicWriteJson(paths.statePath, record);
-    return next;
+    const release = await acquireLock(paths.lockPath);
+    try {
+      const current = await this.load(previous.cycleId);
+      if (checksumCycle(current) !== checksumCycle(previous)) {
+        throw new EvolutionStoreError(
+          `stale cycle state for ${previous.cycleId}; reload before writing`
+        );
+      }
+      const record = this.makeRecord(next, next.history.length);
+      await appendJournal(paths.journalPath, record);
+      await atomicWriteJson(paths.statePath, record);
+      return next;
+    } finally {
+      await release();
+    }
   }
 
   private async readJournal(cycleId: string): Promise<JournalRecord[]> {
