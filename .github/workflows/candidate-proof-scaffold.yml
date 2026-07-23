@@ -1,0 +1,47 @@
+name: Candidate Proof Scaffold
+
+on:
+  push:
+    branches:
+      - agent/candidate-grounded-research
+
+permissions:
+  contents: write
+
+jobs:
+  scaffold:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/candidate-grounded-research
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Add fixed candidate proof to Evolution Engine job
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = '.github/workflows/ci.yml';
+          let text = fs.readFileSync(path, 'utf8');
+          const anchor = `      - name: Assess pinned external repository\n        run: node scripts/test-evolution-external-repo.mjs\n`;
+          const replacement = `${anchor}      - name: Run fixed named-candidate research proof\n        run: node scripts/test-candidate-research.mjs\n      - name: Upload named-candidate research proof\n        if: \${{ always() }}\n        uses: actions/upload-artifact@v4\n        with:\n          name: candidate-research-proof\n          if-no-files-found: warn\n          retention-days: 14\n          path: artifacts/candidate-research-proof.json\n`;
+          if (!text.includes('Run fixed named-candidate research proof')) {
+            if (!text.includes(anchor)) throw new Error('Evolution Engine external proof anchor missing');
+            text = text.replace(anchor, replacement);
+            fs.writeFileSync(path, text);
+          }
+          NODE
+      - name: Commit CI proof
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/ci.yml
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "Run fixed named-candidate research proof in CI"
+          git push origin HEAD:agent/candidate-grounded-research
