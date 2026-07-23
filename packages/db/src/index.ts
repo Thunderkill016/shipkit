@@ -1,4 +1,8 @@
 export {
+  user,
+  session,
+  account,
+  verification,
   profiles,
   notes,
   type Profile,
