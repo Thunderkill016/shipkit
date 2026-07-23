@@ -21,6 +21,7 @@
     "verify": "pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm check:ai",
     "create": "node scripts/create-shipkit.mjs",
     "evolve": "pnpm --filter @shipkit/evolution-core build && node packages/evolution-core/dist/cli.js",
+    "research:public": "pnpm --filter @shipkit/evolution-core build && node packages/evolution-core/dist/public-cli.js",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "db:migrate": "node scripts/db-migrate.mjs"
