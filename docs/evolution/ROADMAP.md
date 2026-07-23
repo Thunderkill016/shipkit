@@ -20,7 +20,7 @@ reviewable and linked to implementation decisions.
 - [x] atomic JSON snapshot and append-only journal;
 - [x] recovery from missing/corrupt snapshot and interrupted trailing write;
 - [x] stale-writer rejection and checksum tamper detection;
-- [x] local CLI for init, start, status, show/resume, inspect, and evidence-backed advance;
+- [x] local CLI for init, start, status, show/resume, inspect, assess, and evidence-backed advance;
 - [x] compiled CLI dogfood on Shipkit in CI;
 - [ ] explicit event-schema migration fixtures across released versions;
 - [ ] kill-process integration test around every persistence boundary.
@@ -35,11 +35,15 @@ Exit: a full cycle can stop/restart and complete without any LLM.
 - [x] content-addressed JSON/file evidence registry with SHA-256;
 - [x] secret-path, outside-root, symlink, size, truncation, and tamper safety tests;
 - [x] check command discovery from project manifests;
-- [ ] safe configurable check runner with timeout and sanitized output;
-- [ ] human-readable project model and scorecard;
-- [ ] prove the scanner on a second unrelated real repository.
+- [x] bounded configurable check runner with timeout, output limits, and secret sanitization;
+- [x] evidence-backed project model and human-readable readiness scorecard;
+- [x] prove inspection and assessment on a pinned unrelated real repository;
+- [ ] enforce network isolation and filesystem write containment for untrusted repositories;
+- [ ] define dependency isolation that does not link host `node_modules` into the check workspace.
 
-Exit: A2 audit works on Shipkit and a second unrelated repository.
+Exit: an A2 audit works on Shipkit and a pinned unrelated repository. Execution of
+untrusted repository scripts still requires an external sandbox until the remaining
+isolation controls are implemented.
 
 ## Phase 3 — research and opportunity intelligence
 
