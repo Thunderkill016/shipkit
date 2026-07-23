@@ -41,7 +41,7 @@ try {
     "--id",
     cycleId,
     "--objective",
-    "Inspect Shipkit and establish evidence for the next product evolution cycle",
+    "Inspect and assess Shipkit for the next product evolution cycle",
     "--autonomy",
     "A2",
     "--risk",
@@ -73,8 +73,32 @@ try {
     throw new Error("repository perception did not discover Shipkit CI");
   }
 
+  const assessed = run([
+    "assess",
+    cycleId,
+    "--root",
+    store,
+    "--project-root",
+    root,
+    "--check",
+    "test",
+    "--timeout-ms",
+    "180000",
+    "--actor",
+    "ci-dogfood",
+  ]);
+  if (assessed.cycle?.stage !== "modeled") {
+    throw new Error("assessment did not advance the persisted cycle to modeled");
+  }
+  if (assessed.checkReport?.summary?.passed !== 1) {
+    throw new Error("isolated Shipkit test check did not pass");
+  }
+  if (!/^sha256:[a-f0-9]{64}$/.test(assessed.evidence?.scorecard?.id ?? "")) {
+    throw new Error("assessment did not produce a content-addressed scorecard");
+  }
+
   const resumed = run(["resume", cycleId, "--root", store]);
-  if (resumed.cycle?.stage !== "observed") throw new Error("resume lost cycle state");
+  if (resumed.cycle?.stage !== "modeled") throw new Error("resume lost modeled cycle state");
 
   const status = run(["status", "--root", store]);
   if (status.cycles?.[0]?.cycleId !== cycleId) throw new Error("status did not list dogfood cycle");
@@ -85,7 +109,10 @@ try {
         ok: true,
         cycleId,
         stage: resumed.cycle.stage,
-        evidence: inspected.evidence.id,
+        snapshotEvidence: inspected.evidence.id,
+        scorecardEvidence: assessed.evidence.scorecard.id,
+        readiness: assessed.scorecard.readiness,
+        checkSummary: assessed.checkReport.summary,
         filesObserved: inspected.snapshot.inventory.filesObserved,
         checks: [...checkNames].sort(),
       },
