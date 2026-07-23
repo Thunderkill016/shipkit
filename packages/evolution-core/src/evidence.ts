@@ -14,14 +14,26 @@ export class EvidenceRegistryError extends Error {
 export type EvidenceReference = {
   schemaVersion: 1;
   id: string;
+  occurrenceId: string;
   digest: string;
   algorithm: "sha256";
   kind: string;
   mediaType: string;
   byteLength: number;
   storedPath: string;
+  occurrencePath: string;
   sourcePath: string | null;
   createdAt: string;
+};
+
+type BlobMetadata = {
+  schemaVersion: 1;
+  id: string;
+  digest: string;
+  algorithm: "sha256";
+  mediaType: string;
+  byteLength: number;
+  storedPath: string;
 };
 
 function portablePath(path: string): string {
@@ -99,11 +111,13 @@ export class EvidenceRegistry {
   readonly storeRoot: string;
   readonly projectRoot: string;
   readonly evidenceRoot: string;
+  readonly occurrenceRoot: string;
 
   constructor(storeRoot = ".shipkit", projectRoot = process.cwd()) {
     this.storeRoot = resolve(storeRoot);
     this.projectRoot = resolve(projectRoot);
     this.evidenceRoot = join(this.storeRoot, "evidence", "sha256");
+    this.occurrenceRoot = join(this.storeRoot, "evidence", "occurrences");
   }
 
   private async persist(
@@ -116,31 +130,55 @@ export class EvidenceRegistry {
     const hash = digest(content);
     const extension = mediaType === "application/json" ? ".json" : ".bin";
     const artifactPath = join(this.evidenceRoot, `${hash}${extension}`);
-    const metadataPath = join(this.evidenceRoot, `${hash}.meta.json`);
-    const reference: EvidenceReference = {
+    const blobMetadataPath = join(this.evidenceRoot, `${hash}.blob.json`);
+    const occurrenceId = `occurrence:${randomUUID()}`;
+    const occurrencePath = join(this.occurrenceRoot, `${occurrenceId.slice("occurrence:".length)}.json`);
+    const blob: BlobMetadata = {
       schemaVersion: 1,
       id: `sha256:${hash}`,
       digest: hash,
       algorithm: "sha256",
-      kind: kind.trim(),
       mediaType,
       byteLength: content.byteLength,
       storedPath: portablePath(relative(this.storeRoot, artifactPath)),
+    };
+    const reference: EvidenceReference = {
+      ...blob,
+      occurrenceId,
+      kind: kind.trim(),
+      occurrencePath: portablePath(relative(this.storeRoot, occurrencePath)),
       sourcePath,
       createdAt: new Date().toISOString(),
     };
 
     try {
       await stat(artifactPath);
-    } catch {
+      const existing = await readFile(artifactPath);
+      if (digest(existing) !== hash) {
+        throw new EvidenceRegistryError(`existing evidence blob failed digest verification: ${hash}`);
+      }
+    } catch (error) {
+      if (error instanceof EvidenceRegistryError) throw error;
       await atomicWrite(artifactPath, content);
     }
+
     try {
-      await stat(metadataPath);
+      await stat(blobMetadataPath);
     } catch {
-      await atomicWrite(metadataPath, serializeJson(reference));
+      await atomicWrite(blobMetadataPath, serializeJson(blob));
     }
+    await atomicWrite(occurrencePath, serializeJson(reference));
     return reference;
+  }
+
+  async verify(reference: EvidenceReference): Promise<boolean> {
+    const path = resolve(this.storeRoot, reference.storedPath);
+    const relativePath = relative(this.storeRoot, path);
+    if (relativePath.startsWith("..") || isAbsolute(relativePath)) {
+      throw new EvidenceRegistryError("stored evidence path escapes the store root");
+    }
+    const content = await readFile(path);
+    return digest(content) === reference.digest && content.byteLength === reference.byteLength;
   }
 
   async registerJson(kind: string, value: unknown): Promise<EvidenceReference> {
