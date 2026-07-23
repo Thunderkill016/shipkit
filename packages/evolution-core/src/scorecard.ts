@@ -15,6 +15,11 @@ export type ProjectScorecard = {
   projectName: string;
   createdAt: string;
   readiness: "ready-for-research" | "needs-foundation" | "blocked";
+  researchReadiness: "ready-for-research" | "needs-foundation" | "blocked";
+  executionReadiness: "trusted-local-only" | "not-assessed" | "blocked";
+  verificationReadiness: "ready" | "unknown" | "blocked";
+  autonomyCeiling: "A0" | "A1" | "A2";
+  evidenceConfidence: "low" | "medium" | "high";
   dimensions: ScorecardDimension[];
   strengths: string[];
   blockers: string[];
@@ -115,7 +120,7 @@ export function createProjectScorecard(
         snapshot.checks.map((check) => `${check.source}:${check.name}`)
       )
     );
-    nextActions.push("Run one or more discovered checks in the isolated check workspace.");
+    nextActions.push("Run one or more discovered checks in the temporary check workspace.");
   } else if (failing > 0) {
     dimensions.push(
       dimension(
@@ -132,11 +137,11 @@ export function createProjectScorecard(
       dimension(
         "verification",
         "pass",
-        `${passing} isolated repository check(s) passed.`,
+        `${passing} temporary-workspace repository check(s) passed.`,
         checks.results.map((result) => `${result.source}:${result.name}:${result.status}`)
       )
     );
-    strengths.push(`${passing} isolated repository check(s) passed.`);
+    strengths.push(`${passing} temporary-workspace repository check(s) passed.`);
   }
 
   if (snapshot.ci.length > 0) {
@@ -207,23 +212,47 @@ export function createProjectScorecard(
   const hasFail = dimensions.some((item) => item.status === "fail");
   const hasCoverage = dimensions.find((item) => item.id === "coverage")?.status === "pass";
   const hasContext = dimensions.find((item) => item.id === "product-context")?.status === "pass";
-  const readiness = hasFail
+  const hasCleanGit = dimensions.find((item) => item.id === "repository-state")?.status === "pass";
+  const researchReadiness = hasFail
     ? "blocked"
     : hasCoverage && hasContext
       ? "ready-for-research"
       : "needs-foundation";
+  const verificationReadiness = failing > 0 ? "blocked" : executed > 0 ? "ready" : "unknown";
+  const executionReadiness = failing > 0
+    ? "blocked"
+    : executed > 0
+      ? "trusted-local-only"
+      : "not-assessed";
+  const autonomyCeiling = hasFail ? "A0" : researchReadiness === "ready-for-research" ? "A2" : "A1";
+  const evidenceConfidence =
+    hasCoverage && hasContext && hasCleanGit && verificationReadiness === "ready"
+      ? "high"
+      : !hasFail && hasCoverage
+        ? "medium"
+        : "low";
 
-  if (readiness === "ready-for-research") {
+  if (researchReadiness === "ready-for-research") {
     nextActions.push("Start bounded internal and external research against one explicit product decision.");
-  } else if (readiness === "needs-foundation") {
+  } else if (researchReadiness === "needs-foundation") {
     nextActions.push("Resolve the highest-impact context or verification gap before opportunity research.");
+  }
+  if (executionReadiness === "trusted-local-only") {
+    nextActions.push(
+      "Treat check execution as trusted-local-only until a backend proves filesystem, process, dependency and network containment."
+    );
   }
 
   return {
     schemaVersion: 1,
     projectName: snapshot.projectName,
     createdAt: options.now ?? new Date().toISOString(),
-    readiness,
+    readiness: researchReadiness,
+    researchReadiness,
+    executionReadiness,
+    verificationReadiness,
+    autonomyCeiling,
+    evidenceConfidence,
     dimensions,
     strengths: [...new Set(strengths)],
     blockers: [...new Set(blockers)],
@@ -232,6 +261,8 @@ export function createProjectScorecard(
     checkSummary: checks.summary,
     limitations: [
       "The scorecard reports observable repository readiness; it is not a universal quality score.",
+      "Research readiness does not imply code-execution readiness.",
+      "Temporary-workspace checks are not a security sandbox.",
       "Passing technical checks does not prove product value, user demand, security, or production safety.",
       "Trust-boundary discovery is structural and must be reviewed before higher-risk actions.",
     ],
