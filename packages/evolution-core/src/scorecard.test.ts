@@ -89,23 +89,33 @@ function report(status: "passed" | "failed" = "passed"): CheckReport {
 }
 
 describe("project scorecard", () => {
-  it("marks an observable green baseline as ready for bounded research", () => {
+  it("marks an observable green baseline as research-ready but trusted-local-only for execution", () => {
     const result = createProjectScorecard(snapshot(), report(), {
       now: "2026-07-23T00:02:00.000Z",
     });
 
     expect(result.readiness).toBe("ready-for-research");
+    expect(result.researchReadiness).toBe("ready-for-research");
+    expect(result.executionReadiness).toBe("trusted-local-only");
+    expect(result.verificationReadiness).toBe("ready");
+    expect(result.autonomyCeiling).toBe("A2");
+    expect(result.evidenceConfidence).toBe("high");
     expect(result.blockers).toEqual([]);
     expect(result.dimensions.find((item) => item.id === "verification")?.status).toBe("pass");
+    expect(result.limitations.join(" ")).toMatch(/not a security sandbox/);
   });
 
-  it("blocks broad conclusions when coverage is truncated or checks fail", () => {
+  it("blocks broad conclusions and execution when coverage is truncated or checks fail", () => {
     const result = createProjectScorecard(
       snapshot({ inventory: { filesObserved: 20_000, truncated: true, ignoredDirectories: [] } }),
       report("failed")
     );
 
     expect(result.readiness).toBe("blocked");
+    expect(result.researchReadiness).toBe("blocked");
+    expect(result.executionReadiness).toBe("blocked");
+    expect(result.verificationReadiness).toBe("blocked");
+    expect(result.autonomyCeiling).toBe("A0");
     expect(result.blockers.length).toBeGreaterThan(0);
     expect(result.nextActions.join(" ")).toMatch(/Diagnose failed checks|Increase the scan limit/);
   });
