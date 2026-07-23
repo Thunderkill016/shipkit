@@ -24,7 +24,7 @@ function outputCollector() {
 }
 
 describe("shipkit-evolve inspect", () => {
-  it("turns a repository scan into hashed baseline evidence and an observed cycle", async () => {
+  it("turns a repository scan into hashed blob evidence and an observed cycle occurrence", async () => {
     const projectRoot = await mkdtemp(join(tmpdir(), "shipkit-inspect-"));
     temporaryRoots.push(projectRoot);
     await mkdir(join(projectRoot, "src"), { recursive: true });
@@ -72,6 +72,7 @@ describe("shipkit-evolve inspect", () => {
 
     const result = inspected.json();
     expect(result.evidence.id).toMatch(/^sha256:[a-f0-9]{64}$/);
+    expect(result.evidence.occurrenceId).toMatch(/^occurrence:/);
     expect(result.snapshot).toMatchObject({
       projectName: expect.any(String),
       checks: expect.arrayContaining([
@@ -83,7 +84,7 @@ describe("shipkit-evolve inspect", () => {
       cycleId: "outside-product:cycle-001",
       stage: "observed",
       artifacts: {
-        baseline: [expect.stringMatching(/^evidence:sha256:/)],
+        baseline: [expect.stringMatching(/^evidence:occurrence:/)],
       },
     });
   });
