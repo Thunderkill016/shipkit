@@ -83,6 +83,7 @@ describe("execution backend contract", () => {
     });
     const serialized = args.join(" ");
 
+    expect(serialized).toContain("--pull never");
     expect(serialized).toContain("--network none");
     expect(serialized).toContain("--read-only");
     expect(serialized).toContain("--cap-drop ALL");
