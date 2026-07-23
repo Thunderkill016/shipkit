@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   live-provider:
-    name: Live GitHub repository-search proof
+    name: Live GitHub repository-search proof (one-time)
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
