@@ -1,0 +1,48 @@
+{
+  "storeSchemaVersion": 1,
+  "sequence": 0,
+  "writtenAt": "2026-07-23T00:00:00.000Z",
+  "checksum": "42dd5bdbab88b580b28b14937c1fd0bb88d915dc7b27f0ef6b7bbbb8af1550ba",
+  "cycle": {
+    "schemaVersion": 1,
+    "cycleId": "fixture:store-v1",
+    "objective": "Verify deterministic store migration",
+    "autonomy": "A2",
+    "risk": "R1",
+    "stage": "created",
+    "createdAt": "2026-07-23T00:00:00.000Z",
+    "updatedAt": "2026-07-23T00:00:00.000Z",
+    "artifacts": {
+      "baseline": [],
+      "model": [],
+      "diagnosis": [],
+      "research": [],
+      "candidates": [],
+      "decision": [],
+      "plan": [],
+      "rollback": [],
+      "changes": [],
+      "verification": [],
+      "measurement": [],
+      "memory": [],
+      "metaChanges": []
+    },
+    "approvals": [],
+    "history": [],
+    "research": {
+      "briefs": [],
+      "plans": [],
+      "runs": [],
+      "queries": [],
+      "sources": [],
+      "claims": [],
+      "citationSpans": [],
+      "contradictions": [],
+      "opportunities": [],
+      "evaluations": [],
+      "decisions": [],
+      "experiments": [],
+      "executionHandoffs": []
+    }
+  }
+}
