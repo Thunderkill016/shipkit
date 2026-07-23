@@ -122,7 +122,7 @@ export type ResearchPlan = ResearchRecordBase & {
 
 export type ResearchRunRecord = ResearchRecordBase & {
   kind: "research-run";
-  adapter: "manual-bundle" | "repository-single-worker" | "public-http-manifest";
+  adapter: "manual-bundle" | "repository-single-worker" | "public-http-manifest" | "candidate-manifest";
   startedAt: string;
   completedAt: string;
   budget: ResearchBudget;
