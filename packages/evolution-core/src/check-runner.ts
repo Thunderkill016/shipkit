@@ -1,7 +1,14 @@
-import { spawn } from "node:child_process";
 import { cp, lstat, mkdir, mkdtemp, readdir, rm, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve, sep } from "node:path";
+import {
+  DockerExecutionBackend,
+  TrustedLocalExecutionBackend,
+  UNTRUSTED_CHECK_BASELINE_CAPABILITIES,
+  assertExecutionCapabilities,
+  type ExecutionBackend,
+  type ExecutionCapability,
+} from "./execution-backend.js";
 import type { ProjectSnapshot, RepositoryCheck } from "./repository.js";
 
 const COPY_EXCLUDES = new Set([
@@ -18,6 +25,13 @@ const COPY_EXCLUDES = new Set([
   "vendor",
   ".venv",
   "venv",
+]);
+
+const SECRET_SOURCE_NAMES = new Set([
+  ".npmrc",
+  ".netrc",
+  ".pypirc",
+  ".git-credentials",
 ]);
 
 const DEFAULT_TIMEOUT_MS = 120_000;
@@ -57,10 +71,13 @@ export type CheckResult = {
   stdoutTruncated: boolean;
   stderrTruncated: boolean;
   isolation: {
+    backend: string;
+    trust: "trusted-local" | "untrusted";
+    capabilities: ExecutionCapability[];
     sourceWorkspace: "temporary-copy";
     dependencyAccess: "linked-existing-node_modules" | "none";
     dependencyInstall: false;
-    networkIsolation: "not-enforced";
+    networkIsolation: "blocked" | "not-enforced";
   };
 };
 
@@ -88,12 +105,6 @@ type Invocation = {
   relativeWorkingDirectory: string;
 };
 
-type Collector = {
-  append: (chunk: Buffer | string) => void;
-  text: () => string;
-  truncated: () => boolean;
-};
-
 function portablePath(path: string): string {
   return path.split(sep).join("/");
 }
@@ -104,37 +115,6 @@ function boundedInteger(value: number | undefined, fallback: number, maximum: nu
     throw new CheckRunnerError(`value must be a positive integer no greater than ${maximum}`);
   }
   return value;
-}
-
-function sanitizeOutput(value: string): string {
-  return value
-    .replace(/(authorization\s*:\s*bearer\s+)[^\s]+/gi, "$1[REDACTED]")
-    .replace(/\b(gh[pousr]_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,})\b/g, "[REDACTED]")
-    .replace(
-      /\b([A-Z][A-Z0-9_]*(?:TOKEN|SECRET|PASSWORD|PRIVATE_KEY|API_KEY))\s*([=:])\s*([^\s]+)/g,
-      "$1$2[REDACTED]"
-    );
-}
-
-function collector(limit: number): Collector {
-  const chunks: Buffer[] = [];
-  let bytes = 0;
-  let wasTruncated = false;
-  return {
-    append(chunk) {
-      const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-      const remaining = Math.max(0, limit - bytes);
-      if (remaining > 0) chunks.push(buffer.subarray(0, remaining));
-      bytes += Math.min(buffer.byteLength, remaining);
-      if (buffer.byteLength > remaining) wasTruncated = true;
-    },
-    text() {
-      return sanitizeOutput(Buffer.concat(chunks).toString("utf8"));
-    },
-    truncated() {
-      return wasTruncated;
-    },
-  };
 }
 
 function selectChecks(snapshot: ProjectSnapshot, requested: string[]): RepositoryCheck[] {
@@ -191,7 +171,17 @@ function invocationFor(snapshot: ProjectSnapshot, check: RepositoryCheck): Invoc
 }
 
 function excludedFromSourceCopy(relativePath: string): boolean {
-  return relativePath.split(sep).some((part) => COPY_EXCLUDES.has(part));
+  const parts = relativePath.split(sep);
+  if (parts.some((part) => COPY_EXCLUDES.has(part) || part === ".ssh" || part === ".aws")) {
+    return true;
+  }
+  const name = parts.at(-1) ?? "";
+  if (SECRET_SOURCE_NAMES.has(name)) return true;
+  if (name === ".env") return true;
+  if (name.startsWith(".env.") && !name.endsWith(".example") && !name.endsWith(".sample")) {
+    return true;
+  }
+  return false;
 }
 
 async function linkExistingNodeModules(root: string, workspaceRoot: string): Promise<number> {
@@ -230,7 +220,10 @@ async function linkExistingNodeModules(root: string, workspaceRoot: string): Pro
   return linked;
 }
 
-async function createWorkspace(projectRoot: string): Promise<{
+async function createWorkspace(
+  projectRoot: string,
+  backend: ExecutionBackend
+): Promise<{
   temporaryRoot: string;
   workspaceRoot: string;
   dependencyAccess: CheckResult["isolation"]["dependencyAccess"];
@@ -254,6 +247,10 @@ async function createWorkspace(projectRoot: string): Promise<{
     },
   });
 
+  if (backend.trust === "untrusted") {
+    return { temporaryRoot, workspaceRoot, dependencyAccess: "none" };
+  }
+
   const linkedDependencies = await linkExistingNodeModules(root, workspaceRoot);
   return {
     temporaryRoot,
@@ -262,41 +259,26 @@ async function createWorkspace(projectRoot: string): Promise<{
   };
 }
 
-function safeEnvironment(home: string): NodeJS.ProcessEnv {
+function safeEnvironment(home: string, backend: ExecutionBackend): NodeJS.ProcessEnv {
   const environment: NodeJS.ProcessEnv = {
-    PATH: process.env.PATH,
-    SystemRoot: process.env.SystemRoot,
-    WINDIR: process.env.WINDIR,
     LANG: process.env.LANG ?? "C.UTF-8",
     LC_ALL: process.env.LC_ALL,
-    HOME: home,
-    USERPROFILE: home,
+    HOME: backend.trust === "untrusted" ? "/tmp/home" : home,
+    USERPROFILE: backend.trust === "untrusted" ? "/tmp/home" : home,
     CI: "true",
     NO_COLOR: "1",
     npm_config_audit: "false",
     npm_config_fund: "false",
     npm_config_update_notifier: "false",
   };
+  if (backend.trust === "trusted-local") {
+    environment.PATH = process.env.PATH;
+    environment.SystemRoot = process.env.SystemRoot;
+    environment.WINDIR = process.env.WINDIR;
+  }
   return Object.fromEntries(
     Object.entries(environment).filter((entry): entry is [string, string] => typeof entry[1] === "string")
   );
-}
-
-async function terminateProcess(child: ReturnType<typeof spawn>): Promise<void> {
-  if (!child.pid) return;
-  try {
-    if (process.platform !== "win32") process.kill(-child.pid, "SIGTERM");
-    else child.kill("SIGTERM");
-  } catch {
-    return;
-  }
-  await new Promise((resolvePromise) => setTimeout(resolvePromise, 250));
-  try {
-    if (process.platform !== "win32") process.kill(-child.pid, "SIGKILL");
-    else child.kill("SIGKILL");
-  } catch {
-    // Process already exited.
-  }
 }
 
 async function runCheck(
@@ -304,62 +286,24 @@ async function runCheck(
   projectRoot: string,
   check: RepositoryCheck,
   timeoutMs: number,
-  maxOutputBytes: number
+  maxOutputBytes: number,
+  backend: ExecutionBackend
 ): Promise<CheckResult> {
   const invocation = invocationFor(snapshot, check);
-  const workspace = await createWorkspace(projectRoot);
+  const workspace = await createWorkspace(projectRoot, backend);
   const home = join(workspace.temporaryRoot, "home");
   await mkdir(home, { recursive: true });
-  const cwd = resolve(workspace.workspaceRoot, invocation.relativeWorkingDirectory);
   const startedAt = new Date();
-  const stdout = collector(maxOutputBytes);
-  const stderr = collector(maxOutputBytes);
 
   try {
-    const result = await new Promise<{
-      status: CheckResultStatus;
-      exitCode: number | null;
-      signal: NodeJS.Signals | null;
-    }>((resolveResult) => {
-      const child = spawn(invocation.executable, invocation.args, {
-        cwd,
-        env: safeEnvironment(home),
-        shell: false,
-        detached: process.platform !== "win32",
-        stdio: ["ignore", "pipe", "pipe"],
-      });
-      let timedOut = false;
-      let settled = false;
-      const finish = (value: {
-        status: CheckResultStatus;
-        exitCode: number | null;
-        signal: NodeJS.Signals | null;
-      }) => {
-        if (settled) return;
-        settled = true;
-        clearTimeout(timer);
-        resolveResult(value);
-      };
-      const timer = setTimeout(() => {
-        timedOut = true;
-        void terminateProcess(child);
-      }, timeoutMs);
-
-      child.stdout?.on("data", stdout.append);
-      child.stderr?.on("data", stderr.append);
-      child.on("error", (error) => {
-        stderr.append(error.message);
-        finish({ status: "unavailable", exitCode: null, signal: null });
-      });
-      child.on("close", (exitCode, signal) => {
-        finish({
-          status: timedOut ? "timed-out" : exitCode === 0 ? "passed" : "failed",
-          exitCode,
-          signal,
-        });
-      });
+    const result = await backend.execute({
+      workspaceRoot: workspace.workspaceRoot,
+      relativeWorkingDirectory: invocation.relativeWorkingDirectory,
+      executable: invocation.executable,
+      arguments: invocation.args,
+      environment: safeEnvironment(home, backend),
+      limits: { timeoutMs, maxOutputBytes },
     });
-
     const finishedAt = new Date();
     return {
       schemaVersion: 1,
@@ -379,15 +323,18 @@ async function runCheck(
       finishedAt: finishedAt.toISOString(),
       durationMs: finishedAt.getTime() - startedAt.getTime(),
       timeoutMs,
-      stdout: stdout.text(),
-      stderr: stderr.text(),
-      stdoutTruncated: stdout.truncated(),
-      stderrTruncated: stderr.truncated(),
+      stdout: result.stdout,
+      stderr: result.stderr,
+      stdoutTruncated: result.stdoutTruncated,
+      stderrTruncated: result.stderrTruncated,
       isolation: {
+        backend: backend.id,
+        trust: backend.trust,
+        capabilities: [...backend.capabilities],
         sourceWorkspace: "temporary-copy",
         dependencyAccess: workspace.dependencyAccess,
         dependencyInstall: false,
-        networkIsolation: "not-enforced",
+        networkIsolation: backend.capabilities.includes("network-deny") ? "blocked" : "not-enforced",
       },
     };
   } finally {
@@ -395,28 +342,58 @@ async function runCheck(
   }
 }
 
+export type RunDiscoveredChecksOptions = {
+  projectRoot?: string;
+  checkNames?: string[];
+  timeoutMs?: number;
+  maxOutputBytes?: number;
+  backend?: ExecutionBackend;
+  requiredCapabilities?: readonly ExecutionCapability[];
+};
+
 export async function runDiscoveredChecks(
   snapshot: ProjectSnapshot,
-  options: {
-    projectRoot?: string;
-    checkNames?: string[];
-    timeoutMs?: number;
-    maxOutputBytes?: number;
-  } = {}
+  options: RunDiscoveredChecksOptions = {}
 ): Promise<CheckReport> {
   const projectRoot = resolve(options.projectRoot ?? process.cwd());
-  const requestedChecks = [...new Set((options.checkNames ?? []).map((name) => name.trim()).filter(Boolean))];
+  const requestedChecks = [
+    ...new Set((options.checkNames ?? []).map((name) => name.trim()).filter(Boolean)),
+  ];
   const timeoutMs = boundedInteger(options.timeoutMs, DEFAULT_TIMEOUT_MS, MAX_TIMEOUT_MS);
   const maxOutputBytes = boundedInteger(
     options.maxOutputBytes,
     DEFAULT_OUTPUT_BYTES,
     MAX_OUTPUT_BYTES
   );
+  const backend = options.backend ?? new TrustedLocalExecutionBackend();
+  const requiredCapabilities =
+    options.requiredCapabilities ??
+    (backend.trust === "untrusted" ? UNTRUSTED_CHECK_BASELINE_CAPABILITIES : []);
+  assertExecutionCapabilities(backend, requiredCapabilities);
+  await backend.assertAvailable();
+
   const selected = selectChecks(snapshot, requestedChecks);
   const results: CheckResult[] = [];
   for (const check of selected) {
-    results.push(await runCheck(snapshot, projectRoot, check, timeoutMs, maxOutputBytes));
+    results.push(await runCheck(snapshot, projectRoot, check, timeoutMs, maxOutputBytes, backend));
   }
+
+  const limitations =
+    backend.trust === "untrusted"
+      ? [
+          "Checks run from repository-declared package scripts in a temporary source copy inside the selected untrusted execution backend.",
+          "Host node_modules directories are not linked into untrusted workspaces, and common credential files are excluded from the source copy; checks that require dependencies must use an isolated dependency strategy supplied by the backend image or a future package cache.",
+          ...(backend.capabilities.includes("disk-limit")
+            ? []
+            : [
+                "The current backend does not prove a hard writable-workspace disk quota; request disk-limit explicitly to fail closed until a backend supports it.",
+              ]),
+        ]
+      : [
+          "Checks run from repository-declared package scripts in a temporary source copy.",
+          "The trusted-local backend may link existing node_modules directories and is not a security sandbox.",
+          "Network, filesystem and process isolation are not enforced; use an untrusted backend for untrusted repositories.",
+        ];
 
   return {
     schemaVersion: 1,
@@ -433,10 +410,15 @@ export async function runDiscoveredChecks(
       timedOut: results.filter((result) => result.status === "timed-out").length,
       unavailable: results.filter((result) => result.status === "unavailable").length,
     },
-    limitations: [
-      "Checks run from repository-declared package scripts in a temporary source copy.",
-      "Dependencies are never installed; existing node_modules directories may be linked into the temporary workspace, but filesystem write protection is not yet enforced.",
-      "Network isolation is not yet enforced; run untrusted repositories inside an external sandbox.",
-    ],
+    limitations,
   };
+}
+
+export function createCheckExecutionBackend(
+  kind: "trusted-local" | "docker",
+  options: { dockerImage?: string } = {}
+): ExecutionBackend {
+  return kind === "docker"
+    ? new DockerExecutionBackend({ image: options.dockerImage })
+    : new TrustedLocalExecutionBackend();
 }
