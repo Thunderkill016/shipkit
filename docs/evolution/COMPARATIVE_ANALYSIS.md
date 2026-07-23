@@ -4,6 +4,13 @@ Status: active decision record
 Issue: #9  
 Reviewed: 2026-07-23
 
+Current revisions, review expiry, limitations, contradictions and falsification
+tests are enforced in
+[`EXTERNAL_SYSTEMS.json`](./EXTERNAL_SYSTEMS.json). The narrative below preserves
+the broader architecture baseline; the machine registry and
+[`../CAPABILITIES.json`](../CAPABILITIES.json) take precedence for current
+external revisions and implemented Shipkit status.
+
 ## Purpose
 
 This document prevents architecture-by-name-dropping. Every external system is evaluated
@@ -54,7 +61,7 @@ specific source revision and ADR are pinned.
 | Temporal | durable distributed execution | replayable event history and crash recovery | repository/product semantics, agent policy, outcome learning | Adapt |
 | LangGraph | stateful agent orchestration | checkpoints, interrupts, human-in-the-loop | independent evidence and product-governance lifecycle | Adapt |
 | Microsoft Agent Framework | agents and graph workflows | provider adapters, executors, workflow composition | repository-first truth and improved-improver proof | Integrate later |
-| OpenHands | AI software-development runtime | agent-neutral coding runtime and sandbox boundary | deterministic product-improvement control plane | Integrate |
+| OpenHands | AI software-development runtime | agent-neutral coding runtime and sandbox boundary | independent decision-to-outcome evidence and external user-value proof | Integrate |
 | Codex CLI | local coding agent | strong terminal execution surface and subprocess UX | project lifecycle, cross-agent comparison, durable claims | Integrate |
 | SWE-agent | issue-resolution agent research | agent-computer-interface and reproducible task framing | product discovery and long-lived project governance | Adapt for benchmarks |
 | mini-SWE-agent | minimal coding agent | small agent loop and multiple environment backends | durable state, policy, evidence, product outcomes | Integrate as minimal baseline |
@@ -281,13 +288,13 @@ promote only when measured lift exceeds uncertainty and no protected metric regr
 | deterministic transitions | Temporal | implemented foundation | kill-boundary and migration tests |
 | agent checkpoints/HITL | LangGraph | cycle resume implemented; agent interrupts absent | two-client resume proof |
 | coding execution | OpenHands, Codex, mini-SWE-agent | adapters absent | same scoped task through two agents |
-| untrusted isolation | OpenSandbox | temporary-copy runner only | host/filesystem/network adversarial suite |
+| untrusted isolation | OpenSandbox, Daytona | Docker baseline implemented; remote providers absent | provider parity, egress allowlist and external security review |
 | policy architecture | OPA | local deterministic module implemented | external-policy parity fixtures |
 | tool interoperability | MCP | absent | CLI/MCP policy-equivalence tests |
 | agent interoperability | A2A | deferred | capability discovery plus identical cycle consumption |
 | portable provenance | in-toto/SLSA | content-addressed evidence implemented | independent attestation verification |
 | observability | OpenTelemetry | absent | exporter-independent correctness |
-| coding benchmarks | SWE-bench/OpenHands Index | one external repository proof | pinned multi-repository benchmark suite |
+| coding benchmarks | SWE-bench/OpenHands Index | repository proofs exist; no broad outcome suite | audited, versioned multi-dimensional evaluation |
 | durable learning | Reflexion/Voyager | absent | consumption records and paired evaluation |
 | positive recursion | no compared system proves Shipkit's full claim | absent by design | causal later-cycle improvement benchmark |
 
@@ -323,33 +330,18 @@ The research gate is complete for a decision only when:
 - contradictory evidence is retained rather than silently removed;
 - changes in the external system trigger review when they affect the decision.
 
-## Source ledger
+## Current source registry
 
-All sources below were reviewed on 2026-07-23. Links point to primary documentation,
-official repositories, specifications, or papers. The `Revision before integration` column is a
-hard implementation gate: no adapter or copied mechanism begins until that revision is recorded.
+The current source-level decisions live in
+[`EXTERNAL_SYSTEMS.json`](./EXTERNAL_SYSTEMS.json). The registry pins a version,
+commit, publication date or access date; records the Shipkit boundary,
+limitation and falsification test; preserves material contradictions; and
+expires on a declared review date.
 
-| System | Primary source | License / standard note | Revision before integration |
-| --- | --- | --- | --- |
-| Temporal | https://docs.temporal.io/ | documentation; inspect component licenses before integration | Required |
-| LangGraph | https://langchain-ai.github.io/langgraph/ | official documentation | Required |
-| Microsoft Agent Framework | https://learn.microsoft.com/agent-framework/ | official Microsoft documentation | Required |
-| OpenHands | https://github.com/OpenHands/OpenHands | MIT core; enterprise directory has separate terms | Required |
-| Codex CLI | https://github.com/openai/codex | Apache-2.0 | Required |
-| SWE-agent | https://github.com/SWE-agent/SWE-agent | MIT | Required |
-| mini-SWE-agent | https://github.com/SWE-agent/mini-swe-agent | MIT | Required |
-| OpenSandbox | https://github.com/alibaba/OpenSandbox | verify every reused component license | Required |
-| MCP | https://github.com/modelcontextprotocol/modelcontextprotocol | MIT specification repository | Required |
-| A2A | https://github.com/a2aproject/A2A | Apache-2.0; Linux Foundation project | Required |
-| OPA | https://www.openpolicyagent.org/docs | CNCF project; official documentation | Required |
-| in-toto | https://in-toto.io/docs/specs/ | specification and attestation framework | Required |
-| SLSA | https://slsa.dev/spec/ | open specification | Required |
-| OpenTelemetry | https://opentelemetry.io/docs/ | CNCF observability standard/project | Required |
-| SWE-bench | https://github.com/SWE-bench/SWE-bench | MIT | Required |
-| OpenHands Index | https://index.openhands.dev/ | official benchmark and result structure | Required |
-| Self-Refine | https://arxiv.org/abs/2303.17651 | research paper | Paper revision recorded |
-| Reflexion | https://arxiv.org/abs/2303.11366 | research paper and released code | Paper/code revision recorded |
-| Voyager | https://arxiv.org/abs/2305.16291 | research paper and released code | Paper/code revision recorded |
+`node scripts/check-external-systems.mjs` rejects floating revisions, expired
+reviews, narrow coverage, missing dissent and incomplete decision records. It is
+a structure and freshness gate, not independent proof that a source claim is
+true or useful to users.
 
 ## Current conclusion
 
@@ -359,10 +351,12 @@ runtimes, repositories, and product outcomes.
 
 The immediate plan is therefore:
 
-1. finish persistence migration and kill-boundary proof;
-2. integrate a real sandbox contract rather than overstating temporary-copy isolation;
-3. build typed research provenance and contradiction records;
-4. produce opportunity portfolios and evaluator-backed experiment decisions;
-5. add at least two execution adapters behind the same kernel;
-6. evaluate technical, product, economic, and learning outcomes independently;
+1. keep external decisions current through the expiring registry;
+2. validate decision-governance value with real users before broad integration;
+3. adapt provider-neutral query, source, citation, budget and stop records;
+4. consume one protected execution handoff through one coding-agent adapter;
+5. keep remote sandbox, MCP/A2A, policy and telemetry integrations optional and
+   gated by demonstrated use cases;
+6. evaluate technical, policy, recovery, economic and product outcomes
+   independently;
 7. permit a positive-recursion claim only after controlled later-cycle evidence.

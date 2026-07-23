@@ -106,8 +106,6 @@ Kernel guarantees currently include:
 
 Remaining kernel gaps:
 
-- schema migration fixtures;
-- kill-process and multi-process stress proof;
 - approval parameter digests;
 - independent versioned package boundary;
 - signed provenance beyond unkeyed corruption detection.
@@ -134,56 +132,46 @@ Planned:
 
 ### Research Intelligence
 
-Planned shared records:
+Partially implemented:
 
-- `ResearchBrief`;
-- `ResearchPlan`;
-- `QueryRecord`;
-- `SourceRecord`;
-- `ClaimRecord`;
-- `ContradictionRecord`;
-- `OpportunityRecord`;
-- `DecisionRecord`;
-- `ExperimentRecord`.
+- typed research briefs, plans, queries, sources, claims, contradictions,
+  opportunities, decisions and experiments;
+- deterministic repository research and readiness gates;
+- bounded public-source capture with SSRF controls, exact citation spans,
+  hostile-source quarantine and independent review;
+- named-candidate comparison against current capabilities and protected
+  experiment parameters;
+- typed execution handoff;
+- an expiring external-system decision registry with pinned revisions,
+  limitations, contradictions and falsification tests.
 
-Required behavior:
+Remaining:
 
-- decision-changing questions before broad search;
-- repository, internal, web, paper, specification, competitor and user evidence;
-- reproducible query history;
-- source authority, freshness, applicability and conflict metadata;
-- exact evidence spans and calculations;
-- visible contradictions and uncertainty;
-- independent citation/adversarial review;
-- at least three opportunities and a reversible experiment;
-- typed handoff to execution.
+- broad web discovery, adaptive query reformulation and citation chasing;
+- paper, PDF, specification, dataset, changelog and incident adapters;
+- consented user-research ingestion and external user decision-value proof;
+- calibrated decision weights and outcome evaluation;
+- execution-handoff consumption by a coding-agent adapter.
 
 ### Execution and Sandbox
 
-Current temporary-workspace checks:
-
-- select discovered package scripts;
-- execute without a shell;
-- use source copies;
-- apply timeout and output limits;
-- reduce environment variables and redact common secret forms;
-- never install dependencies.
-
-They are not a security sandbox:
-
-- network isolation is not enforced;
-- filesystem writes are not fully contained;
-- process containment is incomplete;
-- host `node_modules` may be linked.
-
-Planned:
+Implemented baseline:
 
 - capability-negotiated `ExecutionBackend`;
-- trusted-local and real sandbox implementations;
-- generic command baseline;
+- honestly named trusted-local execution for acknowledged repositories;
+- Docker execution with an immutable local image, denied network, read-only
+  root, reduced environment, resource bounds and forced cleanup;
+- hostile fixtures for secrets, credentials, symlinks, root writes, host paths,
+  network and cleanup;
+- generic command baseline and explicit sandbox-check CLI.
+
+Remaining:
+
+- egress allowlists and remote sandbox providers;
+- hard writable-workspace disk quota;
+- cross-platform container support and external security review;
 - Codex, OpenHands and additional coding-agent adapters;
 - isolated branch/worktree;
-- approved parameter-bound plan;
 - progress, cost and artifact records;
 - draft PR and rollback plan.
 
