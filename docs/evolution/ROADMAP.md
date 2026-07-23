@@ -1,226 +1,356 @@
-# Evolution Engine build roadmap
+# Shipkit integrated product build roadmap
 
 Status: active  
 Issue: #9  
-Primary product definition: [`../../IDEA.md`](../../IDEA.md)
+Product definition: [`../../IDEA.md`](../../IDEA.md)
 
-This roadmap separates the long-term product thesis from the next proof. The current implementation reaches repository assessment (`created → observed → modeled`). It does not yet complete the A2 Research Audit or autonomous product R&D promise.
+Shipkit is one product. This roadmap sequences implementation by dependency and safety while retaining the full destination: workspace, application foundation, evolution kernel, research, execution, sandbox, verification, release, deployment, measurement, learning and interoperability.
 
-## Gate 0 — product coherence and research foundation
+The current implementation reaches repository assessment (`created → observed → modeled`) and includes an application foundation. It does not yet connect all modules into one complete user-visible cycle.
 
-### Completed
+## Roadmap rules
 
-- [x] establish Evolution Engine as the primary Shipkit product;
-- [x] define the Starter Kit as a dogfood/reference product rather than the roadmap owner;
-- [x] make root `IDEA.md` the product source of truth;
-- [x] preserve a separate generated-project idea template;
-- [x] maintain a living primary-source and implementation map;
-- [x] compare workflow, coding-agent, sandbox, protocol, policy, provenance, observability, benchmark, research-agent, product-discovery and learning systems through one framework;
-- [x] record adopt/adapt/integrate/defer/reject decisions and falsification tests;
-- [x] define research as a first-class product capability in `RESEARCH_CAPABILITY.md`.
+1. No module is downgraded to a separate or disposable product.
+2. Every module must have a typed input/output contract with the shared cycle.
+3. A module is “implemented” when its local behavior works; “integrated” only when the unified workflow consumes it.
+4. Safety prerequisites determine activation order, not product ownership.
+5. Every external integration requires a pinned source/version, license review, decision and falsification test.
+6. Every milestone must preserve honest boundaries and measurable acceptance criteria.
 
-### Remaining
+## Workstream A — product workspace and application foundation
 
-- [ ] pin a reviewed tag, release, commit, paper or specification version before each external integration begins;
-- [ ] convert material architecture decisions into versioned ADRs when implementation starts;
-- [ ] validate the beachhead user and A2 Research Audit problem with real developers;
-- [ ] keep README, package metadata, capability registry, project model and issue/PR descriptions synchronized.
+### Implemented foundation
 
-Exit: one coherent product identity, one beachhead user, one MVP definition and inspectable research decisions. A named project or method without a source, limitation, decision and falsifiable test does not satisfy this gate.
+- [x] Next.js application surface;
+- [x] localized landing, login and protected workspace;
+- [x] Supabase and Better Auth adapter paths;
+- [x] portable PostgreSQL setup and user isolation tests;
+- [x] shared security, database, mail, storage and payment packages;
+- [x] Vercel and Docker delivery recipes;
+- [x] project generator and AI engineering workflow;
+- [x] demo and portable PostgreSQL browser E2E.
 
-## Gate 1 — deterministic kernel safety
+### Required integration
 
-### Completed foundation
+- [ ] unified navigation for project, cycles, research, opportunities, executions, verification, releases, outcomes and learning;
+- [ ] product objective, brief, roadmap and experiment editing;
+- [ ] repository attach/create onboarding;
+- [ ] human approval and risk-review surfaces;
+- [ ] claim, source, contradiction and uncertainty inspection;
+- [ ] agent execution timeline and cost view;
+- [ ] verification, release and rollback views;
+- [ ] product metrics and learning history;
+- [ ] organization/team roles after the solo workflow is proven;
+- [ ] ensure generated projects retain their own product identity while connecting to Shipkit tooling.
+
+Exit: a user can operate each integrated milestone from one coherent Shipkit workspace rather than assembling CLI outputs manually.
+
+## Workstream B — deterministic evolution kernel
+
+### Implemented foundation
 
 - [x] state machine and immutable transitions;
+- [x] terminal rejected, rolled-back and inconclusive outcomes;
 - [x] A0–A4 autonomy and R0–R4 risk decisions;
-- [x] protected actions and exact cycle/scope approval matching;
-- [x] approval ID, policy version, expiry and revocation state;
-- [x] atomic JSON snapshot and synchronized append-only journal;
-- [x] recovery from missing/corrupt snapshot and interrupted trailing write;
-- [x] per-cycle writer lock, competing-writer serialization and stale-writer rejection;
-- [x] checksum-based accidental corruption detection;
-- [x] local CLI for init, start, inspect, assess, status, show/resume and evidence-backed advance;
-- [x] compiled CLI dogfood on Shipkit in CI.
+- [x] exact cycle/action/resource-scope approvals;
+- [x] approval IDs, policy versions, expiry and revocation state;
+- [x] synchronized append-only journal and atomic snapshot;
+- [x] corrupt/stale snapshot and interrupted trailing-write recovery;
+- [x] per-cycle owner-token lock and stale-writer rejection;
+- [x] content-addressed evidence blobs and distinct occurrences;
+- [x] read-time digest verification;
+- [x] local CLI and CI dogfood.
 
-### Remaining safety proof
+### Required hardening
 
-- [ ] explicit event-schema migration fixtures across released versions;
-- [ ] kill-process integration tests around journal append, file sync, snapshot write, rename and directory sync;
-- [ ] multi-process persistence stress tests across supported operating systems;
-- [ ] lock-lease recovery tests after forced process termination;
-- [ ] define the boundary between corruption detection and signed cryptographic provenance;
-- [ ] independent persistence and policy review.
+- [ ] explicit cycle/store schema migration chain;
+- [ ] fixtures for every released format;
+- [ ] kill-process tests at every persistence boundary;
+- [ ] multi-process writer and stale-lock stress tests;
+- [ ] parameter digests on protected approvals;
+- [ ] policy decision records and explanation schema;
+- [ ] content-level secret detection;
+- [ ] enforceable retention, deletion and dependent-claim invalidation;
+- [ ] independently buildable and versioned core package;
+- [ ] supported Node/OS compatibility matrix;
+- [ ] independent persistence, policy and API review.
 
-Exit: committed state survives crashes and competing processes without duplicate accepted transitions. A3/A4 remains experimental until the remaining safety proof is complete.
+Exit: every later module can rely on durable, versioned, crash-safe and reviewable shared state.
 
-## Gate 2 — repository perception, evidence and execution boundary
+## Workstream C — project and product understanding
 
-### Completed foundation
+### Implemented repository understanding
 
-- [x] portable bounded project scanner;
-- [x] package manager, manifest, language, source, test, docs, CI and product-signal discovery;
-- [x] structural trust-boundary discovery for auth, database, deployment, secrets and payments;
-- [x] SHA-256 content-addressed evidence blobs;
-- [x] distinct evidence occurrences for contextual kind/source/capture metadata;
-- [x] read-time digest and byte-length verification;
-- [x] secret-path, outside-root, symlink, size and truncation tests;
-- [x] discovered package-script execution without a shell;
-- [x] timeout, output bounds, reduced environment and common secret sanitization;
-- [x] scorecard with separate research, execution and verification readiness;
-- [x] explicit A2 autonomy ceiling for the current read-only product surface;
+- [x] bounded inventory and truncation reporting;
+- [x] Git, package manager, manifest and language discovery;
+- [x] source, tests, documentation and CI discovery;
+- [x] package-script check discovery;
+- [x] structural auth, database, deployment, secret and payment boundaries;
+- [x] temporary-workspace checks with timeout, output bounds and reduced environment;
+- [x] separate research, execution and verification readiness;
 - [x] proof on Shipkit and a pinned unrelated repository.
 
-### Remaining containment work
+### Required product understanding
 
-- [ ] stable execution-backend contract;
-- [ ] explicit capability negotiation for filesystem, process, dependency, secret and network containment;
-- [ ] fail closed when requested isolation is unavailable;
-- [ ] eliminate host `node_modules` links for untrusted execution;
-- [ ] adversarial fixtures for host writes, secret inheritance, symlinks, process trees, output floods, timeout and egress;
-- [ ] content-level secret detection and data-retention policy;
-- [ ] independent sandbox/security review.
+- [ ] typed `ProductBrief` and `ObjectiveRecord`;
+- [ ] architecture/component and user-journey models;
+- [ ] environment and deployment inventory;
+- [ ] decision, experiment and incident history ingestion;
+- [ ] authorized analytics, support and user-research signals;
+- [ ] code-to-product-feature and feature-to-outcome mapping;
+- [ ] blind-spot and evidence-coverage reports;
+- [ ] readiness dimensions for research, execution, verification, release and measurement.
 
-Exit: repository inspection remains portable; untrusted script execution occurs only in a backend that proves the requested containment. Until then, checks are described as **temporary-workspace checks**, not isolated or sandboxed checks.
+Exit: Shipkit understands both the codebase and the product context required to make responsible decisions.
 
-## Gate 3 — A2 Research Audit MVP
+## Workstream D — research intelligence
 
-First usable product:
+### D1 — decision framing
 
-```text
-inspect → assess → decision brief → bounded research
-→ atomic claims → contradiction review → 3 opportunities
-→ transparent ranking → smallest reversible experiment
-```
+- [ ] typed `ResearchBrief` with owner, deadline, assumptions, constraints, evidence thresholds and protected outcomes;
+- [ ] typed `ResearchPlan` with questions, dependencies, coverage, source strategy, budgets, checkpoints and stopping rules;
+- [ ] convert vague objectives into decision-changing questions;
+- [ ] workspace review for high-risk or high-cost plans.
 
-The MVP does not modify product code.
+### D2 — modern retrieval
 
-### 3A — minimum durable records
+- [ ] repository/internal evidence adapters;
+- [ ] public web, paper, repository, specification, competitor, changelog, incident and dataset adapters;
+- [ ] authorized private-source adapters under data governance;
+- [ ] reproducible `QueryRecord` with exact queries, aliases, filters, parents, rationale, tool and results;
+- [ ] adaptive reformulation, citation chasing, entity resolution and multilingual/domain search;
+- [ ] negative, failure, postmortem and falsification search;
+- [ ] authority, directness, freshness, applicability, independence, conflict and limitation scoring.
 
-- [ ] `ResearchBrief`: decision owner, deadline, assumptions, constraints, evidence thresholds and protected outcomes;
-- [ ] `ResearchPlan`: questions, dependencies, coverage map, source strategy, budget, checkpoints and stopping rules;
-- [ ] `QueryRecord`: exact query, aliases, filters, parent query, rationale, tool and result identifiers;
-- [ ] `SourceRecord`: canonical identity, version, publisher, access date, license, source class, digest, authority, freshness and applicability;
-- [ ] `ClaimRecord`: atomic claim, evidence spans, claim type, confidence, uncertainty, expiry and supporting/contradicting sources;
-- [ ] `ContradictionRecord`: conflicting claims, suspected cause, affected decision and resolution state;
-- [ ] `OpportunityRecord`: problem, evidence, alternatives, expected outcome, risk, cost, uncertainty, ranking rationale and smallest experiment.
+### D3 — claims and contradictions
 
-### 3B — single-worker research baseline
+- [ ] typed `SourceRecord`, `ClaimRecord` and `ContradictionRecord`;
+- [ ] exact evidence spans, transformations and calculation provenance;
+- [ ] observation/interpretation/estimate/calculation/recommendation claim types;
+- [ ] confidence, uncertainty, applicability and expiry;
+- [ ] source circularity, citation laundering and stale-version detection;
+- [ ] preserve disagreement instead of silently selecting a favored answer.
 
-- [ ] transform vague objectives into decision-changing questions before searching;
-- [ ] decompose questions into breadth-first and depth-first branches;
-- [ ] route public, private and repository questions to appropriate sources;
-- [ ] preserve query reformulation and citation-chasing history;
-- [ ] search for failures, limitations, postmortems and falsifying evidence;
-- [ ] score source authority, directness, freshness, applicability, independence and conflict of interest;
-- [ ] enforce time, token, search, document and monetary budgets;
-- [ ] stop on evidence threshold, diminishing returns, experiment superiority, exhausted budget or explicit inconclusive result.
+### D4 — product discovery
 
-### 3C — evidence review and synthesis
+- [ ] typed user-research records and consent boundaries;
+- [ ] observed recent behavior rather than hypothetical preference only;
+- [ ] interviews, workflow observation, support, analytics, churn, non-user, sales and accessibility evidence;
+- [ ] outcome/problem/opportunity/solution/experiment mapping;
+- [ ] reach, frequency, severity, strategic fit and constraints;
+- [ ] problem validation before expensive implementation.
 
-- [ ] reconstruct reports from atomic claims rather than narrative-only output;
-- [ ] preserve contradictory evidence instead of silently choosing a preferred source;
-- [ ] detect circular sourcing, citation laundering, stale versions and claims beyond evidence;
-- [ ] run a separate reviewer for material claims and calculations;
-- [ ] produce at least three distinct opportunities;
-- [ ] keep evidence strength, expected value, strategic fit, urgency, cost, risk and learning value separately inspectable;
-- [ ] recommend the smallest reversible experiment when it has more information value than further desk research.
+### D5 — synthesis and review
 
-### 3D — product discovery and real-user proof
+- [ ] separate citation/adversarial reviewer;
+- [ ] report reconstruction from atomic claims;
+- [ ] at least three distinct opportunities;
+- [ ] expected value, evidence, fit, urgency, cost, risk, reversibility and learning value shown separately;
+- [ ] typed `DecisionRecord` and `ExperimentRecord`;
+- [ ] explicit stop reason or `inconclusive` result;
+- [ ] persisted handoff to planning/execution.
 
-- [ ] convert feature requests into problem and behaviour questions;
-- [ ] gather recent observed behaviour from users, non-users, churned users and constrained users;
-- [ ] triangulate interviews with issues, support, analytics, search logs, sales or workflow observation where available;
-- [ ] validate the problem before expensive solution implementation;
-- [ ] test the A2 Audit with real developers on Shipkit and at least one unrelated product;
-- [ ] measure whether recommendations changed, confirmed or prevented a development decision;
-- [ ] measure repeat use across later cycles.
+### D6 — research orchestration and evaluation
 
-### 3E — evaluation
+- [ ] single-worker baseline;
+- [ ] bounded parallel research for genuinely independent branches;
+- [ ] compare deterministic, single-worker, multi-worker and human-assisted configurations;
+- [ ] retrieval correctness, coverage, citation precision/completeness and contradiction recall;
+- [ ] decision usefulness, recommendation survival, avoided waste, cost and latency;
+- [ ] prompt-injection and hostile-source fixtures;
+- [ ] research skill registry only after baseline evidence exists.
 
-- [ ] retrieval correctness and coverage under bounded budgets;
-- [ ] citation precision and completeness;
-- [ ] source quality and freshness accuracy;
-- [ ] contradiction recall and unsupported-claim rate;
-- [ ] human-review agreement and uncertainty communication;
-- [ ] opportunity diversity and recommendation survival after experiments;
-- [ ] time to decision-changing evidence, cost and implementation waste avoided;
-- [ ] compare against a deterministic workflow and one human-assisted baseline.
+Exit: Shipkit produces reproducible, reviewable product decisions and a typed experiment ready for governed implementation.
 
-### Deferred until the MVP proves value
+## Workstream E — execution and sandbox
 
-- parallel research workers;
-- research-skill promotion;
-- automated domain research packs;
-- broad authenticated-source ingestion;
-- multi-agent research orchestration.
+### E1 — backend contract
 
-Parallel work is added only after it beats the single-worker baseline on a suitable task after cost and coordination failures are counted.
+- [ ] `ExecutionBackend` interface;
+- [ ] capabilities for filesystem, process, dependency, secret, network and resources;
+- [ ] trusted-local backend named honestly;
+- [ ] container or remote sandbox backend;
+- [ ] fail closed when requested capability is absent;
+- [ ] cleanup and diagnostic contracts.
 
-Exit: two unrelated products produce inspectable plans, reproducible search trajectories, verified claims, visible contradictions, user-grounded problems, three opportunities and a defensible experiment choice. At least one real user confirms decision value.
+### E2 — adversarial containment
 
-## Gate 4 — bounded A3 execution
+- [ ] host-write and forbidden-path fixtures;
+- [ ] secret/environment leakage fixtures;
+- [ ] symlink, mount and workspace escape tests;
+- [ ] process tree, child process and resource exhaustion bounds;
+- [ ] timeout, output and cleanup tests;
+- [ ] blocked and allowed egress tests;
+- [ ] untrusted dependency and lifecycle-script tests;
+- [ ] independent security review.
 
-Only after Gate 3 demonstrates value:
+### E3 — agent adapters
 
-- [ ] stable agent adapter contract;
-- [ ] generic command adapter as the minimal baseline;
-- [ ] one coding-agent adapter;
-- [ ] dedicated sandbox backend and capability negotiation;
-- [ ] isolated branch delivery;
-- [ ] draft PR only;
-- [ ] independent technical verification and rollback plan;
-- [ ] compare success, cost, duration, safety and portability against the minimal command baseline.
+- [ ] generic command adapter baseline;
+- [ ] Codex CLI adapter;
+- [ ] OpenHands adapter;
+- [ ] Claude Code, Grok or other adapters through the same contract where available;
+- [ ] browser/tool activity adapter;
+- [ ] optional MCP client/tool bridge;
+- [ ] consistent cost, duration, retry and artifact records;
+- [ ] compare success and safety across agents/models/environments.
 
-Exit: one scoped task can be implemented through two interchangeable clients without either client owning cycle state, policy or evidence acceptance. No automatic merge or deploy.
+### E4 — governed change delivery
 
-## Gate 5 — interoperability and portable trust
+- [ ] isolated branch/worktree;
+- [ ] bind execution to approved plan and parameter digest;
+- [ ] change manifest and generated evidence;
+- [ ] rollback plan before mutation;
+- [ ] draft PR creation;
+- [ ] no implicit merge or deployment;
+- [ ] progress and intervention controls in the workspace.
 
-- [ ] MCP tools/resources over kernel operations;
-- [ ] reusable GitHub Action and draft-PR scorecard;
-- [ ] optional OpenTelemetry-compatible traces and metrics;
-- [ ] in-toto-compatible cycle attestation;
-- [ ] policy packs only when they demonstrate value over the local policy module;
-- [ ] independent verifier for evidence and attestation claims.
+Exit: interchangeable agents can implement the selected experiment in containment while the kernel owns authorization and state.
 
-Exit: different clients consume the same persisted cycle and portable claims are independently inspectable.
+## Workstream F — verification and portable trust
 
-## Gate 6 — product outcome measurement
+- [ ] independent verifier boundary distinct from implementer;
+- [ ] project-specific test, lint, type, build, security and policy packs;
+- [ ] regression and adversarial verification;
+- [ ] benchmark tasks pinned by repository, environment and harness;
+- [ ] human review and dissent records;
+- [ ] OpenTelemetry-compatible optional traces/metrics;
+- [ ] in-toto/SLSA-compatible provenance and attestations;
+- [ ] evidence substitution, tamper, expiry and unsupported-claim tests;
+- [ ] GitHub Action and PR scorecard;
+- [ ] portable verdict and unresolved-risk representation.
 
-- [ ] technical, UX, adoption, retention, conversion, cost and uncertainty evaluators;
+Exit: a change cannot claim acceptance only because its implementation agent reports success.
+
+## Workstream G — delivery, release and operations
+
+- [ ] release and deployment adapter contract;
+- [ ] Vercel deployment integration;
+- [ ] Docker/self-hosted deployment integration;
+- [ ] database migration planning and verification;
+- [ ] environment and configuration checks;
+- [ ] exact approval for merge, release, deploy, production writes, secrets and spending;
+- [ ] progressive release/canary support where applicable;
+- [ ] environment-specific rollback;
+- [ ] release evidence, incident and recovery records;
+- [ ] deployment controls in the unified workspace.
+
+Exit: verified work can be explicitly authorized, released, observed and rolled back through the same cycle.
+
+## Workstream H — product outcome measurement
+
 - [ ] experiment exposure and comparison contracts;
+- [ ] technical reliability and performance evaluators;
+- [ ] UX, activation, adoption, retention and conversion evaluators;
+- [ ] support, qualitative research and accessibility outcomes;
+- [ ] cost and operational burden;
+- [ ] guardrail/protected metrics;
 - [ ] keep, iterate, reject and rollback decision records;
-- [ ] separate product-value evidence from code-quality evidence.
+- [ ] separate code-quality evidence from product-value evidence;
+- [ ] outcome views linked to the original objective, research, decision and release.
 
-Exit: a technically passing change can be rejected when user or product evidence does not support it.
+Exit: technically passing work may still be rejected or rolled back when product evidence does not support it.
 
-## Gate 7 — measured learning
+## Workstream I — learning and controlled improvement
 
-- [ ] memory and skill registry with provenance, applicability, risk and expiry;
-- [ ] record actual later-cycle consumption;
-- [ ] paired comparable cycles with and without each proposed learning;
+- [ ] memory and skill registry with provenance, scope, applicability, risk and expiry;
+- [ ] research, planning, implementation, verification and release skill types;
+- [ ] actual later-cycle consumption tracking;
+- [ ] comparable cycles with and without proposed learning;
 - [ ] success, regression, cost, duration and uncertainty reports;
-- [ ] retire harmful, stale or over-specialized learning;
-- [ ] permit no positive-recursion claim before causal later-cycle evidence.
+- [ ] promotion only after measured benefit;
+- [ ] retirement of stale, harmful or over-specialized learning;
+- [ ] meta-change review and rollback;
+- [ ] no positive-recursion claim without causal later-cycle evidence.
 
-Exit: at least one controlled process change improves a later comparable cycle without unacceptable protected-metric regression.
+Exit: at least one accepted learning improves a later comparable end-to-end product cycle without unacceptable regression.
+
+## Workstream J — interoperability and distribution
+
+- [ ] standalone versioned CLI and libraries;
+- [ ] reusable GitHub Action;
+- [ ] MCP server over kernel, research and evidence operations;
+- [ ] A2A support when independent agent systems need coordination;
+- [ ] local unified dashboard/workspace;
+- [ ] self-hosted team deployment;
+- [ ] hosted history, policy, benchmarks and collaboration;
+- [ ] organization roles, approvals and audit logs;
+- [ ] import/export of cycles, evidence and attestations;
+- [ ] extension packs for agents, sandboxes, research sources, verification and deployment.
+
+Exit: local, repository and hosted surfaces present the same Shipkit product and lifecycle.
+
+## Integrated milestones
+
+### Milestone 0 — identity and contracts
+
+- [x] one unified product definition;
+- [ ] update all active documents and machine-readable metadata;
+- [ ] map module contracts and ownership;
+- [ ] define integrated acceptance language.
+
+### Milestone 1 — durable product understanding
+
+Kernel hardening + workspace onboarding + repository/product model.
+
+### Milestone 2 — research-to-decision
+
+Workspace objective → research intelligence → reviewed experiment → execution handoff.
+
+### Milestone 3 — decision-to-change
+
+Approved experiment → sandboxed agents → draft PR → independent verification.
+
+### Milestone 4 — change-to-outcome
+
+Verified change → authorized release → measurement → keep/iterate/rollback.
+
+### Milestone 5 — continuous evolution
+
+Outcome → measured learning → improved later complete cycle.
+
+Each milestone is a vertical integration of the final product, not a separate product launch.
+
+## Full-product acceptance
+
+Shipkit reaches its intended v1 only when:
+
+- one product workspace operates the complete lifecycle;
+- a project can be created or attached;
+- research selects a defensible experiment;
+- at least two interchangeable agents can implement it in a real sandbox;
+- independent verification can accept or reject it;
+- release/deployment requires exact approval;
+- technical and product outcomes are measured;
+- rollback is exercised;
+- later learning is causally evaluated;
+- all states and material claims can be reconstructed from durable evidence.
 
 ## Product metrics
 
-- setup to first inspected model;
-- committed-cycle recovery without state loss;
+- setup to attached/created product workspace;
+- time to first decision-changing evidence;
+- time from accepted experiment to verified change;
+- time from release to measurable outcome;
+- cycle recovery and migration success;
 - false-allow and false-block rates;
-- research coverage, citation quality and contradiction recall;
-- percentage of recommendations surviving experiments;
-- implementation waste avoided;
-- cost and duration per verified decision or improvement;
-- repeated use by the same developer;
-- measured lift or harm from promoted learning.
+- citation quality and contradiction recall;
+- execution success, cost, duration and intervention;
+- verification disagreement and defect escape rate;
+- deployment and rollback reliability;
+- recommendation survival and avoided waste;
+- repeat complete-cycle use;
+- measured benefit or harm from learning.
 
-## Distribution only after core proof
+## Current priority order
 
-- standalone CLI package;
-- reusable GitHub Action;
-- MCP server;
-- local dashboard;
-- hosted history/policy/benchmark service only after local-first value is proven.
+1. Synchronize the unified product definition across repository artifacts.
+2. Complete persistence and policy hardening.
+3. Define shared module contracts and workspace integration skeleton.
+4. Implement the research-to-decision milestone.
+5. Build real sandbox and execution adapters in parallel with workspace handoff.
+6. Complete independent verification and draft-PR delivery.
+7. Add authorized release/deployment and outcome measurement.
+8. Add measured learning, interoperability and hosted collaboration.
+
+No listed workstream is abandoned. Priorities express dependencies and risk, not a change in final product direction.
