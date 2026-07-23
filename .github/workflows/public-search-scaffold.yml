@@ -29,6 +29,7 @@ jobs:
           node .shipkit-public-search-scaffold.cjs
           rm .shipkit-public-search-scaffold.cjs
           rm -rf .shipkit-scaffold
+          git checkout -- .github/workflows/ci.yml
       - name: Commit public search baseline
         run: |
           set -euo pipefail
