@@ -42,7 +42,7 @@ try {
     "--id",
     cycleId,
     "--objective",
-    "Inspect and assess Shipkit for the next product evolution cycle",
+    "Choose Shipkit's next evidence-backed product experiment",
     "--autonomy",
     "A2",
     "--risk",
@@ -58,7 +58,7 @@ try {
     "--project-root",
     root,
     "--actor",
-    "ci-dogfood",
+    "ci-dogfood-inspector",
   ]);
   if (inspected.cycle?.stage !== "observed") {
     throw new Error("inspect did not advance the persisted cycle to observed");
@@ -86,26 +86,8 @@ try {
     "--timeout-ms",
     "180000",
     "--actor",
-    "ci-dogfood",
+    "ci-dogfood-assessor",
   ]);
-  await mkdir(dirname(reportPath), { recursive: true });
-  await writeFile(
-    reportPath,
-    `${JSON.stringify(
-      {
-        cycleId,
-        stage: assessed.cycle?.stage,
-        snapshotEvidence: inspected.evidence?.id,
-        evidence: assessed.evidence,
-        scorecard: assessed.scorecard,
-        checkReport: assessed.checkReport,
-      },
-      null,
-      2
-    )}\n`,
-    "utf8"
-  );
-
   if (assessed.cycle?.stage !== "modeled") {
     throw new Error("assessment did not advance the persisted cycle to modeled");
   }
@@ -125,11 +107,75 @@ try {
     throw new Error("assessment did not produce a content-addressed scorecard");
   }
 
+  const researched = run([
+    "research-repository",
+    cycleId,
+    "--root",
+    store,
+    "--project-root",
+    root,
+    "--check",
+    "test",
+    "--timeout-ms",
+    "180000",
+    "--actor",
+    "ci-dogfood-researcher",
+    "--reviewer",
+    "ci-dogfood-independent-reviewer",
+  ]);
+  if (researched.outcome !== "completed" || researched.cycle?.stage !== "planned") {
+    throw new Error("repository research did not produce a reviewed planned cycle");
+  }
+  if (researched.run?.adapter !== "repository-single-worker") {
+    throw new Error("repository research did not persist the single-worker run adapter");
+  }
+  if (researched.evaluation?.verdict !== "pass") {
+    throw new Error("independent repository research review did not pass");
+  }
+  if ((researched.records?.opportunities ?? []).length < 3) {
+    throw new Error("repository research did not preserve at least three opportunities");
+  }
+  if ((researched.records?.claims ?? []).some((claim) => claim.claimType === "user-problem")) {
+    throw new Error("repository-only research produced an unsupported user-problem claim");
+  }
+  if (!/^[a-f0-9]{64}$/.test(researched.executionHandoff?.parameterDigest ?? "")) {
+    throw new Error("repository research did not create a parameter-bound execution handoff");
+  }
+
   const resumed = run(["resume", cycleId, "--root", store]);
-  if (resumed.cycle?.stage !== "modeled") throw new Error("resume lost modeled cycle state");
+  if (resumed.cycle?.stage !== "planned") throw new Error("resume lost planned research state");
+  if (resumed.cycle?.research?.runs?.at(-1)?.outcome !== "completed") {
+    throw new Error("resume lost the durable research run");
+  }
+  if (resumed.cycle?.research?.evaluations?.at(-1)?.verdict !== "pass") {
+    throw new Error("resume lost the durable research evaluation");
+  }
 
   const status = run(["status", "--root", store]);
   if (status.cycles?.[0]?.cycleId !== cycleId) throw new Error("status did not list dogfood cycle");
+
+  await mkdir(dirname(reportPath), { recursive: true });
+  await writeFile(
+    reportPath,
+    `${JSON.stringify(
+      {
+        cycleId,
+        stage: resumed.cycle?.stage,
+        snapshotEvidence: inspected.evidence?.id,
+        assessmentEvidence: assessed.evidence,
+        researchEvidence: researched.evidence,
+        scorecard: researched.scorecard,
+        checkReport: researched.checkReport,
+        run: researched.run,
+        evaluation: researched.evaluation,
+        selectedDecision: researched.records?.decision,
+        executionHandoff: researched.executionHandoff,
+      },
+      null,
+      2
+    )}\n`,
+    "utf8"
+  );
 
   console.log(
     JSON.stringify(
@@ -138,9 +184,12 @@ try {
         cycleId,
         stage: resumed.cycle.stage,
         snapshotEvidence: inspected.evidence.id,
-        scorecardEvidence: assessed.evidence.scorecard.id,
-        readiness: assessed.scorecard.readiness,
-        checkSummary,
+        scorecardEvidence: researched.evidence.scorecard.id,
+        readiness: researched.scorecard.readiness,
+        checkSummary: researched.checkReport.summary,
+        researchOutcome: researched.run.outcome,
+        reviewVerdict: researched.evaluation.verdict,
+        opportunities: researched.records.opportunities.length,
         filesObserved: inspected.snapshot.inventory.filesObserved,
         checks: [...checkNames].sort(),
       },
