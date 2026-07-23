@@ -18,6 +18,8 @@ const RESEARCH_BUCKETS = [
   "executionHandoffs",
 ] as const satisfies readonly (keyof EvolutionResearchRecords)[];
 
+const NEW_OPTIONAL_BUCKETS = new Set<keyof EvolutionResearchRecords>(["runs", "evaluations"]);
+
 const EXPECTED_KINDS: Record<(typeof RESEARCH_BUCKETS)[number], string> = {
   briefs: "research-brief",
   plans: "research-plan",
@@ -88,6 +90,9 @@ export function assertEvolutionResearchRecords(
 
   const seen = new Set<string>();
   for (const bucket of RESEARCH_BUCKETS) {
+    if (value[bucket] === undefined && NEW_OPTIONAL_BUCKETS.has(bucket)) {
+      value[bucket] = [];
+    }
     const records = value[bucket];
     if (!Array.isArray(records)) {
       throw new Error(`cycle research.${bucket} must be an array`);
@@ -108,7 +113,7 @@ export function mergeResearchRecords(
 ): EvolutionResearchRecords {
   const next = current
     ? Object.fromEntries(
-        RESEARCH_BUCKETS.map((bucket) => [bucket, [...current[bucket]]])
+        RESEARCH_BUCKETS.map((bucket) => [bucket, [...(current[bucket] ?? [])]])
       ) as EvolutionResearchRecords
     : emptyResearchRecords();
 
