@@ -107,6 +107,12 @@ function mediaTypeFor(path: string): string {
   }
 }
 
+function evidenceExtension(mediaType: string): string {
+  if (mediaType === "application/json") return ".json";
+  if (mediaType.startsWith("text/") || mediaType === "application/yaml") return ".txt";
+  return ".bin";
+}
+
 export class EvidenceRegistry {
   readonly storeRoot: string;
   readonly projectRoot: string;
@@ -127,9 +133,9 @@ export class EvidenceRegistry {
     sourcePath: string | null
   ): Promise<EvidenceReference> {
     if (!kind.trim()) throw new EvidenceRegistryError("evidence kind is required");
+    if (!mediaType.trim()) throw new EvidenceRegistryError("evidence mediaType is required");
     const hash = digest(content);
-    const extension = mediaType === "application/json" ? ".json" : ".bin";
-    const artifactPath = join(this.evidenceRoot, `${hash}${extension}`);
+    const artifactPath = join(this.evidenceRoot, `${hash}${evidenceExtension(mediaType)}`);
     const blobMetadataPath = join(this.evidenceRoot, `${hash}.blob.json`);
     const occurrenceId = `occurrence:${randomUUID()}`;
     const occurrencePath = join(this.occurrenceRoot, `${occurrenceId.slice("occurrence:".length)}.json`);
@@ -183,6 +189,20 @@ export class EvidenceRegistry {
 
   async registerJson(kind: string, value: unknown): Promise<EvidenceReference> {
     return this.persist(kind, serializeJson(value), "application/json", null);
+  }
+
+  async registerText(
+    kind: string,
+    value: string,
+    mediaType = "text/plain",
+    sourcePath: string | null = null
+  ): Promise<EvidenceReference> {
+    if (typeof value !== "string") throw new EvidenceRegistryError("text evidence must be a string");
+    const content = Buffer.from(value, "utf8");
+    if (content.byteLength > MAX_FILE_BYTES) {
+      throw new EvidenceRegistryError(`text evidence exceeds ${MAX_FILE_BYTES} bytes`);
+    }
+    return this.persist(kind, content, mediaType, sourcePath);
   }
 
   async registerFile(kind: string, path: string): Promise<EvidenceReference> {
