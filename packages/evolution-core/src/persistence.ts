@@ -22,6 +22,7 @@ export const CURRENT_STORE_SCHEMA_VERSION = 2 as const;
 
 const DEFAULT_LOCK_TIMEOUT_MS = 5_000;
 const DEFAULT_STALE_LOCK_MS = 30_000;
+const ORPHAN_TEMP_STALE_MS = 30_000;
 const SNAPSHOT_TEMPORARY_SUFFIX = ".tmp";
 
 export class EvolutionStoreError extends Error {
@@ -345,16 +346,30 @@ async function removeOrphanedSnapshots(cycleDir: string, statePath: string): Pro
     return;
   }
   const prefix = `${basename(statePath)}.`;
-  await Promise.all(
-    entries
-      .filter(
-        (entry) =>
-          entry.isFile() &&
-          entry.name.startsWith(prefix) &&
-          entry.name.endsWith(SNAPSHOT_TEMPORARY_SUFFIX)
-      )
-      .map((entry) => rm(join(cycleDir, entry.name), { force: true }))
+  const candidates = entries.filter(
+    (entry) =>
+      entry.isFile() &&
+      entry.name.startsWith(prefix) &&
+      entry.name.endsWith(SNAPSHOT_TEMPORARY_SUFFIX)
   );
+
+  for (const entry of candidates) {
+    const candidatePath = join(cycleDir, entry.name);
+    const identity = entry.name.slice(prefix.length, -SNAPSHOT_TEMPORARY_SUFFIX.length);
+    const pid = Number(identity.split(".", 1)[0]);
+    if (Number.isInteger(pid) && pid > 0) {
+      if (processIsAlive(pid)) continue;
+      await rm(candidatePath, { force: true });
+      continue;
+    }
+    try {
+      const details = await stat(candidatePath);
+      if (Date.now() - details.mtimeMs <= ORPHAN_TEMP_STALE_MS) continue;
+      await rm(candidatePath, { force: true });
+    } catch {
+      // A concurrently completed or removed temporary file needs no further cleanup.
+    }
+  }
 }
 
 function normalizeProjectConfig(value: unknown): { config: ProjectConfig; migrated: boolean } {
@@ -373,6 +388,10 @@ function normalizeProjectConfig(value: unknown): { config: ProjectConfig; migrat
     throw new EvolutionStoreError("project config is invalid");
   }
   const migrated = value.schemaVersion === 1;
+  const existingMigratedAt =
+    typeof value.migratedAt === "string" && Number.isFinite(Date.parse(value.migratedAt))
+      ? value.migratedAt
+      : null;
   return {
     migrated,
     config: {
@@ -380,7 +399,9 @@ function normalizeProjectConfig(value: unknown): { config: ProjectConfig; migrat
       projectRoot: value.projectRoot,
       projectName: value.projectName,
       createdAt: value.createdAt,
-      ...(migrated ? { migratedAt: new Date().toISOString() } : {}),
+      ...((existingMigratedAt ?? (migrated ? value.createdAt : null))
+        ? { migratedAt: existingMigratedAt ?? value.createdAt }
+        : {}),
     },
   };
 }
