@@ -292,6 +292,16 @@ Passing CI proves compatibility with the tested repository state, not complete i
 
 This order expresses dependency and safety. It does not remove any module from the intended product.
 
+## Workstream tracking
+
+- #11 — persistence crash, migration and multi-process proof;
+- #12 — fail-closed sandbox execution backends;
+- #13 — research-to-decision integrated milestone;
+- #14 — real-user decision-value validation;
+- #15 — independent/versioned Evolution Core package.
+
+These issues are modules and prerequisites of the single Shipkit product, not separate product directions.
+
 ## Hard constraints
 
 - Shipkit is one product and one lifecycle;
