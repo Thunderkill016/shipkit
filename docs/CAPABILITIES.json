@@ -3,7 +3,7 @@
   "project": "shipkit",
   "primaryProduct": "Shipkit",
   "lastVerified": "2026-07-23",
-  "verificationScope": "Repository evidence and GitHub Actions on draft pull request #10. Shipkit now runs bounded deterministic repository research through the shared durable cycle, persists usage and stopping reasons, requires an independent reviewer, produces an explicit inconclusive outcome when evidence is insufficient, and exposes the result in the web workspace. Public-web research, direct user evidence, sandboxed implementation, release, measured outcome and learning are not yet claimed.",
+  "verificationScope": "Repository evidence and GitHub Actions on draft pull request #10. Shipkit now supports bounded deterministic repository research and a manifest-driven public HTTP source baseline with private-network blocking, hostile-content quarantine, immutable normalized text, exact citation spans and independent review. Search discovery, citation chasing, direct user evidence, sandboxed implementation, release, measured outcome and learning are not yet claimed.",
   "capabilities": [
     {
       "id": "integrated-product-workspace",
@@ -59,14 +59,14 @@
       "verificationStatus": "passing",
       "summary": "Immutable SHA-256 blobs are separated from contextual occurrences so research, execution, verification, release and outcome claims can share trustworthy evidence.",
       "evidence": ["packages/evolution-core/src/evidence.ts", "packages/evolution-core/src/repository-evidence.test.ts"],
-      "checks": ["Stable canonical JSON hashing", "Distinct occurrence records for identical blobs", "Changed-blob verification failure", "Secret-path and outside-root rejection"]
+      "checks": ["Stable canonical JSON hashing", "Distinct occurrence records for identical blobs", "Changed-blob verification failure", "Secret-path and outside-root rejection", "Retrieved normalized text registration"]
     },
     {
       "id": "repository-product-understanding",
       "category": "perception",
       "status": "partial",
       "verificationStatus": "passing",
-      "summary": "Shipkit models repository structure, checks, CI, product signals, Git state and structural trust boundaries and now consumes that model in a bounded repository-research decision flow; deeper user and operational understanding remains planned.",
+      "summary": "Shipkit models repository structure, checks, CI, product signals, Git state and structural trust boundaries and consumes that model in a bounded repository-research decision flow; deeper user and operational understanding remains planned.",
       "evidence": ["packages/evolution-core/src/repository.ts", "packages/evolution-core/src/repository-evidence.test.ts", "packages/evolution-core/src/inspect-cli.test.ts", "packages/evolution-core/src/scorecard.ts", "packages/evolution-core/src/repository-research.ts"],
       "checks": ["Synthetic unrelated repository tests", "Pinned external repository assessment proof", "CI: Shipkit repository-research dogfood"],
       "limitations": ["User journeys, analytics, support, deployment state and product outcomes are not yet integrated", "Repository evidence cannot establish user demand or current external facts"]
@@ -86,10 +86,20 @@
       "category": "research",
       "status": "partial",
       "verificationStatus": "passing",
-      "summary": "Shipkit supports manual typed research bundles and an autonomous deterministic repository/internal single-worker adapter. Research runs persist budgets, usage, coverage gaps and stopping reasons; a distinct reviewer checks evidence support, user-claim boundaries, contradictions, opportunity portfolios, rejected alternatives and execution scope before a decision is accepted.",
-      "evidence": ["packages/evolution-core/src/research-records.ts", "packages/evolution-core/src/research.ts", "packages/evolution-core/src/research-review.ts", "packages/evolution-core/src/repository-research.ts", "packages/evolution-core/src/research.test.ts", "packages/evolution-core/src/repository-research.test.ts", "packages/evolution-core/src/research-cli.test.ts", "packages/evolution-core/src/cli.ts", "scripts/test-evolution-cli.mjs", "apps/web/src/app/app/evolution/page.tsx", "docs/evolution/RESEARCH_CAPABILITY.md"],
-      "checks": ["Unit tests: completed repository research and parameter-bound handoff", "Unit tests: insufficient budget produces durable inconclusive outcome", "Unit tests: repository-only user-problem claim is rejected", "Unit tests: reviewer actor must differ from researcher actor", "CLI test: persist and reload planned research cycle", "CI dogfood: autonomous repository research on Shipkit", "CI: production build", "CI: Evolution Engine Proof"],
-      "limitations": ["No public web, paper, specification, competitor, changelog, incident or dataset adapter is integrated yet", "No consented user-research evidence ingestion exists yet", "The deterministic reviewer does not yet verify external citation spans, transformations or calculations", "No adaptive query reformulation, citation chasing or hostile-source defense exists yet", "No real-user decision-value proof exists yet", "The execution handoff is not yet consumed by a sandbox or agent adapter"]
+      "summary": "Shipkit supports manual typed bundles, deterministic repository research and manifest-driven public-source capture. Research runs persist budgets, usage, coverage and stopping reasons; distinct reviewers check evidence support, user-claim boundaries, citations, source safety, contradictions, alternatives and execution scope before a decision is accepted.",
+      "evidence": ["packages/evolution-core/src/research-records.ts", "packages/evolution-core/src/research.ts", "packages/evolution-core/src/research-review.ts", "packages/evolution-core/src/repository-research.ts", "packages/evolution-core/src/public-research.ts", "packages/evolution-core/src/research.test.ts", "packages/evolution-core/src/repository-research.test.ts", "packages/evolution-core/src/public-research.test.ts", "packages/evolution-core/src/public-cli.test.ts", "packages/evolution-core/src/cli.ts", "packages/evolution-core/src/public-cli.ts", "scripts/test-evolution-cli.mjs", "apps/web/src/app/app/evolution/page.tsx", "docs/evolution/RESEARCH_CAPABILITY.md", "docs/evolution/PUBLIC_SOURCE_RESEARCH.md"],
+      "checks": ["Unit tests: completed repository research and parameter-bound handoff", "Unit tests: insufficient budget produces durable inconclusive outcome", "Unit tests: repository-only user-problem claim is rejected", "Unit tests: reviewer actor must differ from researcher actor", "CLI test: persist and reload planned repository research cycle", "Public-source tests: SSRF and unsafe redirect blocking", "Public-source tests: exact citations, hostile quarantine and missing quote", "Public CLI test: persist and reload citation spans", "CI dogfood: autonomous repository research on Shipkit", "CI: production build", "CI: Evolution Engine Proof"],
+      "limitations": ["Public retrieval requires an explicit URL manifest and does not discover or rank the wider web", "No paper, PDF, specification-specific, competitor, changelog, incident or dataset adapter is integrated yet", "No consented user-research evidence ingestion exists yet", "No adaptive query reformulation or citation chasing exists yet", "Hostile-source screening is pattern-based and not a complete prompt-injection defense", "No real-user decision-value proof exists yet", "The execution handoff is not yet consumed by a sandbox or agent adapter"]
+    },
+    {
+      "id": "public-source-citation-baseline",
+      "category": "research",
+      "status": "partial",
+      "verificationStatus": "passing",
+      "summary": "A single-worker public HTTP adapter captures explicit URLs, blocks private-network and unsafe redirect destinations, bounds response time and size, normalizes textual content, quarantines direct hostile instructions, persists exact citation spans and requires independent citation review before planning.",
+      "evidence": ["packages/evolution-core/src/public-source.ts", "packages/evolution-core/src/public-research.ts", "packages/evolution-core/src/public-cli.ts", "packages/evolution-core/src/public-research.test.ts", "packages/evolution-core/src/public-cli.test.ts", "docs/evolution/PUBLIC_SOURCE_RESEARCH.md"],
+      "checks": ["Private DNS address blocked before fetch", "Redirect to loopback address blocked", "HTML and text normalized into content-addressed evidence", "Exact quote offsets and digests verified", "Hostile instruction fixture produces durable inconclusive cycle", "Missing quote fixture produces durable inconclusive cycle", "CLI journal reload retains public run, citation spans and reviewer verdict"],
+      "limitations": ["No search discovery or ranking", "No JavaScript browser rendering or PDF extraction", "DNS is validated but not cryptographically pinned to the eventual connection", "Normalized offsets are not original DOM locators", "Pattern screening can miss obfuscated hostile content", "No user-research consent provenance"]
     },
     {
       "id": "sandboxed-agent-execution",
