@@ -120,6 +120,27 @@ export type ResearchPlan = ResearchRecordBase & {
   stopConditions: string[];
 };
 
+export type ResearchRunRecord = ResearchRecordBase & {
+  kind: "research-run";
+  adapter: "manual-bundle" | "repository-single-worker";
+  startedAt: string;
+  completedAt: string;
+  budget: ResearchBudget;
+  usage: {
+    queries: number;
+    sources: number;
+    minutes: number;
+    costUsd: number;
+  };
+  coverage: {
+    required: string[];
+    answered: string[];
+    gaps: string[];
+  };
+  stopReason: string;
+  outcome: "completed" | "inconclusive";
+};
+
 export type QueryRecord = ResearchRecordBase & {
   kind: "query";
   query: string;
@@ -226,14 +247,43 @@ export type ExecutionHandoff = ResearchRecordBase & {
   parameterDigest: string;
 };
 
+export type ResearchReviewCheck = {
+  id:
+    | "separate-reviewer"
+    | "budget-compliance"
+    | "source-support"
+    | "user-evidence"
+    | "opportunity-portfolio"
+    | "decision-preservation"
+    | "scope-separation"
+    | "contradiction-visibility"
+    | "stop-reason";
+  passed: boolean;
+  summary: string;
+  evidenceRefs: string[];
+};
+
+export type ResearchEvaluationRecord = ResearchRecordBase & {
+  kind: "research-evaluation";
+  researcherActor: string;
+  verdict: "pass" | "revise" | "inconclusive";
+  checks: ResearchReviewCheck[];
+  unsupportedClaimIds: string[];
+  unresolvedContradictionIds: string[];
+  stopReason: string;
+  limitations: string[];
+};
+
 export type EvolutionResearchRecords = {
   briefs: ResearchBrief[];
   plans: ResearchPlan[];
+  runs: ResearchRunRecord[];
   queries: QueryRecord[];
   sources: SourceRecord[];
   claims: ClaimRecord[];
   contradictions: ContradictionRecord[];
   opportunities: OpportunityRecord[];
+  evaluations: ResearchEvaluationRecord[];
   decisions: DecisionRecord[];
   experiments: ExperimentRecord[];
   executionHandoffs: ExecutionHandoff[];
