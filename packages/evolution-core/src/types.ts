@@ -122,7 +122,7 @@ export type ResearchPlan = ResearchRecordBase & {
 
 export type ResearchRunRecord = ResearchRecordBase & {
   kind: "research-run";
-  adapter: "manual-bundle" | "repository-single-worker";
+  adapter: "manual-bundle" | "repository-single-worker" | "public-http-manifest";
   startedAt: string;
   completedAt: string;
   budget: ResearchBudget;
@@ -159,6 +159,12 @@ export type ResearchSourceClass =
   | "community"
   | "unverified";
 
+export type ResearchSourceRetrievalStatus =
+  | "not-applicable"
+  | "captured"
+  | "quarantined"
+  | "failed";
+
 export type SourceRecord = ResearchRecordBase & {
   kind: "source";
   canonicalId: string;
@@ -174,6 +180,12 @@ export type SourceRecord = ResearchRecordBase & {
   applicability: number;
   independence: number;
   conflictOfInterest: string | null;
+  uri?: string | null;
+  mediaType?: string | null;
+  contentDigest?: string | null;
+  retrievalStatus?: ResearchSourceRetrievalStatus;
+  safetySignals?: string[];
+  transformation?: string | null;
 };
 
 export type ResearchClaimType =
@@ -193,6 +205,25 @@ export type ClaimRecord = ResearchRecordBase & {
   supportingSourceIds: string[];
   contradictingSourceIds: string[];
   expiresAt: string | null;
+};
+
+export type CitationSpanRecord = ResearchRecordBase & {
+  kind: "citation-span";
+  claimId: string;
+  sourceId: string;
+  relation: "supporting" | "contradicting";
+  locator: {
+    type: "normalized-text-offset";
+    start: number;
+    end: number;
+    occurrence: number;
+  };
+  quote: string;
+  quoteDigest: string;
+  sourceContentDigest: string;
+  transformation: string;
+  verified: boolean;
+  verificationError: string | null;
 };
 
 export type ContradictionRecord = ResearchRecordBase & {
@@ -257,7 +288,11 @@ export type ResearchReviewCheck = {
     | "decision-preservation"
     | "scope-separation"
     | "contradiction-visibility"
-    | "stop-reason";
+    | "stop-reason"
+    | "citation-integrity"
+    | "source-safety"
+    | "source-strength"
+    | "source-deduplication";
   passed: boolean;
   summary: string;
   evidenceRefs: string[];
@@ -272,6 +307,9 @@ export type ResearchEvaluationRecord = ResearchRecordBase & {
   unresolvedContradictionIds: string[];
   stopReason: string;
   limitations: string[];
+  verifiedCitationSpanIds?: string[];
+  unverifiedCitationSpanIds?: string[];
+  quarantinedSourceIds?: string[];
 };
 
 export type EvolutionResearchRecords = {
@@ -281,6 +319,7 @@ export type EvolutionResearchRecords = {
   queries: QueryRecord[];
   sources: SourceRecord[];
   claims: ClaimRecord[];
+  citationSpans: CitationSpanRecord[];
   contradictions: ContradictionRecord[];
   opportunities: OpportunityRecord[];
   evaluations: ResearchEvaluationRecord[];
