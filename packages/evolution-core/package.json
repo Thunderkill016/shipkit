@@ -14,9 +14,9 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "shipkit-evolve": "./dist/cli.js",
-    "shipkit-research-public": "./dist/public-cli.js",
-    "shipkit-sandbox-check": "./dist/sandbox-cli.js"
+    "shipkit-evolve": "./dist/bin-evolve.js",
+    "shipkit-research-public": "./dist/bin-public-research.js",
+    "shipkit-sandbox-check": "./dist/bin-sandbox-check.js"
   },
   "exports": {
     ".": {
