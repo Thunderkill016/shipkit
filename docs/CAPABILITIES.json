@@ -3,7 +3,7 @@
   "project": "shipkit",
   "primaryProduct": "Shipkit",
   "lastVerified": "2026-07-23",
-  "verificationScope": "Repository evidence and GitHub Actions through draft pull request #30. Shipkit now supports a standalone Evolution Core package, bounded repository and public-source research, named-candidate decisions grounded in explicit issue/roadmap/capability/implementation evidence, stale-capability rejection, hardened persistence and explicit execution backends. External user decision value, broad web discovery, coding-agent delivery, release and measured learning are not yet claimed.",
+  "verificationScope": "Repository evidence and GitHub Actions through draft pull request #31. Shipkit now supports a standalone Evolution Core package, durable repository and explicit-source research, manifest-grounded named-candidate decisions, and a bounded GitHub public repository-search provider with persisted ranks, timestamps, digests, falsification queries, exact citations and fail-closed outcomes. General web discovery, direct user decision-value proof, coding-agent delivery, release and measured learning are not yet claimed.",
   "capabilities": [
     {
       "id": "integrated-product-workspace",
@@ -177,7 +177,7 @@
       "category": "research",
       "status": "partial",
       "verificationStatus": "passing",
-      "summary": "Shipkit supports manual typed bundles, deterministic repository research, manifest-driven public-source capture and named-candidate comparison. Candidate decisions preserve explicit alternatives, current capability state, protected experiment parameters, rejected options and fail-closed inconclusive outcomes before independent review.",
+      "summary": "Shipkit supports manual typed bundles, deterministic repository research, manifest-driven public-source capture, named-candidate comparison and bounded ranked GitHub repository search. Search decisions persist explicit support and falsification queries, provider ranks, result and response digests, selected sources, exact citations, rejected alternatives and fail-closed inconclusive outcomes before independent review.",
       "evidence": [
         "packages/evolution-core/src/research-records.ts",
         "packages/evolution-core/src/research.ts",
@@ -200,7 +200,15 @@
         "packages/evolution-core/src/candidate-cli.test.ts",
         "packages/evolution-core/src/fixtures/shipkit-next-workstream.candidates.json",
         "scripts/test-candidate-research.mjs",
-        "docs/evolution/CANDIDATE_RESEARCH.md"
+        "docs/evolution/CANDIDATE_RESEARCH.md",
+        "packages/evolution-core/src/public-search.ts",
+        "packages/evolution-core/src/search-cli.ts",
+        "packages/evolution-core/src/public-search.test.ts",
+        "packages/evolution-core/src/public-search-failure.test.ts",
+        "packages/evolution-core/src/search-cli.test.ts",
+        "packages/evolution-core/src/fixtures/public-search-baseline.json",
+        "scripts/test-public-search.mjs",
+        "docs/evolution/PUBLIC_SEARCH.md"
       ],
       "checks": [
         "Unit tests: completed repository research and parameter-bound handoff",
@@ -216,10 +224,14 @@
         "CI: Evolution Engine Proof",
         "Unit tests: named candidates, stale capability rejection, missing evidence and tied ranking",
         "CLI test: persist and reload candidate-manifest cycle",
-        "CI proof: fixed #15/#13/#12/#17 comparison selects #13 and preserves #14 parameters"
+        "CI proof: fixed #15/#13/#12/#17 comparison selects #13 and preserves #14 parameters",
+        "Public-search tests: ranked support and falsification query provenance with exact citations",
+        "Public-search failure tests: duplicate, stale, incomplete, malformed, unsupported and time-budget rejection",
+        "Public-search CLI test: persist, reload and project-root symlink confinement",
+        "CI proof: deterministic public-search cycle with independent review",
+        "One-time live proof: expected Shipkit and Vitest repositories returned from GitHub repository search"
       ],
       "limitations": [
-        "Public retrieval requires an explicit URL manifest and does not discover or rank the wider web",
         "No paper, PDF, specification-specific, competitor, changelog, incident or dataset adapter is integrated yet",
         "No consented user-research evidence ingestion exists yet",
         "Hostile-source screening is pattern-based and not a complete prompt-injection defense",
@@ -227,7 +239,9 @@
         "The execution handoff is not yet consumed by a coding-agent adapter",
         "Named-candidate evidence is supplied through an explicit manifest; Shipkit does not fetch GitHub issues or independently verify external URLs in this adapter",
         "Deterministic priority weights are inspectable project judgments, not statistical estimates of market demand",
-        "No adaptive query reformulation or citation chasing exists yet"
+        "No adaptive query reformulation or citation chasing exists yet",
+        "The only built-in search provider discovers public GitHub repositories; it is not a general web index",
+        "Live provider rankings can change; Shipkit persists timestamps and digests rather than promising identical future results"
       ]
     },
     {
@@ -257,6 +271,37 @@
       ]
     },
     {
+      "id": "public-search-discovery-baseline",
+      "category": "research",
+      "status": "partial",
+      "verificationStatus": "passing",
+      "summary": "A provider-neutral contract with one built-in GitHub repository-search adapter persists explicit support and falsification queries, ranked results, canonical URLs, provider timestamps, response and result digests, selected-source lineage and exact citations. Duplicate, stale, incomplete, malformed, unsupported or over-budget runs fail closed to a durable inconclusive cycle.",
+      "evidence": [
+        "packages/evolution-core/src/public-search.ts",
+        "packages/evolution-core/src/search-cli.ts",
+        "packages/evolution-core/src/public-search.test.ts",
+        "packages/evolution-core/src/public-search-failure.test.ts",
+        "packages/evolution-core/src/search-cli.test.ts",
+        "packages/evolution-core/src/fixtures/public-search-baseline.json",
+        "scripts/test-public-search.mjs",
+        "docs/evolution/PUBLIC_SEARCH.md"
+      ],
+      "checks": [
+        "Unit tests: support and falsification query lineage, ranked result digests and citation verification",
+        "Unit tests: duplicate, stale, incomplete, malformed, unsupported and time-budget fail-closed outcomes",
+        "CLI test: planned-cycle persistence, replay and manifest symlink confinement",
+        "CI: deterministic public-search proof",
+        "One-time live provider proof against Shipkit and an unrelated Vitest repository query"
+      ],
+      "limitations": [
+        "The built-in provider searches public GitHub repositories only and is not a general web index",
+        "Unauthenticated provider availability and rate limits are external dependencies; failures become inconclusive",
+        "Provider order may change between runs even though each observed response is timestamped and content-digested",
+        "No adaptive query reformulation, citation chasing, browser rendering, PDF capture, paid provider or private-source search is implemented",
+        "No direct user demand or product decision value is established without the reopened #14 external pilot"
+      ]
+    },
+    {
       "id": "public-source-citation-baseline",
       "category": "research",
       "status": "partial",
@@ -280,12 +325,12 @@
         "CLI journal reload retains public run, citation spans and reviewer verdict"
       ],
       "limitations": [
-        "No search discovery or ranking",
         "No JavaScript browser rendering or PDF extraction",
         "DNS is validated but not cryptographically pinned to the eventual connection",
         "Normalized offsets are not original DOM locators",
         "Pattern screening can miss obfuscated hostile content",
-        "No user-research consent provenance"
+        "No user-research consent provenance",
+        "Search discovery exists as a separate GitHub repository-search baseline; general web, browser-rendered and PDF discovery remain unavailable"
       ]
     },
     {
