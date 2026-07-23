@@ -161,13 +161,17 @@ export function transitionCycle(
     throw new EvolutionError("transition requires actor and reason");
   }
 
+  const now = input.now ?? new Date().toISOString();
   const approvals = [...cycle.approvals, ...(input.approvals ?? [])];
   if (to === "executing") {
     const decision = authorizeAction({
       autonomy: cycle.autonomy,
       risk: cycle.risk,
       action: "modify-code",
+      cycleId: cycle.cycleId,
+      requiredScope: `cycle:${cycle.cycleId}:modify-code`,
       approvals,
+      now,
     });
     if (!decision.allowed) throw new EvolutionError(decision.reason);
   }
@@ -179,7 +183,6 @@ export function transitionCycle(
   const artifacts = mergeArtifacts(cycle.artifacts, input.addArtifacts);
   assertRequiredArtifacts(to, artifacts);
 
-  const now = input.now ?? new Date().toISOString();
   const evidenceRefs = unique(
     Object.values(input.addArtifacts ?? {}).flatMap((refs) => refs ?? [])
   );
