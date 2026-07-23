@@ -82,15 +82,28 @@ describe("repository perception", () => {
 });
 
 describe("evidence registry", () => {
-  it("canonicalizes JSON into stable content-addressed evidence", async () => {
+  it("deduplicates blobs while preserving distinct evidence occurrences", async () => {
     const root = await temporaryProject();
     const registry = new EvidenceRegistry(join(root, ".shipkit"), root);
     const first = await registry.registerJson("project-snapshot", { b: 2, a: 1 });
-    const second = await registry.registerJson("project-snapshot", { a: 1, b: 2 });
+    const second = await registry.registerJson("decision-input", { a: 1, b: 2 });
 
     expect(first.digest).toBe(second.digest);
     expect(first.id).toMatch(/^sha256:[a-f0-9]{64}$/);
-    expect(first.storedPath).toContain(first.digest);
+    expect(first.occurrenceId).not.toBe(second.occurrenceId);
+    expect(first.kind).toBe("project-snapshot");
+    expect(second.kind).toBe("decision-input");
+    expect(first.storedPath).toBe(second.storedPath);
+    await expect(registry.verify(first)).resolves.toBe(true);
+    await expect(registry.verify(second)).resolves.toBe(true);
+  });
+
+  it("detects a changed blob during verification", async () => {
+    const root = await temporaryProject();
+    const registry = new EvidenceRegistry(join(root, ".shipkit"), root);
+    const reference = await registry.registerJson("project-snapshot", { stable: true });
+    await writeFile(join(root, ".shipkit", reference.storedPath), "tampered\n", "utf8");
+    await expect(registry.verify(reference)).resolves.toBe(false);
   });
 
   it("captures bounded project files but refuses secrets and outside paths", async () => {
@@ -103,6 +116,7 @@ describe("evidence registry", () => {
     await expect(registry.registerFile("roadmap", "docs/ROADMAP.md")).resolves.toMatchObject({
       sourcePath: "docs/ROADMAP.md",
       mediaType: "text/markdown",
+      occurrenceId: expect.stringMatching(/^occurrence:/),
     });
     await expect(registry.registerFile("secret", ".env")).rejects.toBeInstanceOf(
       EvidenceRegistryError
