@@ -3,14 +3,14 @@
   "project": "shipkit",
   "primaryProduct": "Shipkit",
   "lastVerified": "2026-07-23",
-  "verificationScope": "Repository evidence and GitHub Actions on draft pull request #10. Typed research-to-decision records, a parameter-bound execution handoff and a read-only web workspace are now integrated through the same durable cycle. Autonomous retrieval, independent research review, sandboxed implementation, release, measured outcome and learning are not yet claimed.",
+  "verificationScope": "Repository evidence and GitHub Actions on draft pull request #10. Shipkit now runs bounded deterministic repository research through the shared durable cycle, persists usage and stopping reasons, requires an independent reviewer, produces an explicit inconclusive outcome when evidence is insufficient, and exposes the result in the web workspace. Public-web research, direct user evidence, sandboxed implementation, release, measured outcome and learning are not yet claimed.",
   "capabilities": [
     {
       "id": "integrated-product-workspace",
       "category": "product",
       "status": "partial",
       "verificationStatus": "passing",
-      "summary": "The Next.js workspace reads official Evolution Core CLI output and now exposes durable cycles, research counts, contradictions, opportunities, decisions, experiments and execution handoffs without creating a second state store.",
+      "summary": "The Next.js workspace reads official Evolution Core CLI output and exposes durable cycles, research usage, coverage gaps, stopping reasons, independent review verdicts, contradictions, opportunities, decisions, experiments and execution handoffs without creating a second state store.",
       "evidence": [
         "apps/web/src/app/app/page.tsx",
         "apps/web/src/app/app/evolution/page.tsx",
@@ -28,8 +28,8 @@
       ],
       "limitations": [
         "The workspace is currently read-only for evolution records",
-        "Research bundle authoring, approvals, execution controls, release and learning surfaces are not yet implemented",
-        "The local CLI must be built and accessible to the server workspace"
+        "Research-plan authoring, approvals, execution controls, release and learning surfaces are not yet implemented",
+        "The local Evolution Core CLI must be built and accessible to the server workspace"
       ]
     },
     {
@@ -120,19 +120,22 @@
       "category": "perception",
       "status": "partial",
       "verificationStatus": "passing",
-      "summary": "Shipkit currently models repository structure, checks, CI, product signals, Git state and structural trust boundaries; deeper user and operational understanding remains planned.",
+      "summary": "Shipkit models repository structure, checks, CI, product signals, Git state and structural trust boundaries and now consumes that model in a bounded repository-research decision flow; deeper user and operational understanding remains planned.",
       "evidence": [
         "packages/evolution-core/src/repository.ts",
         "packages/evolution-core/src/repository-evidence.test.ts",
         "packages/evolution-core/src/inspect-cli.test.ts",
-        "packages/evolution-core/src/scorecard.ts"
+        "packages/evolution-core/src/scorecard.ts",
+        "packages/evolution-core/src/repository-research.ts"
       ],
       "checks": [
         "Synthetic unrelated repository tests",
-        "Pinned external repository proof"
+        "Pinned external repository assessment proof",
+        "CI: Shipkit repository-research dogfood"
       ],
       "limitations": [
-        "User journeys, analytics, support, deployment state and product outcomes are not yet integrated"
+        "User journeys, analytics, support, deployment state and product outcomes are not yet integrated",
+        "Repository evidence cannot establish user demand or current external facts"
       ]
     },
     {
@@ -140,16 +143,17 @@
       "category": "verification",
       "status": "partial",
       "verificationStatus": "passing",
-      "summary": "Discovered package scripts run without a shell in temporary source copies with timeout, bounded output, reduced environment and secret redaction, feeding the shared readiness model.",
+      "summary": "Discovered package scripts run without a shell in temporary source copies with timeout, bounded output, reduced environment and secret redaction, feeding both readiness assessment and bounded repository research.",
       "evidence": [
         "packages/evolution-core/src/check-runner.ts",
         "packages/evolution-core/src/check-runner.test.ts",
         "packages/evolution-core/src/scorecard.ts",
-        "packages/evolution-core/src/assess-cli.test.ts"
+        "packages/evolution-core/src/assess-cli.test.ts",
+        "packages/evolution-core/src/repository-research.ts"
       ],
       "checks": [
         "CI: Evolution Engine Proof",
-        "Shipkit dogfood assessment",
+        "Shipkit assessment and repository-research dogfood",
         "Pinned sindresorhus/is-plain-obj assessment"
       ],
       "limitations": [
@@ -164,25 +168,35 @@
       "category": "research",
       "status": "partial",
       "verificationStatus": "passing",
-      "summary": "Typed briefs, plans, queries, sources, claims, contradictions, opportunity portfolios, decisions, reversible experiments and parameter-bound execution handoffs now persist inside one Shipkit cycle.",
+      "summary": "Shipkit now supports both manual typed research bundles and an autonomous deterministic repository/internal single-worker adapter. Research runs persist budgets, usage, coverage gaps and stopping reasons; a distinct reviewer checks evidence support, user-claim boundaries, contradictions, opportunity portfolios, rejected alternatives and execution scope before a decision is accepted.",
       "evidence": [
         "packages/evolution-core/src/research-records.ts",
         "packages/evolution-core/src/research.ts",
+        "packages/evolution-core/src/research-review.ts",
+        "packages/evolution-core/src/repository-research.ts",
         "packages/evolution-core/src/research.test.ts",
+        "packages/evolution-core/src/repository-research.test.ts",
         "packages/evolution-core/src/research-cli.test.ts",
         "packages/evolution-core/src/cli.ts",
+        "scripts/test-evolution-cli.mjs",
         "apps/web/src/app/app/evolution/page.tsx",
         "docs/evolution/RESEARCH_CAPABILITY.md"
       ],
       "checks": [
-        "Unit tests: typed research-to-execution handoff",
+        "Unit tests: completed repository research and parameter-bound handoff",
+        "Unit tests: insufficient budget produces durable inconclusive outcome",
+        "Unit tests: repository-only user-problem claim is rejected",
+        "Unit tests: reviewer actor must differ from researcher actor",
         "CLI test: persist and reload planned research cycle",
+        "CI dogfood: autonomous repository research on Shipkit",
         "CI: production build",
         "CI: Evolution Engine Proof"
       ],
       "limitations": [
-        "The research bundle is supplied manually as JSON rather than produced by an autonomous source adapter",
-        "No independent citation or adversarial reviewer is integrated yet",
+        "No public web, paper, specification, competitor, changelog, incident or dataset adapter is integrated yet",
+        "No consented user-research evidence ingestion exists yet",
+        "The deterministic reviewer does not yet verify external citation spans, transformations or calculations",
+        "No adaptive query reformulation, citation chasing or hostile-source defense exists yet",
         "No real-user decision-value proof exists yet",
         "The execution handoff is not yet consumed by a sandbox or agent adapter"
       ]
