@@ -1,4 +1,4 @@
-import { access, mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { access, mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -98,11 +98,14 @@ describe("safe check runner", () => {
     ).rejects.toThrow(/refusing to run untrusted checks/);
   });
 
-  it("does not link host dependencies or credential files into an untrusted workspace", async () => {
+  it("does not link host dependencies, credentials or symlink escapes into an untrusted workspace", async () => {
     const projectRoot = await projectWithScript(`node -e "process.exit(0)"`);
     await mkdir(join(projectRoot, "node_modules", "host-only"), { recursive: true });
     await writeFile(join(projectRoot, "node_modules", "host-only", "sentinel"), "host", "utf8");
     await writeFile(join(projectRoot, ".env"), "API_TOKEN=host-secret\n", "utf8");
+    if (process.platform !== "win32") {
+      await symlink("/etc/passwd", join(projectRoot, "host-escape"));
+    }
     const snapshot = await inspectRepository(projectRoot);
 
     const backend: ExecutionBackend = {
@@ -113,6 +116,9 @@ describe("safe check runner", () => {
       async execute(request: ExecutionRequest) {
         await expect(access(join(request.workspaceRoot, "node_modules"))).rejects.toThrow();
         await expect(access(join(request.workspaceRoot, ".env"))).rejects.toThrow();
+        if (process.platform !== "win32") {
+          await expect(access(join(request.workspaceRoot, "host-escape"))).rejects.toThrow();
+        }
         return {
           status: "passed",
           exitCode: 0,
