@@ -71,17 +71,22 @@ Implementation is sequenced by safety and dependency. Sequencing does not remove
 - content-addressed evidence blobs and contextual occurrences;
 - bounded repository inspection and trust-boundary discovery;
 - temporary-workspace checks and readiness model;
-- typed research briefs, plans, queries, sources, claims and contradictions;
+- typed research briefs, plans, runs, queries, sources, claims and contradictions;
+- deterministic repository/internal single-worker research adapter;
+- bounded query, source, time and cost accounting with explicit stopping reasons;
+- durable completed or `inconclusive` research outcomes;
+- independent deterministic research evaluation with a distinct reviewer actor;
+- repository-only user-demand claim rejection and visible research limitations;
 - three-opportunity portfolios, decision and reversible experiment records;
 - parameter-bound `ExecutionHandoff` persisted through the same cycle;
-- CLI commands to prepare and inspect a research handoff;
-- read-only `/app/evolution` workspace backed by official CLI output;
+- CLI commands to run repository research, prepare manual handoffs and inspect research state;
+- read-only `/app/evolution` workspace showing runs, coverage, stopping reasons and review verdicts;
 - Next.js product foundation, auth, PostgreSQL, security and delivery recipes;
 - product generator and AI workflow;
-- CLI and CI dogfood on Shipkit and an unrelated repository;
+- CLI and CI dogfood on Shipkit plus assessment proof on an unrelated repository;
 - demo and portable PostgreSQL E2E paths.
 
-“Verified” means repository code and current CI evidence exist. It does not imply autonomous research quality, complete integration, product-market fit, secure untrusted execution, production operation or measured self-improvement.
+“Verified” means repository code and current CI evidence exist. It does not imply public-web research quality, direct user evidence, product-market fit, secure untrusted execution, production operation or measured self-improvement.
 
 ## Integration milestone 0 — one product identity
 
@@ -113,31 +118,40 @@ Exit: the shared lifecycle is durable enough for every later module to rely on i
 ```text
 workspace objective
 → inspect and assess
-→ decision brief
-→ bounded modern research
+→ decision brief and coverage map
+→ bounded repository or external research
 → atomic claims and contradictions
+→ independent research review
 → three or more opportunities
 → transparent ranking
 → reversible experiment
 → persisted execution handoff
 ```
 
-- [x] typed `ResearchBrief`, `ResearchPlan`, `QueryRecord`, `SourceRecord`, `ClaimRecord`, `ContradictionRecord`, `OpportunityRecord`, `DecisionRecord`, `ExperimentRecord` and `ExecutionHandoff`;
+- [x] typed `ResearchBrief`, `ResearchPlan`, `ResearchRunRecord`, `QueryRecord`, `SourceRecord`, `ClaimRecord`, `ContradictionRecord`, `ResearchEvaluationRecord`, `OpportunityRecord`, `DecisionRecord`, `ExperimentRecord` and `ExecutionHandoff`;
 - [x] append research records through legal immutable cycle transitions;
+- [x] deterministic repository/internal single-worker source adapter;
 - [x] validate at least three opportunities before accepting a decision bundle;
-- [x] persist research budgets, source strategy and stop-condition fields;
+- [x] enforce repository coverage, query, source and time budgets;
+- [x] persist usage, coverage gaps and explicit stopping reasons;
+- [x] create an automated durable `inconclusive` outcome when minimum evidence or budget is insufficient;
+- [x] require a distinct independent reviewer before repository research can enter `decided`;
+- [x] reject repository-only `user-problem` claims without direct user-research evidence;
+- [x] preserve contradictory evidence, rejected alternatives and reviewer limitations;
 - [x] bind the execution handoff to an experiment and SHA-256 parameter digest;
-- [x] CLI `prepare-handoff` and `research-show` over the shared durable store;
-- [x] read-only workspace views for cycles, sources, claims, contradictions, opportunities, decisions, experiments and execution scope;
-- [ ] autonomous repository, public web and primary technical source adapters;
-- [ ] product discovery and user-research evidence ingestion;
-- [ ] active stop-rule enforcement and explicit automated `inconclusive` research result;
-- [ ] separate citation/adversarial reviewer;
+- [x] CLI `research-repository`, `prepare-handoff` and `research-show` over the shared durable store;
+- [x] workspace views for research usage, coverage, stop reason, reviewer checks, sources, claims, contradictions, opportunities, decisions, experiments and execution scope;
+- [x] Shipkit dogfood proof for autonomous repository research and journal reload;
+- [ ] public web, paper, specification, competitor, changelog, incident and dataset adapters;
+- [ ] adaptive query reformulation, citation chasing, entity resolution and hostile-source defenses;
+- [ ] exact evidence spans, transformations and calculation provenance;
+- [ ] product discovery and consented user-research evidence ingestion;
+- [ ] independent external citation verification beyond the deterministic repository reviewer;
 - [ ] workspace authoring, review and approval of research plans and decisions;
-- [ ] proof on Shipkit and an unrelated product using real gathered research;
+- [ ] autonomous research proof on an unrelated real product;
 - [ ] real-user decision-value validation.
 
-Current boundary: the CLI accepts a manually supplied, validated JSON research bundle. The slice proves the durable contracts and shared interface, not autonomous research quality.
+Current boundary: Shipkit can autonomously make bounded repository-readiness decisions and explicitly identify questions that require user or external evidence. It cannot yet autonomously browse the public web or prove user demand.
 
 Exit: Shipkit can decide what to build and preserve why, while preparing a typed handoff to execution.
 
@@ -211,6 +225,7 @@ Exit: users experience Shipkit as one product across local, repository and hoste
 - cycle recovery without state loss;
 - unsafe action false-allow and false-block rates;
 - citation quality, contradiction recall and research coverage;
+- research budget use, stop quality and reviewer rejection rate;
 - agent task success, cost, duration and intervention rate;
 - recommendation survival and implementation waste avoided;
 - release and rollback reliability;
@@ -226,5 +241,6 @@ Exit: users experience Shipkit as one product across local, repository and hoste
 5. A module working in isolation is not complete integration.
 6. Temporary workspaces are not security sandboxes.
 7. Passing checks is not proof of user value.
-8. Simpler baselines must be measured, but complexity may be added when the integrated product requires it.
-9. Documentation must distinguish planned, implemented, integrated and experimentally proven capability.
+8. Repository evidence is not proof of user demand or current external facts.
+9. Simpler baselines must be measured, but complexity may be added when the integrated product requires it.
+10. Documentation must distinguish planned, implemented, integrated and experimentally proven capability.
