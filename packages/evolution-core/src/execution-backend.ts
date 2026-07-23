@@ -320,6 +320,9 @@ function portablePath(path: string): string {
 }
 
 export function buildDockerRunArguments(input: DockerRunInput): string[] {
+  if (!immutableDockerImage(input.image)) {
+    throw new ExecutionBackendError("docker execution requires an immutable image digest");
+  }
   const workspaceRoot = resolve(input.workspaceRoot);
   if (workspaceRoot.includes(",")) {
     throw new ExecutionBackendError("sandbox workspace path cannot contain a comma");
@@ -396,6 +399,7 @@ export class DockerExecutionBackend implements ExecutionBackend {
   readonly executable: string;
   private readonly probe?: () => Promise<boolean>;
   private readonly spawnProcess?: SpawnLike;
+  private verified = false;
 
   constructor(options: DockerExecutionBackendOptions = {}) {
     const image = options.image?.trim();
@@ -411,8 +415,12 @@ export class DockerExecutionBackend implements ExecutionBackend {
   }
 
   async assertAvailable(): Promise<void> {
+    if (this.verified) return;
     if (this.probe) {
-      if (await this.probe()) return;
+      if (await this.probe()) {
+        this.verified = true;
+        return;
+      }
       throw new ExecutionBackendError(
         "docker execution backend is unavailable; refusing to run untrusted checks without the requested isolation"
       );
@@ -449,9 +457,11 @@ export class DockerExecutionBackend implements ExecutionBackend {
         `sandbox image ${this.image} is not available locally; refusing an implicit image pull`
       );
     }
+    this.verified = true;
   }
 
   async execute(request: ExecutionRequest): Promise<ExecutionBackendResult> {
+    await this.assertAvailable();
     const containerName = `shipkit-check-${randomUUID()}`;
     const args = buildDockerRunArguments({
       containerName,
