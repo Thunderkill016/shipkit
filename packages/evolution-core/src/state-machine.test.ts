@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+  EVOLUTION_POLICY_VERSION,
   EvolutionError,
   authorizeAction,
   createCycle,
   transitionCycle,
+  type EvolutionApproval,
   type EvolutionCycle,
   type EvolutionStage,
 } from "./index.js";
@@ -12,14 +14,35 @@ function step(
   cycle: EvolutionCycle,
   to: EvolutionStage,
   bucket?: keyof EvolutionCycle["artifacts"],
-  options: { verificationPassed?: boolean } = {}
+  options: { verificationPassed?: boolean; approvals?: EvolutionApproval[] } = {}
 ): EvolutionCycle {
   return transitionCycle(cycle, to, {
     actor: "test-agent",
     reason: `advance to ${to}`,
     verificationPassed: options.verificationPassed,
+    approvals: options.approvals,
     addArtifacts: bucket ? { [bucket]: [`artifact:${to}`] } : undefined,
   });
+}
+
+function approval(input: {
+  cycleId: string;
+  action: EvolutionApproval["action"];
+  scope: string;
+  expiresAt?: string;
+}): EvolutionApproval {
+  return {
+    approvalId: `approval:${input.cycleId}:${input.action}`,
+    cycleId: input.cycleId,
+    action: input.action,
+    approvedBy: "human-owner",
+    approvedAt: "2026-07-23T00:00:00.000Z",
+    scope: input.scope,
+    policyVersion: EVOLUTION_POLICY_VERSION,
+    evidenceRefs: [],
+    expiresAt: input.expiresAt ?? "2026-07-24T00:00:00.000Z",
+    revokedAt: null,
+  };
 }
 
 describe("Evolution Engine kernel", () => {
@@ -70,7 +93,6 @@ describe("Evolution Engine kernel", () => {
       autonomy: "A3",
       risk: "R1",
     });
-
     expect(() => step(cycle, "diagnosed", "diagnosis")).toThrow(EvolutionError);
   });
 
@@ -95,13 +117,41 @@ describe("Evolution Engine kernel", () => {
       reason: "prepared a human-executable plan",
       addArtifacts: { plan: ["p"], rollback: ["r"] },
     });
-
     expect(() => step(cycle, "executing")).toThrow(/requires A3/);
   });
 
-  it("requires explicit approval for protected actions and high-risk writes", () => {
+  it("requires an exact current approval for protected and high-risk actions", () => {
     expect(
       authorizeAction({ autonomy: "A4", risk: "R2", action: "deploy" })
+    ).toMatchObject({ allowed: false, requiresApproval: true });
+
+    const valid = approval({
+      cycleId: "repo:cycle-004",
+      action: "deploy",
+      scope: "environment:staging",
+    });
+    expect(
+      authorizeAction({
+        autonomy: "A4",
+        risk: "R2",
+        action: "deploy",
+        cycleId: "repo:cycle-004",
+        requiredScope: "environment:staging",
+        approvals: [valid],
+        now: "2026-07-23T01:00:00.000Z",
+      })
+    ).toMatchObject({ allowed: true, matchedApprovalId: valid.approvalId });
+
+    expect(
+      authorizeAction({
+        autonomy: "A4",
+        risk: "R2",
+        action: "deploy",
+        cycleId: "repo:cycle-004",
+        requiredScope: "environment:production",
+        approvals: [valid],
+        now: "2026-07-23T01:00:00.000Z",
+      })
     ).toMatchObject({ allowed: false, requiresApproval: true });
 
     expect(
@@ -109,19 +159,18 @@ describe("Evolution Engine kernel", () => {
         autonomy: "A4",
         risk: "R2",
         action: "deploy",
+        cycleId: "repo:cycle-004",
+        requiredScope: "environment:staging",
         approvals: [
-          {
+          approval({
+            cycleId: "repo:cycle-004",
             action: "deploy",
-            approvedBy: "human-owner",
-            approvedAt: "2026-07-23T00:00:00.000Z",
-            scope: "staging deployment for cycle 004",
-          },
+            scope: "environment:staging",
+            expiresAt: "2026-07-23T00:30:00.000Z",
+          }),
         ],
+        now: "2026-07-23T01:00:00.000Z",
       })
-    ).toMatchObject({ allowed: true, requiresApproval: true });
-
-    expect(
-      authorizeAction({ autonomy: "A3", risk: "R3", action: "modify-code" })
     ).toMatchObject({ allowed: false, requiresApproval: true });
   });
 
@@ -148,9 +197,6 @@ describe("Evolution Engine kernel", () => {
     });
     cycle = step(cycle, "executing");
     cycle = step(cycle, "implemented", "changes");
-
-    expect(() => step(cycle, "verified", "verification")).toThrow(
-      /explicitly passing/
-    );
+    expect(() => step(cycle, "verified", "verification")).toThrow(/explicitly passing/);
   });
 });
