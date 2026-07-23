@@ -10,6 +10,7 @@ const RESEARCH_BUCKETS = [
   "queries",
   "sources",
   "claims",
+  "citationSpans",
   "contradictions",
   "opportunities",
   "evaluations",
@@ -18,7 +19,11 @@ const RESEARCH_BUCKETS = [
   "executionHandoffs",
 ] as const satisfies readonly (keyof EvolutionResearchRecords)[];
 
-const NEW_OPTIONAL_BUCKETS = new Set<keyof EvolutionResearchRecords>(["runs", "evaluations"]);
+const NEW_OPTIONAL_BUCKETS = new Set<keyof EvolutionResearchRecords>([
+  "runs",
+  "evaluations",
+  "citationSpans",
+]);
 
 const EXPECTED_KINDS: Record<(typeof RESEARCH_BUCKETS)[number], string> = {
   briefs: "research-brief",
@@ -27,6 +32,7 @@ const EXPECTED_KINDS: Record<(typeof RESEARCH_BUCKETS)[number], string> = {
   queries: "query",
   sources: "source",
   claims: "claim",
+  citationSpans: "citation-span",
   contradictions: "contradiction",
   opportunities: "opportunity",
   evaluations: "research-evaluation",
@@ -73,6 +79,7 @@ export function emptyResearchRecords(): EvolutionResearchRecords {
     queries: [],
     sources: [],
     claims: [],
+    citationSpans: [],
     contradictions: [],
     opportunities: [],
     evaluations: [],
