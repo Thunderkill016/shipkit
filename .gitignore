@@ -5,6 +5,7 @@ dist
 .env
 .env.local
 apps/web/.env.local
+.shipkit
 *.log
 .DS_Store
 coverage
