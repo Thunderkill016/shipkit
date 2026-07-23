@@ -1,16 +1,56 @@
 {
   "schemaVersion": 1,
   "project": "shipkit",
-  "primaryProduct": "Shipkit Evolution Engine",
+  "primaryProduct": "Shipkit",
   "lastVerified": "2026-07-23",
-  "verificationScope": "Repository evidence and GitHub Actions on draft pull request #10. Production use, product-market fit, complete sandboxing, external research quality and positive recursive improvement are not claimed.",
+  "verificationScope": "Repository evidence and GitHub Actions on draft pull request #10. Several modules exist independently, but a complete integrated cycle from product objective through sandboxed implementation, release, measured outcome and learning is not yet claimed.",
   "capabilities": [
+    {
+      "id": "integrated-product-workspace",
+      "category": "product",
+      "status": "partial",
+      "verificationStatus": "passing",
+      "summary": "The Next.js workspace and shared product packages provide the current human-facing foundation for product setup, auth, data, security, integrations and future lifecycle control surfaces.",
+      "evidence": [
+        "apps/web",
+        "packages/auth",
+        "packages/db",
+        "packages/security",
+        "packages/mail",
+        "packages/storage",
+        "packages/payment"
+      ],
+      "checks": [
+        "CI: E2E / demo mode",
+        "CI: E2E / portable-pg",
+        "Production build"
+      ],
+      "limitations": [
+        "Research, execution, verification, release and learning are not yet exposed through one unified workspace",
+        "Current app features are a foundation rather than the final Shipkit lifecycle interface"
+      ]
+    },
+    {
+      "id": "product-generator-foundation",
+      "category": "product",
+      "status": "implemented",
+      "verificationStatus": "passing",
+      "summary": "The generator creates a product workspace with independent identity, application foundation and AI workflow while retaining connection to Shipkit tooling.",
+      "evidence": [
+        "scripts/create-shipkit.mjs",
+        "scripts/test-create-shipkit.mjs",
+        "templates/STARTER_IDEA.md"
+      ],
+      "checks": [
+        "AI workflow check: generated project integration"
+      ]
+    },
     {
       "id": "evolution-state-machine",
       "category": "evolution-core",
       "status": "implemented",
       "verificationStatus": "passing",
-      "summary": "Deterministic evidence-gated cycle stages with terminal rejection, rollback and inconclusive paths.",
+      "summary": "Deterministic evidence-gated lifecycle stages govern the unified product loop with rejection, rollback and inconclusive outcomes.",
       "evidence": [
         "packages/evolution-core/src/types.ts",
         "packages/evolution-core/src/state-machine.ts",
@@ -26,7 +66,7 @@
       "category": "policy",
       "status": "implemented",
       "verificationStatus": "passing",
-      "summary": "A0-A4 autonomy and R0-R4 risk policy with cycle-bound exact-scope, versioned, expiring and revocable approval records.",
+      "summary": "A0-A4 autonomy and R0-R4 risk policy use cycle-bound exact-scope, versioned, expiring and revocable approvals for protected product actions.",
       "evidence": [
         "packages/evolution-core/src/policy.ts",
         "packages/evolution-core/src/types.ts",
@@ -41,7 +81,7 @@
       "category": "persistence",
       "status": "implemented",
       "verificationStatus": "passing",
-      "summary": "Append-only synchronized journal, atomic snapshots, corruption recovery, checksums, serialized writers and stale-writer rejection.",
+      "summary": "Append-only synchronized journals, atomic snapshots, corruption recovery, checksums and serialized writers preserve the shared Shipkit lifecycle.",
       "evidence": [
         "packages/evolution-core/src/persistence.ts",
         "packages/evolution-core/src/persistence.test.ts"
@@ -61,7 +101,7 @@
       "category": "evidence",
       "status": "implemented",
       "verificationStatus": "passing",
-      "summary": "Immutable SHA-256 blobs are deduplicated separately from contextual evidence occurrences; read-time digest verification is available.",
+      "summary": "Immutable SHA-256 blobs are separated from contextual occurrences so research, execution, verification, release and outcome claims can share trustworthy evidence.",
       "evidence": [
         "packages/evolution-core/src/evidence.ts",
         "packages/evolution-core/src/repository-evidence.test.ts"
@@ -74,27 +114,31 @@
       ]
     },
     {
-      "id": "repository-inspection",
+      "id": "repository-product-understanding",
       "category": "perception",
-      "status": "implemented",
+      "status": "partial",
       "verificationStatus": "passing",
-      "summary": "Bounded repository inventory, package/check discovery, CI and product-signal detection, Git state and structural trust-boundary mapping.",
+      "summary": "Shipkit currently models repository structure, checks, CI, product signals, Git state and structural trust boundaries; deeper user and operational understanding remains planned.",
       "evidence": [
         "packages/evolution-core/src/repository.ts",
         "packages/evolution-core/src/repository-evidence.test.ts",
-        "packages/evolution-core/src/inspect-cli.test.ts"
+        "packages/evolution-core/src/inspect-cli.test.ts",
+        "packages/evolution-core/src/scorecard.ts"
       ],
       "checks": [
         "Synthetic unrelated repository tests",
         "Pinned external repository proof"
+      ],
+      "limitations": [
+        "User journeys, analytics, support, deployment state and product outcomes are not yet integrated"
       ]
     },
     {
-      "id": "repository-assessment",
+      "id": "temporary-workspace-assessment",
       "category": "verification",
       "status": "partial",
       "verificationStatus": "passing",
-      "summary": "Discovered package scripts run without a shell in temporary source copies with timeout, bounded output, reduced environment and secret redaction; results feed an evidence-backed scorecard.",
+      "summary": "Discovered package scripts run without a shell in temporary source copies with timeout, bounded output, reduced environment and secret redaction, feeding the shared readiness model.",
       "evidence": [
         "packages/evolution-core/src/check-runner.ts",
         "packages/evolution-core/src/check-runner.test.ts",
@@ -114,38 +158,65 @@
       ]
     },
     {
-      "id": "a2-research-audit",
-      "category": "product",
+      "id": "research-intelligence",
+      "category": "research",
       "status": "planned",
       "verificationStatus": "not-run",
-      "summary": "Read-only decision framing, reproducible research, atomic claims, contradiction review, three opportunities and a smallest reversible experiment.",
+      "summary": "Modern internal, external and product research will create reproducible sources, atomic claims, contradictions, opportunities and experiments inside the same product cycle.",
       "evidence": [
-        "IDEA.md",
         "docs/evolution/RESEARCH_CAPABILITY.md",
+        "docs/evolution/COMPARATIVE_ANALYSIS.md",
         "docs/evolution/ROADMAP.md"
       ],
       "checks": [
-        "No complete product-interface cycle yet"
+        "No complete research-to-decision product workflow yet"
       ]
     },
     {
-      "id": "starter-kit-dogfood",
-      "category": "reference-product",
-      "status": "implemented",
-      "verificationStatus": "passing",
-      "summary": "Next.js reference product provides landing, auth, protected app, notes, profile, optional billing and realistic trust boundaries for Evolution Engine dogfood.",
+      "id": "sandboxed-agent-execution",
+      "category": "product",
+      "status": "planned",
+      "verificationStatus": "not-run",
+      "summary": "Capability-negotiated sandboxes and interchangeable command or coding-agent adapters will implement approved experiments without owning state or acceptance.",
       "evidence": [
-        "apps/web",
-        "packages/auth",
-        "packages/db",
-        "packages/security",
-        "scripts/create-shipkit.mjs",
-        "templates/STARTER_IDEA.md"
+        "IDEA.md",
+        "docs/evolution/ARCHITECTURE.md",
+        "docs/evolution/ROADMAP.md"
       ],
       "checks": [
-        "CI: E2E / demo mode",
-        "CI: E2E / portable-pg",
-        "AI workflow check: generator integration"
+        "No real untrusted sandbox or agent-delivery integration yet"
+      ]
+    },
+    {
+      "id": "verified-release-operations",
+      "category": "product",
+      "status": "planned",
+      "verificationStatus": "not-run",
+      "summary": "Independent verification, provenance, explicit release approval, deployment adapters and rollback will extend the same Shipkit cycle into operations.",
+      "evidence": [
+        "IDEA.md",
+        "docs/evolution/ARCHITECTURE.md",
+        "docs/evolution/ROADMAP.md",
+        "docs/DEPLOY.md"
+      ],
+      "checks": [
+        "No complete authorized release and rollback cycle yet"
+      ]
+    },
+    {
+      "id": "outcome-measurement-learning",
+      "category": "product",
+      "status": "planned",
+      "verificationStatus": "not-run",
+      "summary": "Technical and product outcome measurement will drive keep, iterate, rollback and causally evaluated memory or skill improvement in later cycles.",
+      "evidence": [
+        "IDEA.md",
+        "docs/evolution/ARCHITECTURE.md",
+        "docs/evolution/ROADMAP.md",
+        "docs/evolution/RESEARCH_CAPABILITY.md"
+      ],
+      "checks": [
+        "No measured end-to-end learning cycle yet"
       ]
     }
   ]
