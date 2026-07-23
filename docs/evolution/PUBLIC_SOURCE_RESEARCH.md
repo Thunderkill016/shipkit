@@ -90,7 +90,7 @@ For every initial URL and redirect destination, Shipkit:
 - accepts only HTML, plain text, Markdown and JSON;
 - fetches sequentially as a single-worker baseline.
 
-These controls materially reduce SSRF exposure. They do not yet provide a network sandbox or a cryptographically pinned DNS connection, so the adapter must remain outside secret-bearing environments.
+These controls materially reduce SSRF exposure. They do not yet provide a network sandbox, DNS-to-connection pinning, proxy egress policy or protection against every DNS rebinding race. The adapter must remain outside secret-bearing environments until containment is independently proven.
 
 ## Source capture
 
@@ -118,7 +118,7 @@ The baseline quarantines documents containing direct patterns such as:
 
 A quarantined source is retained as inert evidence but may not support a decision. The cycle becomes `inconclusive` and records the failed safety check.
 
-Pattern screening is not a complete prompt-injection defense. Obfuscation, images, encoded payloads and indirect social engineering remain open work.
+Pattern screening is not a complete prompt-injection defense. Obfuscation, images, encoded payloads, multilingual attacks and indirect social engineering remain open work.
 
 ## Exact citation spans
 
@@ -174,7 +174,7 @@ This slice does **not** yet implement:
 - calculation or transformation provenance beyond normalized text;
 - user-research ingestion;
 - paid/model-backed research budgets;
-- a network sandbox or DNS pinning;
+- a network sandbox or DNS-to-connection pinning;
 - proof that retrieved research improves a real user's decision.
 
 The next research slice should add one reproducible discovery adapter and compare it against this manifest baseline before adding parallel workers.
