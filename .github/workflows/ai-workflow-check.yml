@@ -8,6 +8,7 @@ on:
       - "docs/CAPABILITIES.json"
       - "docs/ai/**"
       - "docs/evolution/EXTERNAL_SYSTEMS.json"
+      - "docs/evolution/pilot/**"
       - "prompts/**"
       - ".agents/**"
       - ".github/**"
@@ -17,6 +18,9 @@ on:
       - "scripts/check-external-systems.mjs"
       - "scripts/external-systems-validation.mjs"
       - "scripts/test-external-systems.mjs"
+      - "scripts/a2-pilot-validation.mjs"
+      - "scripts/check-a2-pilot.mjs"
+      - "scripts/test-a2-pilot.mjs"
       - "scripts/create-shipkit.mjs"
       - "scripts/test-create-shipkit.mjs"
       - "package.json"
@@ -37,4 +41,6 @@ jobs:
       - run: node scripts/test-capabilities.mjs
       - run: node scripts/check-external-systems.mjs
       - run: node scripts/test-external-systems.mjs
+      - run: node scripts/check-a2-pilot.mjs
+      - run: node scripts/test-a2-pilot.mjs
       - run: node scripts/test-create-shipkit.mjs

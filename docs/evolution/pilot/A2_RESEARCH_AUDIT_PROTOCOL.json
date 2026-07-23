@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "protocolVersion": "2026-07-24-v1",
+  "issueUrl": "https://github.com/Thunderkill016/shipkit/issues/14",
+  "decision": "Determine whether one Shipkit A2 Research Audit creates inspectable decision value for solo developers and open-source maintainers already using coding agents.",
+  "sample": {
+    "participants": 6,
+    "repositories": 6,
+    "primaryAuditsPerRepository": 1,
+    "maxDurationDays": 14,
+    "maxSessionMinutes": 90,
+    "retryMaximum": 1
+  },
+  "eligibility": [
+    "solo-developer-or-active-open-source-maintainer",
+    "used-coding-agent-on-real-repository-in-last-30-days",
+    "authorized-to-use-selected-repository",
+    "current-meaningful-prioritization-decision",
+    "agrees-to-recent-behavior-not-hypothetical-preference"
+  ],
+  "exclusions": [
+    "shipkit-audit-designer",
+    "unscopable-secret-regulated-or-private-data",
+    "enthusiasm-only-recruitment",
+    "no-real-decision-due-during-pilot"
+  ],
+  "consentItems": [
+    "repository-ownership-or-permission",
+    "exact-public-or-private-access-method",
+    "secret-customer-and-unrelated-private-data-excluded",
+    "inspection-scope-explicitly-approved",
+    "no-mutation-merge-deploy-production-write-or-paid-call",
+    "participant-may-stop-or-withdraw-raw-notes",
+    "redacted-evidence-and-outcome-retention-approved"
+  ],
+  "preAuditRequired": [
+    "recent-decision-context-and-deadline",
+    "current-workflow-and-workaround",
+    "alternatives-currently-considered",
+    "preferred-decision-and-confidence",
+    "evidence-already-used",
+    "likely-action-without-shipkit",
+    "estimated-cost-of-wrong-decision",
+    "evidence-that-could-change-the-decision"
+  ],
+  "primaryOutcomes": [
+    "changed-decision",
+    "materially-confirmed",
+    "prevented-likely-waste",
+    "no-decision-value"
+  ],
+  "decisionValueOutcomes": [
+    "changed-decision",
+    "materially-confirmed",
+    "prevented-likely-waste"
+  ],
+  "secondaryMetrics": [
+    "ranking-understood",
+    "ranking-challengeable",
+    "serious-evidence-failure",
+    "privacy-safety-failure",
+    "minutes-to-first-decision-changing-evidence",
+    "recommendation-disposition",
+    "contradictions",
+    "false-positives",
+    "missing-context",
+    "rejected-recommendations",
+    "later-experiment-survival",
+    "repeat-use-intent"
+  ],
+  "decisionRule": {
+    "success": {
+      "decisionValueMinimum": 3,
+      "explainableAndChallengeableMinimum": 4,
+      "repeatedSeriousFailureAllowed": false
+    },
+    "inconclusive": {
+      "decisionValueExact": 2,
+      "repeatedSeriousFailureAllowed": false,
+      "retryAllowed": 1
+    },
+    "failure": {
+      "decisionValueMaximum": 1,
+      "repeatedSeriousFailureTriggersFailure": true
+    },
+    "unclassified": {
+      "condition": "decision-value is at least 3, explainable-and-challengeable is below 4, and no repeated serious failure occurred",
+      "action": "stop-and-report-protocol-gap-without-changing-thresholds"
+    }
+  },
+  "dataBoundary": {
+    "committedRecords": "redacted-only",
+    "participantIdPattern": "^P0[1-6]$",
+    "repositoryIdPattern": "^R0[1-6]$",
+    "prohibitedCommittedKeys": [
+      "participantName",
+      "email",
+      "phone",
+      "githubLogin",
+      "repositoryUrl",
+      "rawNotes",
+      "secret",
+      "credential",
+      "customerData"
+    ]
+  },
+  "stopConditions": [
+    "missing-or-ambiguous-consent",
+    "participant-or-repository-ineligible",
+    "scope-cannot-exclude-sensitive-data",
+    "session-reaches-90-minutes",
+    "participant-withdraws",
+    "serious-evidence-privacy-or-safety-failure"
+  ]
+}

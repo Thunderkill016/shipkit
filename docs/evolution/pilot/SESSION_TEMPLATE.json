@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "protocolVersion": "2026-07-24-v1",
+  "participantId": null,
+  "repositoryId": null,
+  "eligibility": {
+    "soloDeveloperOrMaintainer": null,
+    "recentCodingAgentUse": null,
+    "repositoryAuthorized": null,
+    "realDecisionDue": null,
+    "recentBehaviorInterviewAccepted": null
+  },
+  "consent": {
+    "repositoryPermission": null,
+    "accessMethodApproved": null,
+    "sensitiveDataExcluded": null,
+    "inspectionScopeApproved": null,
+    "noMutationBoundaryAccepted": null,
+    "withdrawalRightAccepted": null,
+    "redactedRetentionAccepted": null
+  },
+  "recentBehavior": {
+    "decisionContext": null,
+    "decisionDeadline": null,
+    "currentWorkflow": null,
+    "currentWorkaround": null
+  },
+  "preAuditDecision": {
+    "alternatives": [],
+    "preferredAlternative": null,
+    "confidence0To100": null,
+    "evidenceAlreadyUsed": [],
+    "likelyActionWithoutShipkit": null,
+    "estimatedWrongDecisionCost": null,
+    "decisionChangingEvidenceRequested": null,
+    "capturedAt": null
+  },
+  "audit": {
+    "startedAt": null,
+    "completedAt": null,
+    "approvedInspectionScope": [],
+    "technicalOutcome": null,
+    "technicalLimitations": []
+  },
+  "productOutcome": {
+    "classification": null,
+    "specificEvidenceIds": [],
+    "causalExplanation": null,
+    "rankingUnderstood": null,
+    "rankingChallengeable": null,
+    "recommendationDisposition": null,
+    "rejectionReason": null,
+    "minutesToFirstDecisionChangingEvidence": null,
+    "contradictions": [],
+    "falsePositives": [],
+    "missingContext": [],
+    "rejectedRecommendations": [],
+    "seriousEvidenceFailure": null,
+    "privacySafetyFailure": null,
+    "seriousFailureCategories": []
+  },
+  "experimentFollowup": {
+    "experimentDefined": null,
+    "recommendationSurvived": null,
+    "wasteAvoidedEvidence": null
+  },
+  "repeatUseIntent": {
+    "wouldRunAnotherCycle": null,
+    "reason": null
+  },
+  "redactionReview": {
+    "directIdentifiersRemoved": null,
+    "repositoryIdentityRemoved": null,
+    "sensitiveContentRemoved": null,
+    "reviewedAt": null
+  }
+}
