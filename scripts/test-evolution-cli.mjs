@@ -109,9 +109,16 @@ try {
   if (assessed.cycle?.stage !== "modeled") {
     throw new Error("assessment did not advance the persisted cycle to modeled");
   }
-  if (assessed.checkReport?.summary?.passed !== 1) {
+  const checkSummary = assessed.checkReport?.summary;
+  if (
+    !checkSummary ||
+    checkSummary.passed < 1 ||
+    checkSummary.failed > 0 ||
+    checkSummary.timedOut > 0 ||
+    checkSummary.unavailable > 0
+  ) {
     throw new Error(
-      `isolated Shipkit test check did not pass; diagnostic: ${reportPath}`
+      `one or more isolated Shipkit test checks did not pass; diagnostic: ${reportPath}`
     );
   }
   if (!/^sha256:[a-f0-9]{64}$/.test(assessed.evidence?.scorecard?.id ?? "")) {
@@ -133,7 +140,7 @@ try {
         snapshotEvidence: inspected.evidence.id,
         scorecardEvidence: assessed.evidence.scorecard.id,
         readiness: assessed.scorecard.readiness,
-        checkSummary: assessed.checkReport.summary,
+        checkSummary,
         filesObserved: inspected.snapshot.inventory.filesObserved,
         checks: [...checkNames].sort(),
       },
