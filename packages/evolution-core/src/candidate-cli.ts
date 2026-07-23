@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { readFile } from "node:fs/promises";
-import { isAbsolute, resolve } from "node:path";
+import { readFile, realpath } from "node:fs/promises";
+import { isAbsolute, relative, resolve, sep } from "node:path";
 import { prepareCandidateResearch } from "./candidate-research.js";
 import { EvidenceRegistry } from "./evidence.js";
 import { EvolutionStore } from "./persistence.js";
@@ -27,8 +27,9 @@ Usage:
 The command requires a modeled A1+ cycle. It compares only the explicitly named candidates in the
 manifest. Every candidate must link issue, roadmap, current capability and implementation evidence.
 Capability statements are regenerated from the supplied current registry; stale expectations, missing
-coverage or a tied score produce a durable inconclusive result. The command does not search the web,
-call a model, modify product code, merge or deploy.
+coverage or a tied score produce a durable inconclusive result. Manifest and capability files must
+resolve inside project-root; traversal and symlink escape fail closed. The command does not search the
+web, call a model, modify product code, merge or deploy.
 `;
 
 function parseArgs(argv: string[]): ParsedArgs {
@@ -64,8 +65,26 @@ function required(args: ParsedArgs, key: string): string {
   return value;
 }
 
-function filePath(projectRoot: string, value: string): string {
-  return isAbsolute(value) ? resolve(value) : resolve(projectRoot, value);
+export async function resolveCandidateInputFile(
+  projectRoot: string,
+  value: string,
+  label: string
+): Promise<string> {
+  const root = await realpath(resolve(projectRoot));
+  const requested = isAbsolute(value) ? resolve(value) : resolve(root, value);
+  let target: string;
+  try {
+    target = await realpath(requested);
+  } catch (error) {
+    throw new Error(
+      `cannot resolve ${label} ${requested}: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+  const offset = relative(root, target);
+  if (offset === ".." || offset.startsWith(`..${sep}`) || isAbsolute(offset)) {
+    throw new Error(`${label} must resolve inside project-root`);
+  }
+  return target;
 }
 
 async function readJson(path: string, label: string): Promise<unknown> {
@@ -115,10 +134,15 @@ export async function runCandidateResearchCli(
   });
   if (!authorization.allowed) throw new Error(authorization.reason);
 
-  const manifestPath = filePath(projectRoot, required(parsed, "manifest"));
-  const capabilitiesPath = filePath(
+  const manifestPath = await resolveCandidateInputFile(
     projectRoot,
-    one(parsed, "capabilities")?.trim() || "docs/CAPABILITIES.json"
+    required(parsed, "manifest"),
+    "candidate manifest"
+  );
+  const capabilitiesPath = await resolveCandidateInputFile(
+    projectRoot,
+    one(parsed, "capabilities")?.trim() || "docs/CAPABILITIES.json",
+    "capability registry"
   );
   const manifest = await readJson(manifestPath, "candidate manifest");
   const capabilities = await readJson(capabilitiesPath, "capability registry");
