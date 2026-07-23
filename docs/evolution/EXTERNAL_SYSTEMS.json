@@ -1,0 +1,415 @@
+{
+  "schemaVersion": 1,
+  "decision": "Which current external mechanisms should Shipkit adopt, adapt, integrate, defer, or reject?",
+  "reviewedAt": "2026-07-23",
+  "reviewBy": "2026-10-23",
+  "scope": "Primary-source review of adjacent coding-agent, durable-workflow, research, sandbox, interoperability, policy, provenance, telemetry, and evaluation systems. This is architecture evidence, not market or user validation.",
+  "systems": [
+    {
+      "id": "temporal",
+      "name": "Temporal",
+      "group": "durable-workflow",
+      "decision": "adapt",
+      "mechanism": "Crash-proof execution, replayable history, deterministic workflows, and idempotent activities.",
+      "shipkitBoundary": "Keep Shipkit's local inspectable cycle kernel; use Temporal only as a future optional distributed activity backend.",
+      "limitation": "Temporal proves workflow recovery, not repository correctness, product value, or Shipkit policy acceptance.",
+      "falsificationTest": "A future Temporal adapter must replay to the same legal Shipkit cycle state as the local backend without duplicate accepted actions.",
+      "sources": [
+        {
+          "kind": "official-doc",
+          "url": "https://docs.temporal.io/",
+          "revision": "accessed-2026-07-23",
+          "reviewedAt": "2026-07-23"
+        },
+        {
+          "kind": "official-repo",
+          "url": "https://github.com/temporalio/sdk-typescript/commit/2fd61e99ddd7cf83d475d23c823d877ae0e7004a",
+          "revision": "2fd61e99ddd7cf83d475d23c823d877ae0e7004a",
+          "reviewedAt": "2026-07-23"
+        }
+      ]
+    },
+    {
+      "id": "langgraph",
+      "name": "LangGraph",
+      "group": "durable-workflow",
+      "decision": "adapt",
+      "mechanism": "Durable checkpointers, thread-addressed state, interrupts, and resumable human input.",
+      "shipkitBoundary": "Treat a graph as an execution client or activity; Shipkit remains authoritative for policy, evidence, and accepted stage changes.",
+      "limitation": "On resume, the interrupted node restarts from its beginning, so pre-interrupt side effects must be idempotent.",
+      "falsificationTest": "A graph client and plain CLI client must consume identical Shipkit state and produce equivalent policy decisions.",
+      "sources": [
+        {
+          "kind": "official-doc",
+          "url": "https://docs.langchain.com/oss/python/langgraph/interrupts",
+          "revision": "accessed-2026-07-23",
+          "reviewedAt": "2026-07-23"
+        },
+        {
+          "kind": "official-repo",
+          "url": "https://github.com/langchain-ai/langgraph/commit/31f90df3e6b0268fa77fd2d118a917d420b84a68",
+          "revision": "31f90df3e6b0268fa77fd2d118a917d420b84a68",
+          "reviewedAt": "2026-07-23"
+        }
+      ]
+    },
+    {
+      "id": "pydantic-ai-durable-execution",
+      "name": "Pydantic AI durable execution",
+      "group": "durable-workflow",
+      "decision": "integrate-later",
+      "mechanism": "A provider-neutral durable execution layer with integrations for Temporal, DBOS, Prefect, and Restate.",
+      "shipkitBoundary": "Preserve portable Shipkit records and make any workflow-engine integration optional rather than growing a competing distributed runtime.",
+      "limitation": "Provider support does not define Shipkit's product-governance semantics or prove a backend is appropriate for local-first users.",
+      "falsificationTest": "Integrate only if a real multi-process use case cannot meet its recovery target with the local kernel and the adapter preserves all Shipkit invariants.",
+      "sources": [
+        {
+          "kind": "official-doc",
+          "url": "https://pydantic.dev/docs/ai/capabilities/durable_execution/overview/",
+          "revision": "accessed-2026-07-23",
+          "reviewedAt": "2026-07-23"
+        }
+      ]
+    },
+    {
+      "id": "openhands",
+      "name": "OpenHands",
+      "group": "coding-agent",
+      "decision": "integrate-later",
+      "mechanism": "Model-neutral coding-agent runtime, client-server sandbox execution, reusable workflows, policy, cost, and audit controls.",
+      "shipkitBoundary": "Use OpenHands as a bounded execution adapter; differentiate Shipkit through decision-to-outcome evidence rather than the generic control-plane label.",
+      "limitation": "Control-plane, scale, safety, and outcome statements are first-party product claims; the enterprise control plane now overlaps Shipkit's earlier positioning.",
+      "falsificationTest": "One approved Shipkit handoff must execute through OpenHands while Shipkit alone authorizes scope and accepts evidence and final verdicts.",
+      "sources": [
+        {
+          "kind": "official-doc",
+          "url": "https://docs.openhands.dev/openhands/usage/architecture/runtime",
+          "revision": "accessed-2026-07-23",
+          "reviewedAt": "2026-07-23"
+        },
+        {
+          "kind": "official-product-post",
+          "url": "https://www.openhands.dev/blog/openhands-enterprise-agent-control-plane",
+          "revision": "published-2026-05-06",
+          "reviewedAt": "2026-07-23"
+        },
+        {
+          "kind": "official-repo",
+          "url": "https://github.com/OpenHands/OpenHands/commit/e42220d0e2a8493fe78ccfb602ee6216347d737e",
+          "revision": "e42220d0e2a8493fe78ccfb602ee6216347d737e",
+          "reviewedAt": "2026-07-23"
+        }
+      ]
+    },
+    {
+      "id": "openai-codex",
+      "name": "OpenAI Codex",
+      "group": "coding-agent",
+      "decision": "integrate-later",
+      "mechanism": "Local coding-agent execution with sandbox permissions, repository instructions, skills, hooks, and context-isolated specialist agents.",
+      "shipkitBoundary": "Consume a parameter-bound execution handoff through a subprocess adapter; never store Codex sessions as authoritative cycle state.",
+      "limitation": "Parallel write-heavy agent work adds coordination risk, and agent permissions do not replace Shipkit's independent policy and evidence rules.",
+      "falsificationTest": "Interrupt Codex and resume the same Shipkit cycle with another agent without losing accepted state or widening action scope.",
+      "sources": [
+        {
+          "kind": "official-doc",
+          "url": "https://developers.openai.com/codex/",
+          "revision": "manual-fetched-2026-07-23",
+          "reviewedAt": "2026-07-23"
+        },
+        {
+          "kind": "official-repo",
+          "url": "https://github.com/openai/codex/commit/205d37a20f742b0bf8e191622bd07c43f567ea49",
+          "revision": "205d37a20f742b0bf8e191622bd07c43f567ea49",
+          "reviewedAt": "2026-07-23"
+        }
+      ]
+    },
+    {
+      "id": "github-copilot-hooks",
+      "name": "GitHub Copilot hooks",
+      "group": "coding-agent",
+      "decision": "adapt",
+      "mechanism": "Deterministic lifecycle hooks can inspect tool calls, deny or modify them, and emit auditable progress outside model reasoning.",
+      "shipkitBoundary": "Adapt the enforcement-point pattern while keeping Shipkit policy deterministic and independent of a particular agent runtime.",
+      "limitation": "Command-hook crashes fail closed but hook timeouts fail open, so hooks alone are not a complete security boundary.",
+      "falsificationTest": "Policy fixtures must produce equivalent allow or deny results through a hook adapter and the local Shipkit enforcement path, including timeout cases.",
+      "sources": [
+        {
+          "kind": "official-doc",
+          "url": "https://docs.github.com/en/copilot/reference/hooks-reference",
+          "revision": "accessed-2026-07-23",
+          "reviewedAt": "2026-07-23"
+        }
+      ]
+    },
+    {
+      "id": "mini-swe-agent",
+      "name": "mini-SWE-agent",
+      "group": "coding-agent",
+      "decision": "adapt",
+      "mechanism": "A deliberately small agent loop and environment abstraction provide a baseline against unnecessary orchestration complexity.",
+      "shipkitBoundary": "Require new execution-layer complexity to beat a minimal command baseline on a defined protected metric.",
+      "limitation": "Issue-resolution performance does not establish product discovery, governance, release safety, or user value.",
+      "falsificationTest": "Reject an orchestration feature that does not improve success, cost, duration, safety, or portability over the minimal baseline.",
+      "sources": [
+        {
+          "kind": "official-repo",
+          "url": "https://github.com/SWE-agent/mini-swe-agent/commit/a83fcae82d2a08f0ee0c688f9d137b3566c097f8",
+          "revision": "a83fcae82d2a08f0ee0c688f9d137b3566c097f8",
+          "reviewedAt": "2026-07-23"
+        },
+        {
+          "kind": "primary-paper",
+          "url": "https://arxiv.org/abs/2405.15793",
+          "revision": "arxiv-2405.15793",
+          "reviewedAt": "2026-07-23"
+        }
+      ]
+    },
+    {
+      "id": "daytona",
+      "name": "Daytona",
+      "group": "sandbox",
+      "decision": "integrate-later",
+      "mechanism": "Programmatic isolated computers with dedicated kernel, filesystem, network stack, resource limits, snapshots, pause, resume, and fork capabilities.",
+      "shipkitBoundary": "Keep authorization and evidence in Shipkit while a capability-negotiated provider owns remote containment and lifecycle.",
+      "limitation": "The hosted API requires credentials and creates cost, data-location, availability, and provider-trust decisions that need explicit approval.",
+      "falsificationTest": "Pilot only after hostile fixtures prove host isolation, secret denial, network policy, cleanup, and equivalent evidence capture.",
+      "sources": [
+        {
+          "kind": "official-doc",
+          "url": "https://www.daytona.io/docs/en/sandboxes/",
+          "revision": "docs-v0.200-accessed-2026-07-23",
+          "reviewedAt": "2026-07-23"
+        },
+        {
+          "kind": "official-repo",
+          "url": "https://github.com/daytonaio/daytona/commit/ec4c21b2d597091ac09ecc278f3bcc172575a987",
+          "revision": "ec4c21b2d597091ac09ecc278f3bcc172575a987",
+          "reviewedAt": "2026-07-23"
+        }
+      ]
+    },
+    {
+      "id": "model-context-protocol",
+      "name": "Model Context Protocol",
+      "group": "interoperability",
+      "decision": "adapt",
+      "mechanism": "Standard client-to-server transport for tools, resources, prompts, authorization, and reviewable elicitation.",
+      "shipkitBoundary": "Expose permitted Shipkit resources and operations through MCP without treating the protocol as lifecycle authority or a policy boundary.",
+      "limitation": "The reviewed elicitation page is a draft; MCP servers must not request secrets through form mode, and protocol compliance does not make a tool trustworthy.",
+      "falsificationTest": "An MCP client must be unable to perform any action rejected by the local CLI for identical cycle, scope, risk, and approval inputs.",
+      "sources": [
+        {
+          "kind": "official-spec",
+          "url": "https://modelcontextprotocol.io/specification/draft/client/elicitation",
+          "revision": "draft-accessed-2026-07-23",
+          "reviewedAt": "2026-07-23"
+        },
+        {
+          "kind": "official-repo",
+          "url": "https://github.com/modelcontextprotocol/modelcontextprotocol/commit/5bed7b30527019e34ccb0eb474636651424501f6",
+          "revision": "5bed7b30527019e34ccb0eb474636651424501f6",
+          "reviewedAt": "2026-07-23"
+        }
+      ]
+    },
+    {
+      "id": "agent2agent-protocol",
+      "name": "Agent2Agent Protocol",
+      "group": "interoperability",
+      "decision": "defer",
+      "mechanism": "Capability discovery and transport for opaque independent agents, long-running tasks, streaming, and resumable interactions.",
+      "shipkitBoundary": "Keep internal APIs transport-neutral and add A2A only after at least one real execution adapter and an interoperability use case exist.",
+      "limitation": "A2A transports agent work but does not define Shipkit authorization, evidence acceptance, repository truth, or outcome evaluation.",
+      "falsificationTest": "Adopt only if two independent agent clients need the protocol and both preserve identical Shipkit policy and cycle semantics.",
+      "sources": [
+        {
+          "kind": "official-spec",
+          "url": "https://a2a-protocol.org/latest/",
+          "revision": "1.0.0",
+          "reviewedAt": "2026-07-23"
+        },
+        {
+          "kind": "official-repo",
+          "url": "https://github.com/a2aproject/A2A/commit/0ef1b02547e959d770ebf3460d058f5c3421641c",
+          "revision": "0ef1b02547e959d770ebf3460d058f5c3421641c",
+          "reviewedAt": "2026-07-23"
+        }
+      ]
+    },
+    {
+      "id": "open-policy-agent",
+      "name": "Open Policy Agent",
+      "group": "policy-provenance",
+      "decision": "adapt",
+      "mechanism": "Policy decision and enforcement separation, versioned bundles, decision identifiers, trace correlation, and sensitive-field masking.",
+      "shipkitBoundary": "Keep the dependency-free local policy engine and copy the decision-record shape; add Rego only when shared external policy packs show value.",
+      "limitation": "OPA supplies a general policy engine, not Shipkit's domain model, action enforcement, or product-outcome judgment.",
+      "falsificationTest": "A future OPA adapter must match every local policy fixture and remain optional when the external service is unavailable.",
+      "sources": [
+        {
+          "kind": "official-doc",
+          "url": "https://www.openpolicyagent.org/docs/management-decision-logs",
+          "revision": "accessed-2026-07-23",
+          "reviewedAt": "2026-07-23"
+        },
+        {
+          "kind": "official-doc",
+          "url": "https://www.openpolicyagent.org/docs/management-bundles",
+          "revision": "accessed-2026-07-23",
+          "reviewedAt": "2026-07-23"
+        }
+      ]
+    },
+    {
+      "id": "slsa",
+      "name": "SLSA",
+      "group": "policy-provenance",
+      "decision": "adapt",
+      "mechanism": "Versioned provenance and verification-summary formats with incremental build and source assurance tracks.",
+      "shipkitBoundary": "Adapt subjects, materials, provenance, and verification statements to evolution-cycle claims without claiming formal SLSA conformance.",
+      "limitation": "Supply-chain provenance can prove lineage and controls but cannot prove correctness, safety, or user value.",
+      "falsificationTest": "An independent verifier must reject changed subjects, missing materials, and unsupported assurance elevation.",
+      "sources": [
+        {
+          "kind": "official-spec",
+          "url": "https://slsa.dev/spec/v1.2/",
+          "revision": "1.2",
+          "reviewedAt": "2026-07-23"
+        }
+      ]
+    },
+    {
+      "id": "opentelemetry",
+      "name": "OpenTelemetry",
+      "group": "telemetry",
+      "decision": "integrate-later",
+      "mechanism": "Vendor-neutral traces, metrics, logs, and semantic conventions for correlation across runtimes.",
+      "shipkitBoundary": "Export optional telemetry from authoritative Shipkit records; telemetry must never become the cycle journal.",
+      "limitation": "Generative-AI semantic conventions have moved repositories and include development-status fields, so pinning and compatibility tests are required.",
+      "falsificationTest": "Disabling every telemetry exporter must leave cycle correctness, recovery, and evidence verification unchanged.",
+      "sources": [
+        {
+          "kind": "official-spec",
+          "url": "https://opentelemetry.io/docs/specs/semconv/",
+          "revision": "1.43.0",
+          "reviewedAt": "2026-07-23"
+        }
+      ]
+    },
+    {
+      "id": "openai-responses-web-search",
+      "name": "OpenAI Responses web search",
+      "group": "research",
+      "decision": "adapt",
+      "mechanism": "Agentic search exposes search actions, inline URL annotations, a complete source list, domain controls, live-access controls, and token budgets.",
+      "shipkitBoundary": "Adapt these provider-neutral record fields before choosing a paid search provider; preserve complete sources and query trajectory in Shipkit evidence.",
+      "limitation": "The API requires credentials and incurs provider cost; first-party benchmark claims are not independent evidence of Shipkit user value.",
+      "falsificationTest": "A provider-neutral fixture must preserve queries, actions, complete sources, exact citations, budget, and stop reason without importing provider objects into kernel state.",
+      "sources": [
+        {
+          "kind": "official-doc",
+          "url": "https://developers.openai.com/api/docs/guides/tools-web-search",
+          "revision": "accessed-2026-07-23",
+          "reviewedAt": "2026-07-23"
+        }
+      ]
+    },
+    {
+      "id": "browsecomp",
+      "name": "BrowseComp",
+      "group": "evaluation",
+      "decision": "adapt",
+      "mechanism": "Hard-to-find but easy-to-verify questions test persistent, strategic browsing with inexpensive short-answer grading.",
+      "shipkitBoundary": "Adapt verification asymmetry, trajectory retention, and budget reporting for research tests rather than copying the task distribution.",
+      "limitation": "Short stable answers do not represent open-ended user research, and the published deep-research model was trained for BrowseComp-like tasks.",
+      "falsificationTest": "A Shipkit research fixture must measure retrieval, citation support, contradiction handling, cost, and decision usefulness separately.",
+      "sources": [
+        {
+          "kind": "primary-paper",
+          "url": "https://openai.com/index/browsecomp/",
+          "revision": "published-2025-04-10",
+          "reviewedAt": "2026-07-23"
+        }
+      ]
+    },
+    {
+      "id": "swe-bench-family",
+      "name": "SWE-bench benchmark family",
+      "group": "evaluation",
+      "decision": "reject-as-single-gate",
+      "mechanism": "Containerized repository tasks and hidden regression tests provide useful but narrow coding-agent evaluation.",
+      "shipkitBoundary": "Use curated repository tasks only as one technical slice alongside policy, recovery, cost, product outcome, and learning measures.",
+      "limitation": "Audits reported material task-design problems and contamination in SWE-bench Verified, then estimated roughly thirty percent broken tasks in SWE-Bench Pro.",
+      "falsificationTest": "No aggregate score may gate Shipkit promotion until sampled tasks pass independent prompt, test, environment, and contamination review.",
+      "sources": [
+        {
+          "kind": "primary-audit",
+          "url": "https://openai.com/index/why-we-no-longer-evaluate-swe-bench-verified/",
+          "revision": "published-2026-02-23",
+          "reviewedAt": "2026-07-23"
+        },
+        {
+          "kind": "primary-audit",
+          "url": "https://openai.com/index/separating-signal-from-noise-coding-evaluations/",
+          "revision": "published-2026-07-08",
+          "reviewedAt": "2026-07-23"
+        },
+        {
+          "kind": "official-doc",
+          "url": "https://docs.openhands.dev/openhands/usage/developers/evaluation-harness",
+          "revision": "accessed-2026-07-23",
+          "reviewedAt": "2026-07-23"
+        }
+      ]
+    }
+  ],
+  "contradictions": [
+    {
+      "id": "control-plane-is-not-unique",
+      "claim": "Shipkit can differentiate primarily as an agent control plane.",
+      "evidence": [
+        "openhands",
+        "open-policy-agent",
+        "opentelemetry"
+      ],
+      "impact": "OpenHands now markets a broad agent control plane with policy, audit, budgeting, sandboxing, and optimization, while mature projects own policy and telemetry primitives.",
+      "resolution": "Differentiate through cross-agent decision-to-outcome evidence and measured later-cycle learning; avoid generic control-plane positioning."
+    },
+    {
+      "id": "custom-durable-runtime-is-not-the-moat",
+      "claim": "A larger custom durable runtime is a defensible near-term advantage.",
+      "evidence": [
+        "temporal",
+        "langgraph",
+        "pydantic-ai-durable-execution"
+      ],
+      "impact": "Durability, replay, interrupts, and pluggable workflow engines are already mature adjacent capabilities.",
+      "resolution": "Keep the portable local kernel and integrate distributed engines only for demonstrated use cases."
+    },
+    {
+      "id": "headline-benchmarks-are-unstable",
+      "claim": "A leading public coding benchmark score is durable proof of product quality.",
+      "evidence": [
+        "swe-bench-family",
+        "browsecomp",
+        "mini-swe-agent"
+      ],
+      "impact": "Task flaws, contamination, narrow distributions, and setup sensitivity can dominate aggregate scores.",
+      "resolution": "Use multi-dimensional, versioned, sampled, independently reviewed evaluations tied to Shipkit user outcomes."
+    },
+    {
+      "id": "protocol-is-not-authority",
+      "claim": "MCP or A2A adoption supplies authorization and trustworthy agent behavior.",
+      "evidence": [
+        "model-context-protocol",
+        "agent2agent-protocol",
+        "github-copilot-hooks"
+      ],
+      "impact": "Protocols transport requests and context; enforcement behavior, timeouts, secret handling, and trust remain implementation responsibilities.",
+      "resolution": "Keep Shipkit policy and evidence acceptance transport-neutral and test protocol adapters for parity."
+    }
+  ]
+}

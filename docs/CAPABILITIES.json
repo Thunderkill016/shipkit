@@ -200,7 +200,10 @@
         "packages/evolution-core/src/candidate-cli.test.ts",
         "packages/evolution-core/src/fixtures/shipkit-next-workstream.candidates.json",
         "scripts/test-candidate-research.mjs",
-        "docs/evolution/CANDIDATE_RESEARCH.md"
+        "docs/evolution/CANDIDATE_RESEARCH.md",
+        "docs/evolution/EXTERNAL_SYSTEMS.json",
+        "scripts/check-external-systems.mjs",
+        "scripts/test-external-systems.mjs"
       ],
       "checks": [
         "Unit tests: completed repository research and parameter-bound handoff",
@@ -216,7 +219,10 @@
         "CI: Evolution Engine Proof",
         "Unit tests: named candidates, stale capability rejection, missing evidence and tied ranking",
         "CLI test: persist and reload candidate-manifest cycle",
-        "CI proof: fixed #15/#13/#12/#17 comparison selects #13 and preserves #14 parameters"
+        "CI proof: fixed #15/#13/#12/#17 comparison selects #13 and preserves #14 parameters",
+        "External-system registry: revisions, review expiry, coverage, limitations, contradictions and falsification tests",
+        "External-system negative fixtures: floating revision, expiry, narrow coverage and missing contradictions",
+        "GitHub Actions: external-system registry and validator changes trigger and run the focused checks"
       ],
       "limitations": [
         "Public retrieval requires an explicit URL manifest and does not discover or rank the wider web",
@@ -227,7 +233,8 @@
         "The execution handoff is not yet consumed by a coding-agent adapter",
         "Named-candidate evidence is supplied through an explicit manifest; Shipkit does not fetch GitHub issues or independently verify external URLs in this adapter",
         "Deterministic priority weights are inspectable project judgments, not statistical estimates of market demand",
-        "No adaptive query reformulation or citation chasing exists yet"
+        "No adaptive query reformulation or citation chasing exists yet",
+        "The external-system registry validates structure and freshness metadata but does not fetch URLs, prove source claims or establish user value"
       ]
     },
     {

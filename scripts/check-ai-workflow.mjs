@@ -21,6 +21,7 @@ const required = [
   "docs/ai/improvements/INDEX.md",
   "docs/ai/research/README.md",
   "docs/ai/research/INDEX.md",
+  "docs/evolution/EXTERNAL_SYSTEMS.json",
   "docs/ai/templates/IMPLEMENTATION_PLAN.md",
   "docs/ai/templates/PROJECT_MODEL.md",
   "docs/ai/templates/PROJECT_HEALTH_REPORT.md",
@@ -45,6 +46,9 @@ const required = [
   ".github/pull_request_template.md",
   "scripts/check-capabilities.mjs",
   "scripts/test-capabilities.mjs",
+  "scripts/external-systems-validation.mjs",
+  "scripts/check-external-systems.mjs",
+  "scripts/test-external-systems.mjs",
   "scripts/create-shipkit.mjs",
   "scripts/test-create-shipkit.mjs",
 ];
