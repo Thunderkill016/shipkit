@@ -17,3 +17,6 @@ export * from "./scorecard.js";
 
 export * from "./candidate-research.js";
 export * from "./candidate-cli.js";
+
+export * from "./public-search.js";
+export * from "./search-cli.js";

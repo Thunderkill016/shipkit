@@ -27,7 +27,8 @@
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "db:migrate": "node scripts/db-migrate.mjs",
-    "research:candidates": "pnpm --filter @shipkit/evolution-core build && node packages/evolution-core/dist/candidate-cli.js"
+    "research:candidates": "pnpm --filter @shipkit/evolution-core build && node packages/evolution-core/dist/candidate-cli.js",
+    "research:search": "pnpm --filter @shipkit/evolution-core build && node packages/evolution-core/dist/search-cli.js"
   },
   "engines": {
     "node": ">=20"

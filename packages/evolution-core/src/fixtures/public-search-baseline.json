@@ -1,0 +1,154 @@
+{
+  "provider": "github-repository-search",
+  "maxResultAgeMinutes": 60,
+  "brief": {
+    "decisionQuestion": "Should Shipkit add a reproducible public search baseline before the external pilot?",
+    "owner": "search-researcher",
+    "deadline": null,
+    "assumptions": ["GitHub repository search is a bounded first discovery provider."],
+    "constraints": ["Use zero-cost public endpoints only."],
+    "evidenceThreshold": "Every material claim requires an exact verified quote.",
+    "protectedOutcomes": ["Keep the six-person pilot thresholds unchanged"]
+  },
+  "plan": {
+    "questions": [
+      "Can ranked public discovery be reconstructed?",
+      "What limitation could invalidate the recommendation?"
+    ],
+    "sourceStrategy": ["Public repository search", "Falsification search"],
+    "budget": { "maxQueries": 4, "maxSources": 2, "maxMinutes": 15, "maxCostUsd": 0 },
+    "stopConditions": ["Support and falsification evidence are captured and reviewed."]
+  },
+  "queries": [
+    {
+      "query": "shipkit evidence research in:name,description",
+      "rationale": "Find the primary Shipkit repository result.",
+      "intent": "support",
+      "maxResults": 3
+    },
+    {
+      "query": "shipkit limitations archived in:name,description",
+      "rationale": "Search explicitly for a limitation or contrary implementation.",
+      "intent": "falsification",
+      "maxResults": 3
+    }
+  ],
+  "selections": [
+    {
+      "queryIndex": 0,
+      "rank": 1,
+      "publisher": "GitHub",
+      "sourceClass": "primary-technical",
+      "version": "2026-07",
+      "license": null,
+      "authority": 0.9,
+      "directness": 1,
+      "freshness": 1,
+      "applicability": 1,
+      "independence": 0.5,
+      "conflictOfInterest": "The repository describes its own implementation."
+    },
+    {
+      "queryIndex": 1,
+      "rank": 1,
+      "publisher": "GitHub",
+      "sourceClass": "community",
+      "version": "2026-07",
+      "license": null,
+      "authority": 0.6,
+      "directness": 0.8,
+      "freshness": 1,
+      "applicability": 0.8,
+      "independence": 0.9,
+      "conflictOfInterest": null
+    }
+  ],
+  "claims": [
+    {
+      "statement": "Shipkit has a bounded search and exact-citation implementation path.",
+      "claimType": "fact",
+      "confidence": 0.9,
+      "uncertainty": "The fixture proves the baseline contract, not external product value.",
+      "supportingCitations": [
+        {
+          "sourceIndex": 0,
+          "quote": "\"description\":\"Shipkit uses bounded search and exact citations.\""
+        }
+      ],
+      "contradictingCitations": [],
+      "expiresAt": null
+    },
+    {
+      "statement": "Repository search is not equivalent to general web discovery.",
+      "claimType": "limitation",
+      "confidence": 0.99,
+      "uncertainty": "A later provider can expand beyond repositories.",
+      "supportingCitations": [
+        {
+          "sourceIndex": 1,
+          "quote": "\"description\":\"Repository search alone is not a general web index.\""
+        }
+      ],
+      "contradictingCitations": [],
+      "expiresAt": null
+    }
+  ],
+  "contradictions": [],
+  "opportunities": [
+    {
+      "title": "Add one reproducible search provider",
+      "problem": "Explicit URL manifests cannot discover omitted public repositories.",
+      "expectedOutcome": "Queries, ranks, result digests, selected sources, and citations are reconstructible.",
+      "evidenceClaimIndexes": [0, 1],
+      "alternatives": ["Remain manifest-only", "Add several providers immediately"],
+      "estimatedCost": "small",
+      "risk": "low",
+      "uncertainty": "Repository search is narrower than web search.",
+      "learningValue": "Tests whether discovered evidence improves pilot decisions.",
+      "smallestExperiment": "Run one support and one falsification query."
+    },
+    {
+      "title": "Stay explicit-manifest only",
+      "problem": "Search results can change between runs.",
+      "expectedOutcome": "Maximum input control at the cost of discovery coverage.",
+      "evidenceClaimIndexes": [1],
+      "alternatives": ["Add search", "Manual browsing"],
+      "estimatedCost": "none",
+      "risk": "medium",
+      "uncertainty": "Missed sources may dominate the decision.",
+      "learningValue": "Provides the comparison baseline.",
+      "smallestExperiment": "Compare one manifest run with one search run."
+    },
+    {
+      "title": "Add a general web provider now",
+      "problem": "Repository search does not cover the wider web.",
+      "expectedOutcome": "Broader coverage immediately.",
+      "evidenceClaimIndexes": [1],
+      "alternatives": ["Start narrow", "Defer discovery"],
+      "estimatedCost": "medium",
+      "risk": "medium",
+      "uncertainty": "Cost, safety, and ranking quality are unproven.",
+      "learningValue": "Could benchmark broader discovery later.",
+      "smallestExperiment": "Do not start before the repository baseline is measured."
+    }
+  ],
+  "decision": {
+    "selectedOpportunityIndex": 0,
+    "rejectedOpportunityIndexes": [1, 2],
+    "rationale": "One provider is the smallest falsifiable step before the six-person pilot."
+  },
+  "experiment": {
+    "hypothesis": "A ranked support and falsification search improves evidence coverage without changing pilot thresholds.",
+    "method": "Run the bounded provider, capture selected sources, and verify exact quotes.",
+    "successCriteria": ["Search provenance is reconstructible", "Falsification evidence remains visible"],
+    "guardrails": ["No paid calls", "No pilot threshold changes"],
+    "rollbackPlan": ["Remove the provider adapter and retain evidence for review"]
+  },
+  "handoff": {
+    "allowedScope": ["packages/evolution-core/src/public-search*.ts", "docs/evolution/**"],
+    "forbiddenScope": ["production", "secrets", "automatic merge", "automatic deploy"],
+    "acceptanceCriteria": ["Support and falsification queries pass independent review"],
+    "verificationPlan": ["Run deterministic provider and source fixtures"],
+    "rollbackPlan": ["Revert the public-search adapter"]
+  }
+}

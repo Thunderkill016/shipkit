@@ -172,6 +172,21 @@ try {
     );
   }
 
+  const searchBinary = join(
+    consumerRoot,
+    "node_modules",
+    ".bin",
+    process.platform === "win32"
+      ? "shipkit-research-search.cmd"
+      : "shipkit-research-search"
+  );
+  const searchHelp = await run(searchBinary, ["--help"], consumerRoot);
+  if (!searchHelp.stdout.includes("Shipkit reproducible public search research")) {
+    throw new Error(
+      "installed shipkit-research-search binary did not return expected help output"
+    );
+  }
+
   await persistDiagnostics();
   process.stdout.write(
     `${JSON.stringify(
@@ -186,6 +201,7 @@ try {
         consumerImport: "passed",
         consumerCli: "passed",
         consumerCandidateCli: "passed",
+        consumerSearchCli: "passed",
       },
       null,
       2
