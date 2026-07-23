@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -11,6 +11,7 @@ const cli = join(root, "packages/evolution-core/dist/cli.js");
 const temporary = await mkdtemp(join(tmpdir(), "shipkit-evolution-smoke-"));
 const store = join(temporary, ".shipkit");
 const cycleId = "shipkit:ci-dogfood-001";
+const reportPath = join(root, "artifacts", "evolution-dogfood-report.json");
 
 function run(args) {
   const result = spawnSync(process.execPath, [cli, ...args], {
@@ -87,12 +88,30 @@ try {
     "--actor",
     "ci-dogfood",
   ]);
+  await mkdir(dirname(reportPath), { recursive: true });
+  await writeFile(
+    reportPath,
+    `${JSON.stringify(
+      {
+        cycleId,
+        stage: assessed.cycle?.stage,
+        snapshotEvidence: inspected.evidence?.id,
+        evidence: assessed.evidence,
+        scorecard: assessed.scorecard,
+        checkReport: assessed.checkReport,
+      },
+      null,
+      2
+    )}\n`,
+    "utf8"
+  );
+
   if (assessed.cycle?.stage !== "modeled") {
     throw new Error("assessment did not advance the persisted cycle to modeled");
   }
   if (assessed.checkReport?.summary?.passed !== 1) {
     throw new Error(
-      `isolated Shipkit test check did not pass:\n${JSON.stringify(assessed.checkReport, null, 2)}`
+      `isolated Shipkit test check did not pass; diagnostic: ${reportPath}`
     );
   }
   if (!/^sha256:[a-f0-9]{64}$/.test(assessed.evidence?.scorecard?.id ?? "")) {
