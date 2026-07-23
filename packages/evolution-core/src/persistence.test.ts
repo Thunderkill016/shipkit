@@ -66,7 +66,7 @@ describe("EvolutionStore", () => {
     await expect(store.load(created.cycleId)).resolves.toEqual(created);
   });
 
-  it("rejects stale concurrent writers", async () => {
+  it("serializes competing writers and accepts exactly one transition", async () => {
     const store = await temporaryStore();
     const created = createCycle({
       cycleId: "external-repo:cycle-003",
@@ -81,14 +81,26 @@ describe("EvolutionStore", () => {
       reason: "captured baseline A",
       addArtifacts: { baseline: ["evidence:a"] },
     });
-    await store.save(created, firstWriter);
-
-    const staleWriter = transitionCycle(created, "observed", {
+    const secondWriter = transitionCycle(created, "observed", {
       actor: "observer-b",
       reason: "captured baseline B",
       addArtifacts: { baseline: ["evidence:b"] },
     });
-    await expect(store.save(created, staleWriter)).rejects.toThrow(/stale cycle state/);
+
+    const results = await Promise.allSettled([
+      store.save(created, firstWriter),
+      store.save(created, secondWriter),
+    ]);
+    expect(results.filter((result) => result.status === "fulfilled")).toHaveLength(1);
+    expect(results.filter((result) => result.status === "rejected")).toHaveLength(1);
+    await expect(store.load(created.cycleId)).resolves.toMatchObject({
+      stage: "observed",
+      history: [expect.objectContaining({ to: "observed" })],
+    });
+
+    const [cycleDirectory] = await readdir(store.cyclesDir);
+    const journal = await readFile(join(store.cyclesDir, cycleDirectory!, "events.jsonl"), "utf8");
+    expect(journal.trim().split("\n")).toHaveLength(2);
   });
 
   it("fails closed when a completed journal record is tampered with", async () => {
