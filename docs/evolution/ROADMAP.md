@@ -9,15 +9,19 @@ Issue: #9
 - [x] record architectural extracts, contradictions, licenses, and rejected patterns;
 - [x] define kernel invariants before adding agent integrations;
 - [x] compare durable workflow, coding-agent, sandbox, protocol, policy, provenance,
-  observability, benchmark, and learning systems through one common framework;
+  observability, benchmark, research-agent, product-discovery, and learning systems through one
+  common framework;
 - [x] record explicit adopt/adapt/integrate/defer/reject decisions and falsification tests;
-- [ ] pin a reviewed tag, release, commit, or specification version for every dependency or
-  integration candidate before implementation begins;
-- [ ] convert material comparison decisions into versioned ADRs as their implementation starts.
+- [x] define research as a first-class product capability in `RESEARCH_CAPABILITY.md`;
+- [ ] pin a reviewed tag, release, commit, paper, or specification version for every dependency,
+  research method, benchmark, or integration candidate before implementation begins;
+- [ ] convert material comparison and research-architecture decisions into versioned ADRs as their
+  implementation starts.
 
-Exit: product thesis, architecture, threat model, benchmark strategy, and
-`COMPARATIVE_ANALYSIS.md` are reviewable and linked to implementation decisions. A project name
-without a source, decision, limitation, and falsifiable test does not satisfy this phase.
+Exit: product thesis, architecture, threat model, benchmark strategy,
+`COMPARATIVE_ANALYSIS.md`, and `RESEARCH_CAPABILITY.md` are reviewable and linked to implementation
+decisions. A project or research method named without a source, decision, limitation, and
+falsifiable test does not satisfy this phase.
 
 ## Phase 1 — deterministic kernel
 
@@ -52,20 +56,115 @@ Exit: an A2 audit works on Shipkit and a pinned unrelated repository. Execution 
 untrusted repository scripts still requires an external sandbox until the remaining
 isolation controls are implemented.
 
-## Phase 3 — research and opportunity intelligence
+## Phase 3 — research capability and opportunity intelligence
 
-- [ ] internal evidence collector for issues, CI, docs, decisions, analytics, and user signals;
-- [ ] external-source adapter contract for web, papers, repositories, competitors, and user research;
-- [ ] source freshness, applicability, contradiction, confidence, and expiry records;
-- [ ] preserve source version, access date, license, scope, and evidence digest;
-- [ ] require opportunity records to identify comparable external mechanisms and rejected alternatives;
-- [ ] parallel research worker plan with bounded budgets and stop conditions;
+### 3A — decision framing and research planning
+
+- [ ] typed `ResearchBrief` with decision owner, deadline, assumptions, constraints, evidence
+  thresholds, protected outcomes, and information value;
+- [ ] typed `ResearchPlan` with question decomposition, dependency graph, coverage map, source
+  strategy, budgets, checkpoints, and explicit stop conditions;
+- [ ] transform vague objectives into decision-changing questions before any broad search begins;
+- [ ] distinguish breadth-first branches that can run in parallel from depth-first dependent work;
+- [ ] human-review checkpoint for high-cost, high-risk, or poorly scoped research plans.
+
+### 3B — modern search and retrieval skills
+
+- [ ] internal evidence collectors for issues, CI, docs, decisions, support, analytics, sales and
+  prior user research;
+- [ ] external-source adapters for web, papers, repositories, specifications, competitors,
+  changelogs, incidents, datasets and authenticated sources;
+- [ ] reproducible `QueryRecord` ledger with aliases, synonyms, filters, parent queries, rationale,
+  result identifiers, and query reformulation history;
+- [ ] citation chasing, entity resolution, negative/falsification queries, failure/postmortem search,
+  and multilingual/domain-specific search strategies;
+- [ ] adaptive search loop: inspect evidence, measure coverage, identify gaps, revise strategy, and
+  search again;
+- [ ] source-type routing so private/internal questions are not incorrectly sent to public web tools;
+- [ ] source quality scoring for authority, directness, freshness, applicability, independence,
+  conflicts of interest and known limitations.
+
+### 3C — product discovery research
+
+- [ ] convert team opinions and feature requests into testable research questions and assumptions;
+- [ ] typed `UserResearchRecord` with participant criteria, consent boundary, method, observed
+  behaviour, notes, findings, limitations, and evidence links;
+- [ ] ingest interviews, contextual observation, support tickets, search logs, analytics, churn,
+  non-user, sales and accessibility evidence;
+- [ ] validate the user problem before solution design and validate proposed solutions before
+  expensive implementation;
+- [ ] maintain an opportunity map connecting desired outcomes, user needs, problems, candidate
+  solutions and experiments;
+- [ ] separate observed behaviour from stated preference and separate loud feedback from reach,
+  frequency, severity and strategic fit;
+- [ ] continue user research through discovery, alpha, beta and live operation rather than treating
+  it as a one-time phase.
+
+### 3D — claims, provenance and contradiction
+
+- [ ] typed `SourceRecord`, `ClaimRecord`, and `ContradictionRecord`;
+- [ ] preserve source identity, version, author/publisher, access date, license, scope, integrity and
+  evidence digest;
+- [ ] record claim type: observation, interpretation, estimate, calculation or recommendation;
+- [ ] bind every material claim to exact evidence locations and transformations;
+- [ ] record freshness, applicability, confidence, uncertainty and expiry;
+- [ ] triangulate official claims, code, independent reproduction, user evidence and product data;
+- [ ] preserve contradictory evidence and explain disagreements instead of silently selecting the
+  source that supports the current hypothesis;
+- [ ] detect source circularity, citation laundering, stale versions and unsupported claim elevation.
+
+### 3E — bounded orchestration and research safety
+
+- [ ] single-worker research baseline with explicit time, token, search, document and monetary
+  budgets;
+- [ ] bounded parallel-worker plan with clear division of labour, output schemas, duplicate-work
+  avoidance, stop conditions and escalation rules;
+- [ ] scale effort to decision value and query complexity rather than spawning agents by default;
+- [ ] prove parallel research improves coverage or latency enough to justify coordination and token
+  costs over the single-worker baseline;
+- [ ] treat web pages, repositories and documents as hostile inputs rather than executable
+  instructions;
+- [ ] browsing and code-execution isolation, prompt-injection resistance, privacy minimisation,
+  connected-source authorization and protected credential boundaries;
+- [ ] retain complete `ResearchRun` trajectories, failures, budgets and stop reasons.
+
+### 3F — adversarial review and synthesis
+
+- [ ] independent research reviewer that searches for contrary evidence, alternative explanations,
+  missing populations, source bias, faulty calculations and claims beyond evidence;
+- [ ] citation verification and unsupported-claim checks separate from report generation;
 - [ ] opportunity/hypothesis portfolio rather than a single generated answer;
-- [ ] evaluator-backed candidate ranking and smallest decision-changing experiment.
+- [ ] require every opportunity to identify comparable external mechanisms, rejected alternatives,
+  supporting and contradicting evidence, expected outcome, risk, reversibility and cost;
+- [ ] evaluator-backed candidate ranking that keeps evidence strength, expected value, strategic fit,
+  urgency, cost, risk and learning value separately inspectable;
+- [ ] smallest decision-changing experiment selected when experimentation has higher information
+  value than more desk research;
+- [ ] explicit `inconclusive` result when evidence thresholds cannot be met.
 
-Exit: the engine produces three evidence-backed development opportunities for two
-unrelated products, and a human can explain why the selected experiment outranks the
-alternatives, which comparable systems informed it, and why competing mechanisms were rejected.
+### 3G — research evaluation and skill learning
+
+- [ ] typed `ResearchEvaluation` covering correctness, coverage, citation precision/completeness,
+  source quality, contradiction recall, freshness, decision usefulness, cost, latency and human
+  review;
+- [ ] retrieval benchmarks inspired by BrowseComp and DeepSearchQA;
+- [ ] report/evidence benchmarks using atomic verifiable rubrics and per-claim citation checks;
+- [ ] product-decision benchmark measuring problem validation, opportunity quality, experiment
+  survival, avoided waste and product outcome rather than report prose alone;
+- [ ] compare deterministic workflow, single researcher, bounded parallel researchers and
+  human-assisted configurations;
+- [ ] research-skill registry for query transformations, source maps, decomposition templates,
+  failure patterns and domain research packs;
+- [ ] promote a research skill only after later comparable runs consume it and demonstrate measured
+  improvement; expire or retire stale and harmful skills.
+
+Exit: for two unrelated products, the engine produces inspectable research plans, reproducible
+search trajectories, verified atomic claims, visible contradictions, user-validated problems, and
+at least three evidence-backed opportunities. A human can explain why the selected experiment
+outranks alternatives, which sources and comparable systems informed it, what remains uncertain,
+and why the research stopped. The bounded research architecture must beat its simpler baseline on
+at least one relevant quality metric without unacceptable cost, latency, safety or reliability
+regression.
 
 ## Phase 4 — execution adapters
 
@@ -118,24 +217,38 @@ then may Shipkit consider an E3 positive-recursive claim.
 - durability: kill every persistence boundary and verify deterministic recovery;
 - portability: three unrelated repositories, multiple package managers, and at least two languages;
 - execution: two agent adapters plus one minimal command baseline;
-- containment: hostile filesystem, process, secret, output, timeout, and egress fixtures;
+- containment: hostile filesystem, process, secret, output, timeout, egress and prompt-injection fixtures;
 - policy: allow, deny, and approval cases across every autonomy/risk combination;
-- evidence: tamper, substitution, contradiction, expiry, and unsupported-claim cases;
+- evidence: tamper, substitution, contradiction, expiry and unsupported-claim cases;
+- research retrieval: hard-to-find facts, exhaustive multi-step lists, query reformulation and
+  coverage under bounded budgets;
+- research reporting: atomic correctness, citation precision/completeness, source quality,
+  contradiction recall and uncertainty communication;
+- discovery: validated user problems, opportunity quality, experiment survival and avoided waste;
 - outcome: technical checks and product/user evaluators reported separately;
-- learning: comparable later cycles with and without each promoted memory or meta-change;
-- economics: success, regressions, cost, duration, retries, and human interventions;
-- explainability: durable artifacts alone explain selection, authorization, and verdict.
+- learning: comparable later cycles with and without each promoted memory, research skill or
+  meta-change;
+- economics: success, regressions, cost, duration, retries, tool calls and human interventions;
+- explainability: durable artifacts alone explain research scope, selection, authorization,
+  evidence, uncertainty and verdict.
 
 ## Product metrics
 
 - time from install to first inspected project model;
+- time from decision brief to first decision-changing evidence;
+- research coverage and unsupported-claim rate;
+- citation precision, completeness and primary-source ratio;
+- contradiction discovery and unresolved-gap visibility;
+- percentage of opportunities grounded in direct user evidence;
+- percentage of research recommendations that survive experiments;
+- implementation waste avoided through problem or solution invalidation;
 - percentage of cycles resumed without state loss;
 - invalid/unsafe action block rate and false-block rate;
 - verified outcome rate by task/repository/agent/model;
 - cost and duration per verified improvement;
-- percentage of retained memories actually consumed later;
+- percentage of retained memories and research skills actually consumed later;
 - measured lift or harm from each promoted meta-change;
-- user ability to explain selection, authorization, and verdict.
+- user ability to explain selection, authorization, evidence and verdict.
 
 ## Distribution after core proof
 
