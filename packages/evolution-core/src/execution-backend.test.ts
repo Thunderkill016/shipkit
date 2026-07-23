@@ -12,6 +12,7 @@ import {
 } from "./execution-backend.js";
 
 const temporaryRoots: string[] = [];
+const IMMUTABLE_IMAGE = `sha256:${"a".repeat(64)}`;
 
 afterEach(async () => {
   await Promise.all(temporaryRoots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
@@ -24,8 +25,18 @@ describe("execution backend contract", () => {
     ).toThrow(ExecutionBackendError);
   });
 
+  it("requires an explicit immutable Docker image reference", () => {
+    expect(() => new DockerExecutionBackend()).toThrow(/immutable image digest/);
+    expect(() => new DockerExecutionBackend({ image: "node:22-bookworm-slim" })).toThrow(
+      /immutable image digest/
+    );
+  });
+
   it("declares the Docker untrusted baseline without claiming a hard disk quota", () => {
-    const backend = new DockerExecutionBackend({ probe: async () => true });
+    const backend = new DockerExecutionBackend({
+      image: IMMUTABLE_IMAGE,
+      probe: async () => true,
+    });
     expect(backend.capabilities).toEqual(UNTRUSTED_CHECK_BASELINE_CAPABILITIES);
     expect(backend.capabilities).not.toContain("disk-limit");
   });
@@ -35,7 +46,7 @@ describe("execution backend contract", () => {
     temporaryRoots.push(workspaceRoot);
     const args = buildDockerRunArguments({
       containerName: "shipkit-check-test",
-      image: "node:22-bookworm-slim",
+      image: IMMUTABLE_IMAGE,
       workspaceRoot,
       relativeWorkingDirectory: ".",
       executable: "npm",
@@ -64,7 +75,7 @@ describe("execution backend contract", () => {
     expect(serialized).toContain("--cpus 1");
     expect(serialized).toContain("CI=true");
     expect(serialized).not.toContain("must-not-cross");
-    expect(args).toContain("node:22-bookworm-slim");
+    expect(args).toContain(IMMUTABLE_IMAGE);
   });
 
   it("runs trusted-local commands with an explicit environment instead of inheriting secrets", async () => {
