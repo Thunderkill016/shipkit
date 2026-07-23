@@ -17,9 +17,13 @@ import {
   type EvolutionCycle,
 } from "./types.js";
 
-const STORE_SCHEMA_VERSION = 1 as const;
-const LOCK_TIMEOUT_MS = 5_000;
-const STALE_LOCK_MS = 30_000;
+export const STORE_SCHEMA_VERSIONS = [1, 2] as const;
+export const CURRENT_STORE_SCHEMA_VERSION = 2 as const;
+
+const DEFAULT_LOCK_TIMEOUT_MS = 5_000;
+const DEFAULT_STALE_LOCK_MS = 30_000;
+const ORPHAN_TEMP_STALE_MS = 30_000;
+const SNAPSHOT_TEMPORARY_SUFFIX = ".tmp";
 
 export class EvolutionStoreError extends Error {
   constructor(message: string) {
@@ -28,20 +32,40 @@ export class EvolutionStoreError extends Error {
   }
 }
 
-type JournalRecord = {
-  storeSchemaVersion: typeof STORE_SCHEMA_VERSION;
+type JournalRecordV1 = {
+  storeSchemaVersion: 1;
   sequence: number;
   writtenAt: string;
   checksum: string;
   cycle: EvolutionCycle;
 };
 
-type StateEnvelope = JournalRecord;
+type JournalRecord = {
+  storeSchemaVersion: typeof CURRENT_STORE_SCHEMA_VERSION;
+  sequence: number;
+  writtenAt: string;
+  previousChecksum: string | null;
+  checksum: string;
+  cycle: EvolutionCycle;
+};
 
 type LockRecord = {
   token: string;
   pid: number;
   acquiredAt: string;
+};
+
+type ProjectConfig = {
+  schemaVersion: typeof CURRENT_STORE_SCHEMA_VERSION;
+  projectRoot: string;
+  projectName: string;
+  createdAt: string;
+  migratedAt?: string;
+};
+
+export type EvolutionStoreOptions = {
+  lockTimeoutMs?: number;
+  staleLockMs?: number;
 };
 
 export type CycleSummary = {
@@ -55,6 +79,12 @@ export type CycleSummary = {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function assertPositiveInteger(value: number, label: string): void {
+  if (!Number.isInteger(value) || value <= 0) {
+    throw new EvolutionStoreError(`${label} must be a positive integer`);
+  }
 }
 
 function assertCycle(value: unknown): asserts value is EvolutionCycle {
@@ -89,19 +119,34 @@ function checksumCycle(cycle: EvolutionCycle): string {
   return createHash("sha256").update(JSON.stringify(cycle)).digest("hex");
 }
 
-function assertJournalRecord(value: unknown, expectedSequence: number): JournalRecord {
+function maybeCrash(point: string): void {
+  if (process.env.SHIPKIT_PERSISTENCE_CRASH_POINT !== point) return;
+  process.stderr.write(`shipkit persistence fault injection: ${point}\n`);
+  if (process.platform === "win32") process.exit(86);
+  process.kill(process.pid, "SIGKILL");
+  throw new EvolutionStoreError(`fault injection did not terminate process at ${point}`);
+}
+
+function migrateJournalRecord(
+  value: unknown,
+  expectedSequence: number,
+  expectedPreviousChecksum: string | null
+): JournalRecord {
   if (!isRecord(value)) throw new EvolutionStoreError("journal record must be an object");
-  if (value.storeSchemaVersion !== STORE_SCHEMA_VERSION) {
-    throw new EvolutionStoreError(
-      `unsupported store schemaVersion: ${String(value.storeSchemaVersion)}`
-    );
+  const version = value.storeSchemaVersion;
+  if (!STORE_SCHEMA_VERSIONS.includes(version as (typeof STORE_SCHEMA_VERSIONS)[number])) {
+    throw new EvolutionStoreError(`unsupported store schemaVersion: ${String(version)}`);
   }
   if (value.sequence !== expectedSequence) {
     throw new EvolutionStoreError(
       `journal sequence mismatch: expected ${expectedSequence}, got ${String(value.sequence)}`
     );
   }
-  if (typeof value.writtenAt !== "string" || typeof value.checksum !== "string") {
+  if (
+    typeof value.writtenAt !== "string" ||
+    !Number.isFinite(Date.parse(value.writtenAt)) ||
+    typeof value.checksum !== "string"
+  ) {
     throw new EvolutionStoreError("journal metadata is invalid");
   }
   assertCycle(value.cycle);
@@ -109,7 +154,25 @@ function assertJournalRecord(value: unknown, expectedSequence: number): JournalR
   if (value.checksum !== expectedChecksum) {
     throw new EvolutionStoreError(`journal checksum mismatch at sequence ${expectedSequence}`);
   }
-  return value as JournalRecord;
+
+  if (version === 2) {
+    if (value.previousChecksum !== expectedPreviousChecksum) {
+      throw new EvolutionStoreError(
+        `journal checksum chain mismatch at sequence ${expectedSequence}`
+      );
+    }
+    return value as JournalRecord;
+  }
+
+  const legacy = value as JournalRecordV1;
+  return {
+    storeSchemaVersion: CURRENT_STORE_SCHEMA_VERSION,
+    sequence: legacy.sequence,
+    writtenAt: legacy.writtenAt,
+    previousChecksum: expectedPreviousChecksum,
+    checksum: legacy.checksum,
+    cycle: legacy.cycle,
+  };
 }
 
 async function exists(path: string): Promise<boolean> {
@@ -135,20 +198,29 @@ async function syncDirectory(path: string): Promise<void> {
   }
 }
 
-async function atomicWriteJson(path: string, value: unknown): Promise<void> {
+async function atomicWriteJson(
+  path: string,
+  value: unknown,
+  enableSnapshotFaults = false
+): Promise<void> {
   await mkdir(dirname(path), { recursive: true });
-  const temporary = `${path}.${process.pid}.${randomUUID()}.tmp`;
+  const temporary = `${path}.${process.pid}.${randomUUID()}${SNAPSHOT_TEMPORARY_SUFFIX}`;
   const handle = await open(temporary, "wx", 0o600);
+  if (enableSnapshotFaults) maybeCrash("snapshot:after-temp-open");
   try {
     await handle.writeFile(`${JSON.stringify(value, null, 2)}\n`, "utf8");
+    if (enableSnapshotFaults) maybeCrash("snapshot:after-temp-write");
     await handle.sync();
+    if (enableSnapshotFaults) maybeCrash("snapshot:after-temp-sync");
   } finally {
     await handle.close();
   }
 
   try {
     await rename(temporary, path);
+    if (enableSnapshotFaults) maybeCrash("snapshot:after-rename");
     await syncDirectory(dirname(path));
+    if (enableSnapshotFaults) maybeCrash("snapshot:after-directory-sync");
   } catch (error) {
     await rm(temporary, { force: true });
     throw error;
@@ -159,13 +231,18 @@ async function appendJournal(path: string, record: JournalRecord): Promise<void>
   await mkdir(dirname(path), { recursive: true });
   const existed = await exists(path);
   const handle = await open(path, "a", 0o600);
+  maybeCrash("journal:after-open");
   try {
     await handle.writeFile(`${JSON.stringify(record)}\n`, "utf8");
+    maybeCrash("journal:after-write");
     await handle.sync();
+    maybeCrash("journal:after-sync");
   } finally {
     await handle.close();
   }
-  if (!existed) await syncDirectory(dirname(path));
+  if (!existed) {
+    await syncDirectory(dirname(path));
+  }
 }
 
 async function readLockRecord(path: string): Promise<LockRecord | null> {
@@ -175,7 +252,10 @@ async function readLockRecord(path: string): Promise<LockRecord | null> {
       isRecord(value) &&
       typeof value.token === "string" &&
       typeof value.pid === "number" &&
-      typeof value.acquiredAt === "string"
+      Number.isInteger(value.pid) &&
+      value.pid > 0 &&
+      typeof value.acquiredAt === "string" &&
+      Number.isFinite(Date.parse(value.acquiredAt))
     ) {
       return value as LockRecord;
     }
@@ -185,10 +265,33 @@ async function readLockRecord(path: string): Promise<LockRecord | null> {
   return null;
 }
 
-async function acquireLock(path: string): Promise<() => Promise<void>> {
+function processIsAlive(pid: number): boolean {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException).code;
+    return code !== "ESRCH";
+  }
+}
+
+async function lockIsReclaimable(path: string, staleLockMs: number): Promise<boolean> {
+  const details = await stat(path);
+  const ageMs = Date.now() - details.mtimeMs;
+  const record = await readLockRecord(path);
+  if (record) {
+    return !processIsAlive(record.pid);
+  }
+  return ageMs > staleLockMs;
+}
+
+async function acquireLock(
+  path: string,
+  options: Required<EvolutionStoreOptions>
+): Promise<() => Promise<void>> {
   await mkdir(dirname(path), { recursive: true });
   const startedAt = Date.now();
-  while (Date.now() - startedAt < LOCK_TIMEOUT_MS) {
+  while (Date.now() - startedAt < options.lockTimeoutMs) {
     const token = randomUUID();
     try {
       const handle = await open(path, "wx", 0o600);
@@ -208,15 +311,16 @@ async function acquireLock(path: string): Promise<() => Promise<void>> {
         const current = await readLockRecord(path);
         if (current?.token === token) {
           await rm(path, { force: true });
+          await syncDirectory(dirname(path));
         }
       };
     } catch (error) {
       const code = (error as NodeJS.ErrnoException).code;
       if (code !== "EEXIST") throw error;
       try {
-        const details = await stat(path);
-        if (Date.now() - details.mtimeMs > STALE_LOCK_MS) {
+        if (await lockIsReclaimable(path, options.staleLockMs)) {
           await rm(path, { force: true });
+          await syncDirectory(dirname(path));
           continue;
         }
       } catch {
@@ -228,19 +332,93 @@ async function acquireLock(path: string): Promise<() => Promise<void>> {
   throw new EvolutionStoreError(`timed out acquiring cycle lock: ${path}`);
 }
 
-function directoryName(cycleId: string): string {
+export function cycleStorageDirectoryName(cycleId: string): string {
   const readable = cycleId.replace(/[^A-Za-z0-9._-]/g, "_").slice(0, 64) || "cycle";
   const suffix = createHash("sha256").update(cycleId).digest("hex").slice(0, 12);
   return `${readable}-${suffix}`;
 }
 
+async function removeOrphanedSnapshots(cycleDir: string, statePath: string): Promise<void> {
+  let entries;
+  try {
+    entries = await readdir(cycleDir, { withFileTypes: true });
+  } catch {
+    return;
+  }
+  const prefix = `${basename(statePath)}.`;
+  const candidates = entries.filter(
+    (entry) =>
+      entry.isFile() &&
+      entry.name.startsWith(prefix) &&
+      entry.name.endsWith(SNAPSHOT_TEMPORARY_SUFFIX)
+  );
+
+  for (const entry of candidates) {
+    const candidatePath = join(cycleDir, entry.name);
+    const identity = entry.name.slice(prefix.length, -SNAPSHOT_TEMPORARY_SUFFIX.length);
+    const pid = Number(identity.split(".", 1)[0]);
+    if (Number.isInteger(pid) && pid > 0) {
+      if (processIsAlive(pid)) continue;
+      await rm(candidatePath, { force: true });
+      continue;
+    }
+    try {
+      const details = await stat(candidatePath);
+      if (Date.now() - details.mtimeMs <= ORPHAN_TEMP_STALE_MS) continue;
+      await rm(candidatePath, { force: true });
+    } catch {
+      // A concurrently completed or removed temporary file needs no further cleanup.
+    }
+  }
+}
+
+function normalizeProjectConfig(value: unknown): { config: ProjectConfig; migrated: boolean } {
+  if (!isRecord(value)) throw new EvolutionStoreError("project config must be an object");
+  if (value.schemaVersion !== 1 && value.schemaVersion !== CURRENT_STORE_SCHEMA_VERSION) {
+    throw new EvolutionStoreError(
+      `unsupported project config schemaVersion: ${String(value.schemaVersion)}`
+    );
+  }
+  if (
+    typeof value.projectRoot !== "string" ||
+    typeof value.projectName !== "string" ||
+    typeof value.createdAt !== "string" ||
+    !Number.isFinite(Date.parse(value.createdAt))
+  ) {
+    throw new EvolutionStoreError("project config is invalid");
+  }
+  const migrated = value.schemaVersion === 1;
+  const existingMigratedAt =
+    typeof value.migratedAt === "string" && Number.isFinite(Date.parse(value.migratedAt))
+      ? value.migratedAt
+      : null;
+  return {
+    migrated,
+    config: {
+      schemaVersion: CURRENT_STORE_SCHEMA_VERSION,
+      projectRoot: value.projectRoot,
+      projectName: value.projectName,
+      createdAt: value.createdAt,
+      ...((existingMigratedAt ?? (migrated ? value.createdAt : null))
+        ? { migratedAt: existingMigratedAt ?? value.createdAt }
+        : {}),
+    },
+  };
+}
+
 export class EvolutionStore {
   readonly rootDir: string;
   readonly cyclesDir: string;
+  readonly options: Required<EvolutionStoreOptions>;
 
-  constructor(rootDir = ".shipkit") {
+  constructor(rootDir = ".shipkit", options: EvolutionStoreOptions = {}) {
+    const lockTimeoutMs = options.lockTimeoutMs ?? DEFAULT_LOCK_TIMEOUT_MS;
+    const staleLockMs = options.staleLockMs ?? DEFAULT_STALE_LOCK_MS;
+    assertPositiveInteger(lockTimeoutMs, "lockTimeoutMs");
+    assertPositiveInteger(staleLockMs, "staleLockMs");
     this.rootDir = resolve(rootDir);
     this.cyclesDir = join(this.rootDir, "cycles");
+    this.options = { lockTimeoutMs, staleLockMs };
   }
 
   async initializeProject(projectRoot = process.cwd()): Promise<string> {
@@ -248,17 +426,29 @@ export class EvolutionStore {
     const configPath = join(this.rootDir, "config.json");
     if (!(await exists(configPath))) {
       await atomicWriteJson(configPath, {
-        schemaVersion: STORE_SCHEMA_VERSION,
+        schemaVersion: CURRENT_STORE_SCHEMA_VERSION,
         projectRoot: resolve(projectRoot),
         projectName: basename(resolve(projectRoot)),
         createdAt: new Date().toISOString(),
       });
+      return configPath;
     }
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(await readFile(configPath, "utf8"));
+    } catch (error) {
+      throw new EvolutionStoreError(
+        `cannot read project config: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+    const normalized = normalizeProjectConfig(parsed);
+    if (normalized.migrated) await atomicWriteJson(configPath, normalized.config);
     return configPath;
   }
 
   private paths(cycleId: string) {
-    const cycleDir = join(this.cyclesDir, directoryName(cycleId));
+    const cycleDir = join(this.cyclesDir, cycleStorageDirectoryName(cycleId));
     return {
       cycleDir,
       statePath: join(cycleDir, "state.json"),
@@ -267,11 +457,16 @@ export class EvolutionStore {
     };
   }
 
-  private makeRecord(cycle: EvolutionCycle, sequence: number): JournalRecord {
+  private makeRecord(
+    cycle: EvolutionCycle,
+    sequence: number,
+    previousChecksum: string | null
+  ): JournalRecord {
     return {
-      storeSchemaVersion: STORE_SCHEMA_VERSION,
+      storeSchemaVersion: CURRENT_STORE_SCHEMA_VERSION,
       sequence,
       writtenAt: new Date().toISOString(),
+      previousChecksum,
       checksum: checksumCycle(cycle),
       cycle,
     };
@@ -281,14 +476,15 @@ export class EvolutionStore {
     await this.initializeProject();
     const paths = this.paths(cycle.cycleId);
     await mkdir(paths.cycleDir, { recursive: true });
-    const release = await acquireLock(paths.lockPath);
+    await removeOrphanedSnapshots(paths.cycleDir, paths.statePath);
+    const release = await acquireLock(paths.lockPath, this.options);
     try {
       if ((await exists(paths.statePath)) || (await exists(paths.journalPath))) {
         throw new EvolutionStoreError(`cycle already exists: ${cycle.cycleId}`);
       }
-      const record = this.makeRecord(cycle, 0);
+      const record = this.makeRecord(cycle, 0, null);
       await appendJournal(paths.journalPath, record);
-      await atomicWriteJson(paths.statePath, record);
+      await atomicWriteJson(paths.statePath, record, true);
       return cycle;
     } finally {
       await release();
@@ -304,17 +500,19 @@ export class EvolutionStore {
     }
 
     const paths = this.paths(next.cycleId);
-    const release = await acquireLock(paths.lockPath);
+    const release = await acquireLock(paths.lockPath, this.options);
     try {
+      await removeOrphanedSnapshots(paths.cycleDir, paths.statePath);
       const current = await this.load(previous.cycleId);
-      if (checksumCycle(current) !== checksumCycle(previous)) {
+      const currentChecksum = checksumCycle(current);
+      if (currentChecksum !== checksumCycle(previous)) {
         throw new EvolutionStoreError(
           `stale cycle state for ${previous.cycleId}; reload before writing`
         );
       }
-      const record = this.makeRecord(next, next.history.length);
+      const record = this.makeRecord(next, next.history.length, currentChecksum);
       await appendJournal(paths.journalPath, record);
-      await atomicWriteJson(paths.statePath, record);
+      await atomicWriteJson(paths.statePath, record, true);
       return next;
     } finally {
       await release();
@@ -337,13 +535,19 @@ export class EvolutionStore {
     for (let index = 0; index < rawLines.length; index += 1) {
       const line = rawLines[index]?.trim();
       if (!line) continue;
+      let parsed: unknown;
       try {
-        records.push(assertJournalRecord(JSON.parse(line), records.length));
+        parsed = JSON.parse(line);
       } catch (error) {
-        const isTrailingPartial = index === rawLines.length - 1 && !source.endsWith("\n");
+        const isTrailingPartial =
+          error instanceof SyntaxError && index === rawLines.length - 1 && !source.endsWith("\n");
         if (isTrailingPartial) break;
-        throw error;
+        throw new EvolutionStoreError(
+          `invalid journal JSON at line ${index + 1}: ${error instanceof Error ? error.message : String(error)}`
+        );
       }
+      const previousChecksum = records.at(-1)?.checksum ?? null;
+      records.push(migrateJournalRecord(parsed, records.length, previousChecksum));
     }
     if (records.length === 0) {
       throw new EvolutionStoreError(`journal has no valid records: ${cycleId}`);
@@ -362,23 +566,32 @@ export class EvolutionStore {
   }
 
   async load(cycleId: string): Promise<EvolutionCycle> {
-    const latestFromJournal = await this.replay(cycleId);
-    const { statePath } = this.paths(cycleId);
+    const paths = this.paths(cycleId);
+    await removeOrphanedSnapshots(paths.cycleDir, paths.statePath);
+    const records = await this.readJournal(cycleId);
+    const latest = records.at(-1);
+    if (!latest) throw new EvolutionStoreError(`journal has no latest record: ${cycleId}`);
+    if (latest.cycle.cycleId !== cycleId) {
+      throw new EvolutionStoreError(`journal cycle ID mismatch for ${cycleId}`);
+    }
+    const previousChecksum = records.at(-2)?.checksum ?? null;
 
     try {
-      const parsed = JSON.parse(await readFile(statePath, "utf8"));
-      const envelope = assertJournalRecord(parsed, latestFromJournal.history.length);
+      const parsed = JSON.parse(await readFile(paths.statePath, "utf8"));
+      const envelope = migrateJournalRecord(parsed, latest.sequence, previousChecksum);
       if (envelope.cycle.cycleId !== cycleId) {
         throw new EvolutionStoreError(`state cycle ID mismatch for ${cycleId}`);
       }
-      if (envelope.checksum !== checksumCycle(latestFromJournal)) {
+      if (envelope.checksum !== latest.checksum) {
         throw new EvolutionStoreError(`state is stale for ${cycleId}`);
+      }
+      if (isRecord(parsed) && parsed.storeSchemaVersion === 1) {
+        await atomicWriteJson(paths.statePath, envelope, true);
       }
       return envelope.cycle;
     } catch {
-      const recovered = this.makeRecord(latestFromJournal, latestFromJournal.history.length);
-      await atomicWriteJson(statePath, recovered);
-      return latestFromJournal;
+      await atomicWriteJson(paths.statePath, latest, true);
+      return latest.cycle;
     }
   }
 

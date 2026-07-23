@@ -266,13 +266,17 @@ describe("public source capture and citation review", () => {
   });
 
   it("persists a reviewed public research decision with exact citation spans", async () => {
+    // The adapter enforces its time budget against the live clock during capture.
+    // Keep this integration test relative to that clock so it does not expire as the calendar advances.
+    const completedAt = new Date();
+    const startedAt = new Date(completedAt.getTime() - 60_000);
     const prepared = await preparePublicSourceResearch(modeledCycle(), manifest(), {
       actor: "public-researcher",
       reviewerActor: "independent-citation-reviewer",
       registry: await registry(),
       manifestEvidenceRef: "evidence:manifest",
-      startedAt: "2026-07-23T09:03:00.000Z",
-      now: "2026-07-23T09:04:00.000Z",
+      startedAt: startedAt.toISOString(),
+      now: completedAt.toISOString(),
       runtime: { fetcher: cleanFetcher(), resolveAddresses: publicResolver },
     });
 
