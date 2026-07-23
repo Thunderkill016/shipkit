@@ -1,51 +1,132 @@
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import Link from "next/link";
 import { basename, dirname, resolve } from "node:path";
-import {
-  EvolutionStore,
-  type EvolutionCycle,
-} from "../../../../../../packages/evolution-core/src/index";
+import type { ReactNode } from "react";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 type PageProps = {
   searchParams: Promise<{ cycle?: string }>;
 };
 
-function defaultStateRoot(): string {
-  if (process.env.SHIPKIT_STATE_ROOT) return resolve(process.env.SHIPKIT_STATE_ROOT);
+type CycleSummary = {
+  cycleId: string;
+  objective: string;
+  stage: string;
+  autonomy: string;
+  risk: string;
+  updatedAt: string;
+};
+
+type OpportunityView = {
+  recordId: string;
+  title: string;
+  problem: string;
+  smallestExperiment: string;
+};
+
+type DecisionView = {
+  selectedOpportunityId: string;
+  rejectedOpportunityIds: string[];
+  rationale: string;
+};
+
+type ExperimentView = {
+  hypothesis: string;
+  method: string;
+  successCriteria: string[];
+};
+
+type HandoffView = {
+  parameterDigest: string;
+  allowedScope: string[];
+  forbiddenScope: string[];
+  acceptanceCriteria: string[];
+  verificationPlan: string[];
+};
+
+type ResearchView = {
+  sources: Array<{ recordId: string }>;
+  claims: Array<{ recordId: string }>;
+  contradictions: Array<{ recordId: string }>;
+  opportunities: OpportunityView[];
+  decisions: DecisionView[];
+  experiments: ExperimentView[];
+  executionHandoffs: HandoffView[];
+};
+
+type CycleView = {
+  cycleId: string;
+  objective: string;
+  stage: string;
+  autonomy: string;
+  risk: string;
+  history: unknown[];
+  artifacts: Record<string, string[]>;
+  research?: ResearchView;
+};
+
+type StatusOutput = {
+  root: string;
+  cycles: CycleSummary[];
+};
+
+type ShowOutput = {
+  cycle: CycleView;
+};
+
+const execFileAsync = promisify(execFile);
+
+function repositoryRoot(): string {
   const cwd = process.cwd();
-  const fromWebWorkspace = basename(cwd) === "web" && basename(dirname(cwd)) === "apps";
-  return fromWebWorkspace ? resolve(cwd, "../..", ".shipkit") : resolve(cwd, ".shipkit");
+  return basename(cwd) === "web" && basename(dirname(cwd)) === "apps"
+    ? resolve(cwd, "../..")
+    : cwd;
 }
 
-async function loadCycles() {
-  const store = new EvolutionStore(defaultStateRoot());
+function stateRoot(): string {
+  return resolve(process.env.SHIPKIT_STATE_ROOT ?? resolve(repositoryRoot(), ".shipkit"));
+}
+
+function cliPath(): string {
+  return resolve(
+    process.env.SHIPKIT_EVOLUTION_CLI ??
+      resolve(repositoryRoot(), "packages/evolution-core/dist/cli.js")
+  );
+}
+
+async function runCoreCli<T>(args: string[]): Promise<T> {
+  const { stdout } = await execFileAsync(process.execPath, [cliPath(), ...args], {
+    cwd: repositoryRoot(),
+    env: process.env,
+    maxBuffer: 4 * 1024 * 1024,
+  });
+  return JSON.parse(stdout) as T;
+}
+
+async function loadWorkspace(selectedCycleId?: string) {
+  const root = stateRoot();
   try {
-    const summaries = await store.list();
-    const cycles = await Promise.all(
-      summaries.map(async (summary) => {
-        try {
-          return await store.load(summary.cycleId);
-        } catch {
-          return null;
-        }
-      })
-    );
-    return {
-      root: store.rootDir,
-      cycles: cycles.filter((cycle): cycle is EvolutionCycle => cycle !== null),
-      error: null,
-    };
+    const status = await runCoreCli<StatusOutput>(["status", "--root", root]);
+    const selectedSummary =
+      status.cycles.find((cycle) => cycle.cycleId === selectedCycleId) ?? status.cycles[0] ?? null;
+    const selected = selectedSummary
+      ? (await runCoreCli<ShowOutput>(["show", selectedSummary.cycleId, "--root", root])).cycle
+      : null;
+    return { root: status.root, summaries: status.cycles, selected, error: null };
   } catch (error) {
     return {
-      root: store.rootDir,
-      cycles: [] as EvolutionCycle[],
+      root,
+      summaries: [] as CycleSummary[],
+      selected: null as CycleView | null,
       error: error instanceof Error ? error.message : String(error),
     };
   }
 }
 
-function Badge({ children }: { children: React.ReactNode }) {
+function Badge({ children }: { children: ReactNode }) {
   return (
     <span className="rounded-full border border-border bg-background px-2.5 py-1 text-xs text-muted">
       {children}
@@ -55,9 +136,8 @@ function Badge({ children }: { children: React.ReactNode }) {
 
 export default async function EvolutionWorkspacePage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const workspace = await loadCycles();
-  const selected =
-    workspace.cycles.find((cycle) => cycle.cycleId === params.cycle) ?? workspace.cycles[0] ?? null;
+  const workspace = await loadWorkspace(params.cycle);
+  const selected = workspace.selected;
   const research = selected?.research;
   const decision = research?.decisions.at(-1) ?? null;
   const experiment = research?.experiments.at(-1) ?? null;
@@ -77,8 +157,9 @@ export default async function EvolutionWorkspacePage({ searchParams }: PageProps
           </p>
           <h1 className="mt-2 text-2xl font-semibold text-foreground">Evolution cycles</h1>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
-            This view reads the same durable journal and cycle records as the CLI. It does not keep a
-            second workspace state.
+            This server view calls the official Evolution Core CLI. The CLI and web workspace therefore
+            share the same journal replay, recovery, policy and cycle state instead of maintaining two
+            sources of truth.
           </p>
         </div>
         <Link
@@ -99,7 +180,7 @@ export default async function EvolutionWorkspacePage({ searchParams }: PageProps
         </div>
       )}
 
-      {workspace.cycles.length === 0 ? (
+      {workspace.summaries.length === 0 ? (
         <section className="mt-8 rounded-2xl border border-border bg-card p-6">
           <h2 className="font-medium text-foreground">No durable cycle found</h2>
           <p className="mt-2 text-sm text-muted">
@@ -113,7 +194,7 @@ export default async function EvolutionWorkspacePage({ searchParams }: PageProps
       ) : (
         <div className="mt-8 grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
           <aside className="space-y-3">
-            {workspace.cycles.map((cycle) => (
+            {workspace.summaries.map((cycle) => (
               <Link
                 key={cycle.cycleId}
                 href={`/app/evolution?cycle=${encodeURIComponent(cycle.cycleId)}`}
@@ -149,7 +230,9 @@ export default async function EvolutionWorkspacePage({ searchParams }: PageProps
                   <div className="flex flex-wrap gap-2">
                     <Badge>stage: {selected.stage}</Badge>
                     <Badge>events: {selected.history.length}</Badge>
-                    <Badge>evidence buckets: {Object.values(selected.artifacts).filter((v) => v.length).length}</Badge>
+                    <Badge>
+                      evidence buckets: {Object.values(selected.artifacts).filter((refs) => refs.length).length}
+                    </Badge>
                   </div>
                 </div>
               </section>
@@ -192,7 +275,8 @@ export default async function EvolutionWorkspacePage({ searchParams }: PageProps
                         )}
                       </div>
                       <p className="mt-3 text-sm text-muted">
-                        Smallest experiment: <span className="text-foreground">{opportunity.smallestExperiment}</span>
+                        Smallest experiment:{" "}
+                        <span className="text-foreground">{opportunity.smallestExperiment}</span>
                       </p>
                     </article>
                   ))}
@@ -210,7 +294,8 @@ export default async function EvolutionWorkspacePage({ searchParams }: PageProps
                       <p className="text-lg font-medium text-foreground">{selectedOpportunity.title}</p>
                       <p>{decision.rationale}</p>
                       <p>
-                        Rejected alternatives: <span className="text-foreground">{decision.rejectedOpportunityIds.length}</span>
+                        Rejected alternatives:{" "}
+                        <span className="text-foreground">{decision.rejectedOpportunityIds.length}</span>
                       </p>
                     </div>
                   ) : (
@@ -242,31 +327,40 @@ export default async function EvolutionWorkspacePage({ searchParams }: PageProps
                     <div>
                       <p className="text-xs uppercase tracking-wider text-muted">Allowed scope</p>
                       <ul className="mt-2 space-y-1 text-foreground">
-                        {handoff.allowedScope.map((item) => <li key={item}>✓ {item}</li>)}
+                        {handoff.allowedScope.map((item) => (
+                          <li key={item}>✓ {item}</li>
+                        ))}
                       </ul>
                     </div>
                     <div>
                       <p className="text-xs uppercase tracking-wider text-muted">Forbidden scope</p>
                       <ul className="mt-2 space-y-1 text-foreground">
-                        {handoff.forbiddenScope.map((item) => <li key={item}>× {item}</li>)}
+                        {handoff.forbiddenScope.map((item) => (
+                          <li key={item}>× {item}</li>
+                        ))}
                       </ul>
                     </div>
                     <div>
                       <p className="text-xs uppercase tracking-wider text-muted">Acceptance</p>
                       <ul className="mt-2 space-y-1 text-foreground">
-                        {handoff.acceptanceCriteria.map((item) => <li key={item}>• {item}</li>)}
+                        {handoff.acceptanceCriteria.map((item) => (
+                          <li key={item}>• {item}</li>
+                        ))}
                       </ul>
                     </div>
                     <div>
                       <p className="text-xs uppercase tracking-wider text-muted">Verification</p>
                       <ul className="mt-2 space-y-1 text-foreground">
-                        {handoff.verificationPlan.map((item) => <li key={item}>• {item}</li>)}
+                        {handoff.verificationPlan.map((item) => (
+                          <li key={item}>• {item}</li>
+                        ))}
                       </ul>
                     </div>
                   </div>
                 ) : (
                   <p className="mt-4 text-sm text-muted">
-                    Run <code className="text-foreground">prepare-handoff</code> after the cycle reaches modeled.
+                    Run <code className="text-foreground">prepare-handoff</code> after the cycle reaches
+                    modeled.
                   </p>
                 )}
               </section>
