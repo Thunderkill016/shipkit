@@ -24,9 +24,12 @@ For each system:
 4. separate useful mechanisms from product positioning;
 5. state what Shipkit adopts, adapts, integrates, defers, or rejects;
 6. define a test or benchmark that can falsify the Shipkit decision;
-7. revisit the decision when a source changes materially or evidence contradicts it.
+7. pin a release, tag, commit, or specification version before implementing an integration;
+8. revisit the decision when a source changes materially or evidence contradicts it.
 
 A comparison is not considered complete merely because a project is named or summarized.
+The current entries are the architecture baseline; integration work remains blocked until its
+specific source revision and ADR are pinned.
 
 ## Comparison dimensions
 
@@ -323,29 +326,30 @@ The research gate is complete for a decision only when:
 ## Source ledger
 
 All sources below were reviewed on 2026-07-23. Links point to primary documentation,
-official repositories, specifications, or papers.
+official repositories, specifications, or papers. The `Revision before integration` column is a
+hard implementation gate: no adapter or copied mechanism begins until that revision is recorded.
 
-| System | Primary source | License / standard note |
-| --- | --- | --- |
-| Temporal | https://docs.temporal.io/ | documentation; SDK/server licenses reviewed before integration |
-| LangGraph | https://langchain-ai.github.io/langgraph/ | official documentation |
-| Microsoft Agent Framework | https://learn.microsoft.com/agent-framework/ | official Microsoft documentation |
-| OpenHands | https://github.com/OpenHands/OpenHands | MIT core; enterprise directory has separate terms |
-| Codex CLI | https://github.com/openai/codex | Apache-2.0 |
-| SWE-agent | https://github.com/SWE-agent/SWE-agent | MIT |
-| mini-SWE-agent | https://github.com/SWE-agent/mini-swe-agent | MIT |
-| OpenSandbox | https://github.com/alibaba/OpenSandbox | official repository; verify component licenses before reuse |
-| MCP | https://github.com/modelcontextprotocol/modelcontextprotocol | MIT specification repository |
-| A2A | https://github.com/a2aproject/A2A | Apache-2.0; Linux Foundation project |
-| OPA | https://www.openpolicyagent.org/docs | CNCF project; official documentation |
-| in-toto | https://in-toto.io/docs/specs/ | specification and attestation framework |
-| SLSA | https://slsa.dev/spec/ | open specification |
-| OpenTelemetry | https://opentelemetry.io/docs/ | CNCF observability standard/project |
-| SWE-bench | https://github.com/SWE-bench/SWE-bench | MIT |
-| OpenHands Index | https://index.openhands.dev/ | official benchmark site and published result structure |
-| Self-Refine | https://arxiv.org/abs/2303.17651 | research paper |
-| Reflexion | https://arxiv.org/abs/2303.11366 | research paper and released code |
-| Voyager | https://arxiv.org/abs/2305.16291 | research paper and released code |
+| System | Primary source | License / standard note | Revision before integration |
+| --- | --- | --- | --- |
+| Temporal | https://docs.temporal.io/ | documentation; inspect component licenses before integration | Required |
+| LangGraph | https://langchain-ai.github.io/langgraph/ | official documentation | Required |
+| Microsoft Agent Framework | https://learn.microsoft.com/agent-framework/ | official Microsoft documentation | Required |
+| OpenHands | https://github.com/OpenHands/OpenHands | MIT core; enterprise directory has separate terms | Required |
+| Codex CLI | https://github.com/openai/codex | Apache-2.0 | Required |
+| SWE-agent | https://github.com/SWE-agent/SWE-agent | MIT | Required |
+| mini-SWE-agent | https://github.com/SWE-agent/mini-swe-agent | MIT | Required |
+| OpenSandbox | https://github.com/alibaba/OpenSandbox | verify every reused component license | Required |
+| MCP | https://github.com/modelcontextprotocol/modelcontextprotocol | MIT specification repository | Required |
+| A2A | https://github.com/a2aproject/A2A | Apache-2.0; Linux Foundation project | Required |
+| OPA | https://www.openpolicyagent.org/docs | CNCF project; official documentation | Required |
+| in-toto | https://in-toto.io/docs/specs/ | specification and attestation framework | Required |
+| SLSA | https://slsa.dev/spec/ | open specification | Required |
+| OpenTelemetry | https://opentelemetry.io/docs/ | CNCF observability standard/project | Required |
+| SWE-bench | https://github.com/SWE-bench/SWE-bench | MIT | Required |
+| OpenHands Index | https://index.openhands.dev/ | official benchmark and result structure | Required |
+| Self-Refine | https://arxiv.org/abs/2303.17651 | research paper | Paper revision recorded |
+| Reflexion | https://arxiv.org/abs/2303.11366 | research paper and released code | Paper/code revision recorded |
+| Voyager | https://arxiv.org/abs/2305.16291 | research paper and released code | Paper/code revision recorded |
 
 ## Current conclusion
 
