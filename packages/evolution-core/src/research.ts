@@ -20,41 +20,41 @@ import type {
 export type ResearchBundleInput = {
   brief: {
     decisionQuestion: string;
-    owner?: string;
-    deadline?: string | null;
-    assumptions?: string[];
-    constraints?: string[];
-    evidenceThreshold?: string;
-    protectedOutcomes?: string[];
+    owner: string;
+    deadline: string | null;
+    assumptions: string[];
+    constraints: string[];
+    evidenceThreshold: string;
+    protectedOutcomes: string[];
   };
   plan: {
     questions: string[];
     sourceStrategy: string[];
-    budget?: Partial<ResearchBudget>;
+    budget: ResearchBudget;
     stopConditions: string[];
   };
   queries: Array<{
     query: string;
     rationale: string;
-    tool?: string;
-    parentQueryIndex?: number | null;
-    resultRefs?: string[];
+    tool: string;
+    parentQueryIndex: number | null;
+    resultRefs: string[];
   }>;
   sources: Array<{
     canonicalId: string;
     title: string;
     publisher: string;
     sourceClass: ResearchSourceClass;
-    version?: string | null;
-    accessedAt?: string;
-    license?: string | null;
+    version: string | null;
+    accessedAt: string;
+    license: string | null;
     authority: number;
     directness: number;
     freshness: number;
     applicability: number;
     independence: number;
-    conflictOfInterest?: string | null;
-    evidenceRefs?: string[];
+    conflictOfInterest: string | null;
+    evidenceRefs: string[];
   }>;
   claims: Array<{
     statement: string;
@@ -62,22 +62,22 @@ export type ResearchBundleInput = {
     confidence: number;
     uncertainty: string;
     supportingSourceIndexes: number[];
-    contradictingSourceIndexes?: number[];
-    expiresAt?: string | null;
+    contradictingSourceIndexes: number[];
+    expiresAt: string | null;
   }>;
-  contradictions?: Array<{
+  contradictions: Array<{
     claimIndexes: number[];
     summary: string;
     suspectedCause: string;
     affectedDecision: string;
-    status?: ContradictionRecord["status"];
+    status: ContradictionRecord["status"];
   }>;
   opportunities: Array<{
     title: string;
     problem: string;
     expectedOutcome: string;
     evidenceClaimIndexes: number[];
-    alternatives?: string[];
+    alternatives: string[];
     estimatedCost: string;
     risk: string;
     uncertainty: string;
@@ -86,7 +86,7 @@ export type ResearchBundleInput = {
   }>;
   decision: {
     selectedOpportunityIndex: number;
-    rejectedOpportunityIndexes?: number[];
+    rejectedOpportunityIndexes: number[];
     rationale: string;
   };
   experiment: {
@@ -149,30 +149,44 @@ const CLAIM_TYPES = new Set<ResearchClaimType>([
   "recommendation",
 ]);
 
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+const CONTRADICTION_STATES = new Set<ContradictionRecord["status"]>([
+  "open",
+  "resolved",
+  "accepted-uncertainty",
+]);
+
+function object(value: unknown, label: string): Record<string, any> {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    throw new Error(`${label} must be an object`);
+  }
+  return value as Record<string, any>;
 }
 
-function text(value: unknown, label: string): string {
+function stringValue(value: unknown, label: string, fallback?: string): string {
+  if ((value === undefined || value === null || value === "") && fallback !== undefined) {
+    return fallback;
+  }
   if (typeof value !== "string" || !value.trim()) throw new Error(`${label} is required`);
   return value.trim();
 }
 
-function optionalText(value: unknown, label: string): string | null {
+function optionalString(value: unknown, label: string): string | null {
   if (value === undefined || value === null || value === "") return null;
-  return text(value, label);
+  return stringValue(value, label);
 }
 
-function texts(value: unknown, label: string, minimum = 0): string[] {
+function stringArray(value: unknown, label: string, minimum = 0): string[] {
+  if (value === undefined && minimum === 0) return [];
   if (!Array.isArray(value)) throw new Error(`${label} must be an array`);
-  const result = [...new Set(value.map((item) => text(item, label)))];
-  if (result.length < minimum) throw new Error(`${label} requires at least ${minimum} item(s)`);
-  return result;
+  const normalized = [...new Set(value.map((item) => stringValue(item, label)))];
+  if (normalized.length < minimum) throw new Error(`${label} requires at least ${minimum} item(s)`);
+  return normalized;
 }
 
-function finiteNumber(value: unknown, label: string, minimum: number, maximum: number): number {
-  if (typeof value !== "number" || !Number.isFinite(value) || value < minimum || value > maximum) {
-    throw new Error(`${label} must be between ${minimum} and ${maximum}`);
+function boundedNumber(value: unknown, label: string, fallback?: number): number {
+  if (value === undefined && fallback !== undefined) return fallback;
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > 1) {
+    throw new Error(`${label} must be between 0 and 1`);
   }
   return value;
 }
@@ -193,41 +207,42 @@ function nonNegativeNumber(value: unknown, label: string, fallback: number): num
   return value;
 }
 
-function index(value: unknown, label: string, length: number): number {
+function validIndex(value: unknown, label: string, length: number): number {
   if (typeof value !== "number" || !Number.isInteger(value) || value < 0 || value >= length) {
     throw new Error(`${label} must reference an existing item`);
   }
   return value;
 }
 
-function indexes(value: unknown, label: string, length: number, minimum = 0): number[] {
+function indexArray(value: unknown, label: string, length: number, minimum = 0): number[] {
+  if (value === undefined && minimum === 0) return [];
   if (!Array.isArray(value)) throw new Error(`${label} must be an array`);
-  const result = [...new Set(value.map((item) => index(item, label, length)))];
-  if (result.length < minimum) throw new Error(`${label} requires at least ${minimum} item(s)`);
-  return result;
+  const normalized = [...new Set(value.map((item) => validIndex(item, label, length)))];
+  if (normalized.length < minimum) throw new Error(`${label} requires at least ${minimum} item(s)`);
+  return normalized;
 }
 
-function dateOrNull(value: unknown, label: string): string | null {
-  const parsed = optionalText(value, label);
-  if (parsed !== null && !Number.isFinite(Date.parse(parsed))) {
+function dateValue(value: unknown, label: string, fallback: string | null): string | null {
+  const normalized = optionalString(value, label) ?? fallback;
+  if (normalized !== null && !Number.isFinite(Date.parse(normalized))) {
     throw new Error(`${label} must be an ISO-compatible date`);
   }
-  return parsed;
+  return normalized;
 }
 
 function recordId(kind: string, cycleId: string, position: number, payload: unknown): string {
-  const digest = createHash("sha256")
+  const hash = createHash("sha256")
     .update(JSON.stringify({ kind, cycleId, position, payload }))
     .digest("hex")
     .slice(0, 24);
-  return `${kind}:${digest}`;
+  return `${kind}:${hash}`;
 }
 
-function digest(value: unknown): string {
+function hash(value: unknown): string {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
 
-function base(
+function recordBase(
   kind: string,
   cycleId: string,
   position: number,
@@ -241,170 +256,190 @@ function base(
     cycleId,
     actor,
     createdAt,
-    evidenceRefs: [...new Set(evidenceRefs.map((item) => item.trim()).filter(Boolean))],
+    evidenceRefs: [...new Set(evidenceRefs.map((reference) => reference.trim()).filter(Boolean))],
   };
 }
 
 export function parseResearchBundle(value: unknown): ResearchBundleInput {
-  if (!isObject(value)) throw new Error("research bundle must be an object");
-  if (!isObject(value.brief) || !isObject(value.plan) || !isObject(value.decision)) {
-    throw new Error("research bundle requires brief, plan, and decision objects");
-  }
-  if (!isObject(value.experiment) || !isObject(value.handoff)) {
-    throw new Error("research bundle requires experiment and handoff objects");
-  }
-  if (!Array.isArray(value.queries) || !Array.isArray(value.sources) || !Array.isArray(value.claims)) {
-    throw new Error("research bundle requires query, source, and claim arrays");
-  }
-  if (!Array.isArray(value.opportunities) || value.opportunities.length < 3) {
+  const raw = object(value, "research bundle");
+  const brief = object(raw.brief, "brief");
+  const plan = object(raw.plan, "plan");
+  const decision = object(raw.decision, "decision");
+  const experiment = object(raw.experiment, "experiment");
+  const handoff = object(raw.handoff, "handoff");
+  const rawQueries = Array.isArray(raw.queries) ? raw.queries : [];
+  const rawSources = Array.isArray(raw.sources) ? raw.sources : [];
+  const rawClaims = Array.isArray(raw.claims) ? raw.claims : [];
+  const rawContradictions = Array.isArray(raw.contradictions) ? raw.contradictions : [];
+  const rawOpportunities = Array.isArray(raw.opportunities) ? raw.opportunities : [];
+
+  if (rawOpportunities.length < 3) {
     throw new Error("research bundle requires at least three opportunities");
   }
 
-  const budgetInput = isObject(value.plan.budget) ? value.plan.budget : {};
-  const budget: ResearchBudget = {
-    maxQueries: positiveInteger(budgetInput.maxQueries, "plan.budget.maxQueries", 20),
-    maxSources: positiveInteger(budgetInput.maxSources, "plan.budget.maxSources", 30),
-    maxMinutes: positiveInteger(budgetInput.maxMinutes, "plan.budget.maxMinutes", 60),
-    maxCostUsd: nonNegativeNumber(budgetInput.maxCostUsd, "plan.budget.maxCostUsd", 0),
-  };
-
-  const queries = value.queries.map((entry, entryIndex) => {
-    if (!isObject(entry)) throw new Error(`queries[${entryIndex}] must be an object`);
-    const parentQueryIndex = entry.parentQueryIndex;
+  const budget = object(plan.budget ?? {}, "plan.budget");
+  const queries = rawQueries.map((entry, entryIndex) => {
+    const item = object(entry, `queries[${entryIndex}]`);
     return {
-      query: text(entry.query, `queries[${entryIndex}].query`),
-      rationale: text(entry.rationale, `queries[${entryIndex}].rationale`),
-      tool: optionalText(entry.tool, `queries[${entryIndex}].tool`) ?? "unspecified",
+      query: stringValue(item.query, `queries[${entryIndex}].query`),
+      rationale: stringValue(item.rationale, `queries[${entryIndex}].rationale`),
+      tool: stringValue(item.tool, `queries[${entryIndex}].tool`, "unspecified"),
       parentQueryIndex:
-        parentQueryIndex === undefined || parentQueryIndex === null
+        item.parentQueryIndex === undefined || item.parentQueryIndex === null
           ? null
-          : index(parentQueryIndex, `queries[${entryIndex}].parentQueryIndex`, value.queries.length),
-      resultRefs: texts(entry.resultRefs ?? [], `queries[${entryIndex}].resultRefs`),
+          : validIndex(item.parentQueryIndex, `queries[${entryIndex}].parentQueryIndex`, rawQueries.length),
+      resultRefs: stringArray(item.resultRefs, `queries[${entryIndex}].resultRefs`),
     };
   });
 
-  const sources = value.sources.map((entry, entryIndex) => {
-    if (!isObject(entry)) throw new Error(`sources[${entryIndex}] must be an object`);
-    const sourceClass = text(entry.sourceClass, `sources[${entryIndex}].sourceClass`) as ResearchSourceClass;
+  const now = new Date().toISOString();
+  const sources = rawSources.map((entry, entryIndex) => {
+    const item = object(entry, `sources[${entryIndex}]`);
+    const sourceClass = stringValue(
+      item.sourceClass,
+      `sources[${entryIndex}].sourceClass`
+    ) as ResearchSourceClass;
     if (!SOURCE_CLASSES.has(sourceClass)) {
       throw new Error(`sources[${entryIndex}].sourceClass is invalid`);
     }
-    const accessedAt = optionalText(entry.accessedAt, `sources[${entryIndex}].accessedAt`) ?? new Date().toISOString();
-    if (!Number.isFinite(Date.parse(accessedAt))) {
-      throw new Error(`sources[${entryIndex}].accessedAt must be an ISO-compatible date`);
-    }
     return {
-      canonicalId: text(entry.canonicalId, `sources[${entryIndex}].canonicalId`),
-      title: text(entry.title, `sources[${entryIndex}].title`),
-      publisher: text(entry.publisher, `sources[${entryIndex}].publisher`),
+      canonicalId: stringValue(item.canonicalId, `sources[${entryIndex}].canonicalId`),
+      title: stringValue(item.title, `sources[${entryIndex}].title`),
+      publisher: stringValue(item.publisher, `sources[${entryIndex}].publisher`),
       sourceClass,
-      version: optionalText(entry.version, `sources[${entryIndex}].version`),
-      accessedAt,
-      license: optionalText(entry.license, `sources[${entryIndex}].license`),
-      authority: finiteNumber(entry.authority, `sources[${entryIndex}].authority`, 0, 1),
-      directness: finiteNumber(entry.directness, `sources[${entryIndex}].directness`, 0, 1),
-      freshness: finiteNumber(entry.freshness, `sources[${entryIndex}].freshness`, 0, 1),
-      applicability: finiteNumber(entry.applicability, `sources[${entryIndex}].applicability`, 0, 1),
-      independence: finiteNumber(entry.independence, `sources[${entryIndex}].independence`, 0, 1),
-      conflictOfInterest: optionalText(
-        entry.conflictOfInterest,
+      version: optionalString(item.version, `sources[${entryIndex}].version`),
+      accessedAt: dateValue(item.accessedAt, `sources[${entryIndex}].accessedAt`, now)!,
+      license: optionalString(item.license, `sources[${entryIndex}].license`),
+      authority: boundedNumber(item.authority, `sources[${entryIndex}].authority`),
+      directness: boundedNumber(item.directness, `sources[${entryIndex}].directness`),
+      freshness: boundedNumber(item.freshness, `sources[${entryIndex}].freshness`),
+      applicability: boundedNumber(item.applicability, `sources[${entryIndex}].applicability`),
+      independence: boundedNumber(item.independence, `sources[${entryIndex}].independence`),
+      conflictOfInterest: optionalString(
+        item.conflictOfInterest,
         `sources[${entryIndex}].conflictOfInterest`
       ),
-      evidenceRefs: texts(entry.evidenceRefs ?? [], `sources[${entryIndex}].evidenceRefs`),
+      evidenceRefs: stringArray(item.evidenceRefs, `sources[${entryIndex}].evidenceRefs`),
     };
   });
 
-  const claims = value.claims.map((entry, entryIndex) => {
-    if (!isObject(entry)) throw new Error(`claims[${entryIndex}] must be an object`);
-    const claimType = text(entry.claimType, `claims[${entryIndex}].claimType`) as ResearchClaimType;
+  const claims = rawClaims.map((entry, entryIndex) => {
+    const item = object(entry, `claims[${entryIndex}]`);
+    const claimType = stringValue(item.claimType, `claims[${entryIndex}].claimType`) as ResearchClaimType;
     if (!CLAIM_TYPES.has(claimType)) throw new Error(`claims[${entryIndex}].claimType is invalid`);
     return {
-      statement: text(entry.statement, `claims[${entryIndex}].statement`),
+      statement: stringValue(item.statement, `claims[${entryIndex}].statement`),
       claimType,
-      confidence: finiteNumber(entry.confidence, `claims[${entryIndex}].confidence`, 0, 1),
-      uncertainty: text(entry.uncertainty, `claims[${entryIndex}].uncertainty`),
-      supportingSourceIndexes: indexes(
-        entry.supportingSourceIndexes,
+      confidence: boundedNumber(item.confidence, `claims[${entryIndex}].confidence`),
+      uncertainty: stringValue(item.uncertainty, `claims[${entryIndex}].uncertainty`),
+      supportingSourceIndexes: indexArray(
+        item.supportingSourceIndexes,
         `claims[${entryIndex}].supportingSourceIndexes`,
         sources.length,
         1
       ),
-      contradictingSourceIndexes: indexes(
-        entry.contradictingSourceIndexes ?? [],
+      contradictingSourceIndexes: indexArray(
+        item.contradictingSourceIndexes,
         `claims[${entryIndex}].contradictingSourceIndexes`,
         sources.length
       ),
-      expiresAt: dateOrNull(entry.expiresAt, `claims[${entryIndex}].expiresAt`),
+      expiresAt: dateValue(item.expiresAt, `claims[${entryIndex}].expiresAt`, null),
     };
   });
 
-  const contradictions = (Array.isArray(value.contradictions) ? value.contradictions : []).map(
-    (entry, entryIndex) => {
-      if (!isObject(entry)) throw new Error(`contradictions[${entryIndex}] must be an object`);
-      const status = (optionalText(entry.status, `contradictions[${entryIndex}].status`) ??
-        "open") as ContradictionRecord["status"];
-      if (!new Set(["open", "resolved", "accepted-uncertainty"]).has(status)) {
-        throw new Error(`contradictions[${entryIndex}].status is invalid`);
-      }
-      return {
-        claimIndexes: indexes(
-          entry.claimIndexes,
-          `contradictions[${entryIndex}].claimIndexes`,
-          claims.length,
-          2
-        ),
-        summary: text(entry.summary, `contradictions[${entryIndex}].summary`),
-        suspectedCause: text(entry.suspectedCause, `contradictions[${entryIndex}].suspectedCause`),
-        affectedDecision: text(
-          entry.affectedDecision,
-          `contradictions[${entryIndex}].affectedDecision`
-        ),
-        status,
-      };
+  const contradictions = rawContradictions.map((entry, entryIndex) => {
+    const item = object(entry, `contradictions[${entryIndex}]`);
+    const status = stringValue(
+      item.status,
+      `contradictions[${entryIndex}].status`,
+      "open"
+    ) as ContradictionRecord["status"];
+    if (!CONTRADICTION_STATES.has(status)) {
+      throw new Error(`contradictions[${entryIndex}].status is invalid`);
     }
-  );
-
-  const opportunities = value.opportunities.map((entry, entryIndex) => {
-    if (!isObject(entry)) throw new Error(`opportunities[${entryIndex}] must be an object`);
     return {
-      title: text(entry.title, `opportunities[${entryIndex}].title`),
-      problem: text(entry.problem, `opportunities[${entryIndex}].problem`),
-      expectedOutcome: text(entry.expectedOutcome, `opportunities[${entryIndex}].expectedOutcome`),
-      evidenceClaimIndexes: indexes(
-        entry.evidenceClaimIndexes,
+      claimIndexes: indexArray(
+        item.claimIndexes,
+        `contradictions[${entryIndex}].claimIndexes`,
+        claims.length,
+        2
+      ),
+      summary: stringValue(item.summary, `contradictions[${entryIndex}].summary`),
+      suspectedCause: stringValue(
+        item.suspectedCause,
+        `contradictions[${entryIndex}].suspectedCause`
+      ),
+      affectedDecision: stringValue(
+        item.affectedDecision,
+        `contradictions[${entryIndex}].affectedDecision`
+      ),
+      status,
+    };
+  });
+
+  const opportunities = rawOpportunities.map((entry, entryIndex) => {
+    const item = object(entry, `opportunities[${entryIndex}]`);
+    return {
+      title: stringValue(item.title, `opportunities[${entryIndex}].title`),
+      problem: stringValue(item.problem, `opportunities[${entryIndex}].problem`),
+      expectedOutcome: stringValue(
+        item.expectedOutcome,
+        `opportunities[${entryIndex}].expectedOutcome`
+      ),
+      evidenceClaimIndexes: indexArray(
+        item.evidenceClaimIndexes,
         `opportunities[${entryIndex}].evidenceClaimIndexes`,
         claims.length,
         1
       ),
-      alternatives: texts(entry.alternatives ?? [], `opportunities[${entryIndex}].alternatives`),
-      estimatedCost: text(entry.estimatedCost, `opportunities[${entryIndex}].estimatedCost`),
-      risk: text(entry.risk, `opportunities[${entryIndex}].risk`),
-      uncertainty: text(entry.uncertainty, `opportunities[${entryIndex}].uncertainty`),
-      learningValue: text(entry.learningValue, `opportunities[${entryIndex}].learningValue`),
-      smallestExperiment: text(
-        entry.smallestExperiment,
+      alternatives: stringArray(item.alternatives, `opportunities[${entryIndex}].alternatives`),
+      estimatedCost: stringValue(
+        item.estimatedCost,
+        `opportunities[${entryIndex}].estimatedCost`
+      ),
+      risk: stringValue(item.risk, `opportunities[${entryIndex}].risk`),
+      uncertainty: stringValue(item.uncertainty, `opportunities[${entryIndex}].uncertainty`),
+      learningValue: stringValue(
+        item.learningValue,
+        `opportunities[${entryIndex}].learningValue`
+      ),
+      smallestExperiment: stringValue(
+        item.smallestExperiment,
         `opportunities[${entryIndex}].smallestExperiment`
       ),
     };
   });
 
+  const selectedOpportunityIndex = validIndex(
+    decision.selectedOpportunityIndex,
+    "decision.selectedOpportunityIndex",
+    opportunities.length
+  );
+
   return {
     brief: {
-      decisionQuestion: text(value.brief.decisionQuestion, "brief.decisionQuestion"),
-      owner: optionalText(value.brief.owner, "brief.owner") ?? "unassigned",
-      deadline: dateOrNull(value.brief.deadline, "brief.deadline"),
-      assumptions: texts(value.brief.assumptions ?? [], "brief.assumptions"),
-      constraints: texts(value.brief.constraints ?? [], "brief.constraints"),
-      evidenceThreshold:
-        optionalText(value.brief.evidenceThreshold, "brief.evidenceThreshold") ??
-        "Material claims require at least one direct source and visible uncertainty.",
-      protectedOutcomes: texts(value.brief.protectedOutcomes ?? [], "brief.protectedOutcomes"),
+      decisionQuestion: stringValue(brief.decisionQuestion, "brief.decisionQuestion"),
+      owner: stringValue(brief.owner, "brief.owner", "unassigned"),
+      deadline: dateValue(brief.deadline, "brief.deadline", null),
+      assumptions: stringArray(brief.assumptions, "brief.assumptions"),
+      constraints: stringArray(brief.constraints, "brief.constraints"),
+      evidenceThreshold: stringValue(
+        brief.evidenceThreshold,
+        "brief.evidenceThreshold",
+        "Material claims require direct evidence and visible uncertainty."
+      ),
+      protectedOutcomes: stringArray(brief.protectedOutcomes, "brief.protectedOutcomes"),
     },
     plan: {
-      questions: texts(value.plan.questions, "plan.questions", 1),
-      sourceStrategy: texts(value.plan.sourceStrategy, "plan.sourceStrategy", 1),
-      budget,
-      stopConditions: texts(value.plan.stopConditions, "plan.stopConditions", 1),
+      questions: stringArray(plan.questions, "plan.questions", 1),
+      sourceStrategy: stringArray(plan.sourceStrategy, "plan.sourceStrategy", 1),
+      budget: {
+        maxQueries: positiveInteger(budget.maxQueries, "plan.budget.maxQueries", 20),
+        maxSources: positiveInteger(budget.maxSources, "plan.budget.maxSources", 30),
+        maxMinutes: positiveInteger(budget.maxMinutes, "plan.budget.maxMinutes", 60),
+        maxCostUsd: nonNegativeNumber(budget.maxCostUsd, "plan.budget.maxCostUsd", 0),
+      },
+      stopConditions: stringArray(plan.stopConditions, "plan.stopConditions", 1),
     },
     queries,
     sources,
@@ -412,37 +447,33 @@ export function parseResearchBundle(value: unknown): ResearchBundleInput {
     contradictions,
     opportunities,
     decision: {
-      selectedOpportunityIndex: index(
-        value.decision.selectedOpportunityIndex,
-        "decision.selectedOpportunityIndex",
-        opportunities.length
-      ),
-      rejectedOpportunityIndexes: indexes(
-        value.decision.rejectedOpportunityIndexes ?? opportunities.map((_, i) => i).filter(
-          (i) => i !== value.decision.selectedOpportunityIndex
+      selectedOpportunityIndex,
+      rejectedOpportunityIndexes: indexArray(
+        decision.rejectedOpportunityIndexes ?? opportunities.map((_, itemIndex) => itemIndex).filter(
+          (itemIndex) => itemIndex !== selectedOpportunityIndex
         ),
         "decision.rejectedOpportunityIndexes",
         opportunities.length
       ),
-      rationale: text(value.decision.rationale, "decision.rationale"),
+      rationale: stringValue(decision.rationale, "decision.rationale"),
     },
     experiment: {
-      hypothesis: text(value.experiment.hypothesis, "experiment.hypothesis"),
-      method: text(value.experiment.method, "experiment.method"),
-      successCriteria: texts(value.experiment.successCriteria, "experiment.successCriteria", 1),
-      guardrails: texts(value.experiment.guardrails, "experiment.guardrails", 1),
-      rollbackPlan: texts(value.experiment.rollbackPlan, "experiment.rollbackPlan", 1),
+      hypothesis: stringValue(experiment.hypothesis, "experiment.hypothesis"),
+      method: stringValue(experiment.method, "experiment.method"),
+      successCriteria: stringArray(experiment.successCriteria, "experiment.successCriteria", 1),
+      guardrails: stringArray(experiment.guardrails, "experiment.guardrails", 1),
+      rollbackPlan: stringArray(experiment.rollbackPlan, "experiment.rollbackPlan", 1),
     },
     handoff: {
-      allowedScope: texts(value.handoff.allowedScope, "handoff.allowedScope", 1),
-      forbiddenScope: texts(value.handoff.forbiddenScope, "handoff.forbiddenScope", 1),
-      acceptanceCriteria: texts(
-        value.handoff.acceptanceCriteria,
+      allowedScope: stringArray(handoff.allowedScope, "handoff.allowedScope", 1),
+      forbiddenScope: stringArray(handoff.forbiddenScope, "handoff.forbiddenScope", 1),
+      acceptanceCriteria: stringArray(
+        handoff.acceptanceCriteria,
         "handoff.acceptanceCriteria",
         1
       ),
-      verificationPlan: texts(value.handoff.verificationPlan, "handoff.verificationPlan", 1),
-      rollbackPlan: texts(value.handoff.rollbackPlan, "handoff.rollbackPlan", 1),
+      verificationPlan: stringArray(handoff.verificationPlan, "handoff.verificationPlan", 1),
+      rollbackPlan: stringArray(handoff.rollbackPlan, "handoff.rollbackPlan", 1),
     },
   };
 }
@@ -455,64 +486,64 @@ export function prepareResearchToExecution(
   if (cycle.stage !== "modeled") {
     throw new Error(`research handoff requires a modeled cycle; current stage is ${cycle.stage}`);
   }
-  const actor = text(options.actor, "actor");
-  const evidenceRefs = texts(options.evidenceRefs, "evidenceRefs", 1);
+  const actor = stringValue(options.actor, "actor");
+  const evidenceRefs = stringArray(options.evidenceRefs, "evidenceRefs", 1);
   const bundle = parseResearchBundle(rawBundle);
   const now = options.now ?? new Date().toISOString();
 
   const brief: ResearchBrief = {
-    ...base("research-brief", cycle.cycleId, 0, bundle.brief, actor, now, evidenceRefs),
+    ...recordBase("research-brief", cycle.cycleId, 0, bundle.brief, actor, now, evidenceRefs),
     kind: "research-brief",
     ...bundle.brief,
   };
   const plan: ResearchPlan = {
-    ...base("research-plan", cycle.cycleId, 0, bundle.plan, actor, now, evidenceRefs),
+    ...recordBase("research-plan", cycle.cycleId, 0, bundle.plan, actor, now, evidenceRefs),
     kind: "research-plan",
     briefId: brief.recordId,
     ...bundle.plan,
   };
 
   const queries: QueryRecord[] = bundle.queries.map((entry, entryIndex, all) => ({
-    ...base("query", cycle.cycleId, entryIndex, entry, actor, now, evidenceRefs),
+    ...recordBase("query", cycle.cycleId, entryIndex, entry, actor, now, evidenceRefs),
     kind: "query",
     query: entry.query,
     rationale: entry.rationale,
-    tool: entry.tool ?? "unspecified",
+    tool: entry.tool,
     parentQueryId:
-      entry.parentQueryIndex === null || entry.parentQueryIndex === undefined
+      entry.parentQueryIndex === null
         ? null
         : recordId("query", cycle.cycleId, entry.parentQueryIndex, all[entry.parentQueryIndex]),
-    resultRefs: entry.resultRefs ?? [],
+    resultRefs: entry.resultRefs,
   }));
 
   const sources: SourceRecord[] = bundle.sources.map((entry, entryIndex) => ({
-    ...base(
+    ...recordBase(
       "source",
       cycle.cycleId,
       entryIndex,
       entry,
       actor,
       now,
-      [...evidenceRefs, ...(entry.evidenceRefs ?? [])]
+      [...evidenceRefs, ...entry.evidenceRefs]
     ),
     kind: "source",
     canonicalId: entry.canonicalId,
     title: entry.title,
     publisher: entry.publisher,
     sourceClass: entry.sourceClass,
-    version: entry.version ?? null,
-    accessedAt: entry.accessedAt ?? now,
-    license: entry.license ?? null,
+    version: entry.version,
+    accessedAt: entry.accessedAt,
+    license: entry.license,
     authority: entry.authority,
     directness: entry.directness,
     freshness: entry.freshness,
     applicability: entry.applicability,
     independence: entry.independence,
-    conflictOfInterest: entry.conflictOfInterest ?? null,
+    conflictOfInterest: entry.conflictOfInterest,
   }));
 
   const claims: ClaimRecord[] = bundle.claims.map((entry, entryIndex) => ({
-    ...base("claim", cycle.cycleId, entryIndex, entry, actor, now, evidenceRefs),
+    ...recordBase("claim", cycle.cycleId, entryIndex, entry, actor, now, evidenceRefs),
     kind: "claim",
     statement: entry.statement,
     claimType: entry.claimType,
@@ -521,26 +552,26 @@ export function prepareResearchToExecution(
     supportingSourceIds: entry.supportingSourceIndexes.map(
       (sourceIndex) => sources[sourceIndex]!.recordId
     ),
-    contradictingSourceIds: (entry.contradictingSourceIndexes ?? []).map(
+    contradictingSourceIds: entry.contradictingSourceIndexes.map(
       (sourceIndex) => sources[sourceIndex]!.recordId
     ),
-    expiresAt: entry.expiresAt ?? null,
+    expiresAt: entry.expiresAt,
   }));
 
-  const contradictions: ContradictionRecord[] = (bundle.contradictions ?? []).map(
+  const contradictions: ContradictionRecord[] = bundle.contradictions.map(
     (entry, entryIndex) => ({
-      ...base("contradiction", cycle.cycleId, entryIndex, entry, actor, now, evidenceRefs),
+      ...recordBase("contradiction", cycle.cycleId, entryIndex, entry, actor, now, evidenceRefs),
       kind: "contradiction",
       claimIds: entry.claimIndexes.map((claimIndex) => claims[claimIndex]!.recordId),
       summary: entry.summary,
       suspectedCause: entry.suspectedCause,
       affectedDecision: entry.affectedDecision,
-      status: entry.status ?? "open",
+      status: entry.status,
     })
   );
 
   const opportunities: OpportunityRecord[] = bundle.opportunities.map((entry, entryIndex) => ({
-    ...base("opportunity", cycle.cycleId, entryIndex, entry, actor, now, evidenceRefs),
+    ...recordBase("opportunity", cycle.cycleId, entryIndex, entry, actor, now, evidenceRefs),
     kind: "opportunity",
     title: entry.title,
     problem: entry.problem,
@@ -548,7 +579,7 @@ export function prepareResearchToExecution(
     evidenceClaimIds: entry.evidenceClaimIndexes.map(
       (claimIndex) => claims[claimIndex]!.recordId
     ),
-    alternatives: entry.alternatives ?? [],
+    alternatives: entry.alternatives,
     estimatedCost: entry.estimatedCost,
     risk: entry.risk,
     uncertainty: entry.uncertainty,
@@ -557,19 +588,18 @@ export function prepareResearchToExecution(
   }));
 
   const selectedOpportunity = opportunities[bundle.decision.selectedOpportunityIndex]!;
-  const rejectedOpportunityIds = (bundle.decision.rejectedOpportunityIndexes ?? [])
-    .filter((opportunityIndex) => opportunityIndex !== bundle.decision.selectedOpportunityIndex)
-    .map((opportunityIndex) => opportunities[opportunityIndex]!.recordId);
   const decision: DecisionRecord = {
-    ...base("decision", cycle.cycleId, 0, bundle.decision, actor, now, evidenceRefs),
+    ...recordBase("decision", cycle.cycleId, 0, bundle.decision, actor, now, evidenceRefs),
     kind: "decision",
     selectedOpportunityId: selectedOpportunity.recordId,
-    rejectedOpportunityIds,
+    rejectedOpportunityIds: bundle.decision.rejectedOpportunityIndexes
+      .filter((opportunityIndex) => opportunityIndex !== bundle.decision.selectedOpportunityIndex)
+      .map((opportunityIndex) => opportunities[opportunityIndex]!.recordId),
     rationale: bundle.decision.rationale,
   };
 
-  const experiment: ExperimentRecord = {
-    ...base("experiment", cycle.cycleId, 0, bundle.experiment, actor, now, evidenceRefs),
+  const experimentRecord: ExperimentRecord = {
+    ...recordBase("experiment", cycle.cycleId, 0, bundle.experiment, actor, now, evidenceRefs),
     kind: "experiment",
     decisionId: decision.recordId,
     hypothesis: bundle.experiment.hypothesis,
@@ -580,15 +610,15 @@ export function prepareResearchToExecution(
   };
 
   const handoffPayload = {
-    experimentId: experiment.recordId,
+    experimentId: experimentRecord.recordId,
     objective: cycle.objective,
     ...bundle.handoff,
   };
   const executionHandoff: ExecutionHandoff = {
-    ...base("execution-handoff", cycle.cycleId, 0, handoffPayload, actor, now, evidenceRefs),
+    ...recordBase("execution-handoff", cycle.cycleId, 0, handoffPayload, actor, now, evidenceRefs),
     kind: "execution-handoff",
     ...handoffPayload,
-    parameterDigest: digest(handoffPayload),
+    parameterDigest: hash(handoffPayload),
   };
 
   const diagnosed = transitionCycle(cycle, "diagnosed", {
@@ -617,7 +647,10 @@ export function prepareResearchToExecution(
     reason: "Prepared a reversible experiment and typed execution handoff",
     now,
     addArtifacts: { plan: evidenceRefs, rollback: evidenceRefs },
-    appendResearch: { experiments: [experiment], executionHandoffs: [executionHandoff] },
+    appendResearch: {
+      experiments: [experimentRecord],
+      executionHandoffs: [executionHandoff],
+    },
   });
 
   return {
@@ -634,7 +667,7 @@ export function prepareResearchToExecution(
       contradictions,
       opportunities,
       decision,
-      experiment,
+      experiment: experimentRecord,
       executionHandoff,
     },
   };
