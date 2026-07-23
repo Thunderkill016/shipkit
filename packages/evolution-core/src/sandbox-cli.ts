@@ -16,10 +16,10 @@ type ParsedArgs = {
 const HELP = `Shipkit Sandbox Check
 
 Usage:
-  shipkit-sandbox-check --project-root . --backend trusted-local \\
+  shipkit-sandbox-check --project-root . --backend trusted-local \
     --acknowledge-trusted-repository --check test [--check build]
 
-  shipkit-sandbox-check --project-root . --backend docker \\
+  shipkit-sandbox-check --project-root . --backend docker \
     --docker-image sha256:<64-hex> --check test
 
 Options:
@@ -92,7 +92,7 @@ function selectedBackend(parsed: ParsedArgs) {
     if (!dockerImage) throw new Error("--docker-image is required with --backend docker");
   }
 
-  return createCheckExecutionBackend(kind, { dockerImage });
+  return createCheckExecutionBackend(kind, dockerImage ? { dockerImage } : {});
 }
 
 export async function runSandboxCli(
@@ -129,7 +129,7 @@ export async function runSandboxCli(
         },
         repository: {
           projectName: snapshot.projectName,
-          projectRoot: snapshot.projectRoot,
+          projectRoot,
           commit: snapshot.git.commit,
           dirty: snapshot.git.dirty,
         },
