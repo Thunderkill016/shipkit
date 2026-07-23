@@ -7,10 +7,17 @@ Issue: #9
 
 - [x] maintain a living primary-source and implementation map;
 - [x] record architectural extracts, contradictions, licenses, and rejected patterns;
-- [x] define kernel invariants before adding agent integrations.
+- [x] define kernel invariants before adding agent integrations;
+- [x] compare durable workflow, coding-agent, sandbox, protocol, policy, provenance,
+  observability, benchmark, and learning systems through one common framework;
+- [x] record explicit adopt/adapt/integrate/defer/reject decisions and falsification tests;
+- [ ] pin a reviewed tag, release, commit, or specification version for every dependency or
+  integration candidate before implementation begins;
+- [ ] convert material comparison decisions into versioned ADRs as their implementation starts.
 
-Exit: product thesis, architecture, threat model, and benchmark strategy are
-reviewable and linked to implementation decisions.
+Exit: product thesis, architecture, threat model, benchmark strategy, and
+`COMPARATIVE_ANALYSIS.md` are reviewable and linked to implementation decisions. A project name
+without a source, decision, limitation, and falsifiable test does not satisfy this phase.
 
 ## Phase 1 — deterministic kernel
 
@@ -50,13 +57,15 @@ isolation controls are implemented.
 - [ ] internal evidence collector for issues, CI, docs, decisions, analytics, and user signals;
 - [ ] external-source adapter contract for web, papers, repositories, competitors, and user research;
 - [ ] source freshness, applicability, contradiction, confidence, and expiry records;
+- [ ] preserve source version, access date, license, scope, and evidence digest;
+- [ ] require opportunity records to identify comparable external mechanisms and rejected alternatives;
 - [ ] parallel research worker plan with bounded budgets and stop conditions;
 - [ ] opportunity/hypothesis portfolio rather than a single generated answer;
 - [ ] evaluator-backed candidate ranking and smallest decision-changing experiment.
 
 Exit: the engine produces three evidence-backed development opportunities for two
 unrelated products, and a human can explain why the selected experiment outranks the
-alternatives.
+alternatives, which comparable systems informed it, and why competing mechanisms were rejected.
 
 ## Phase 4 — execution adapters
 
@@ -65,9 +74,12 @@ alternatives.
 - [ ] OpenHands adapter;
 - [ ] generic command adapter;
 - [ ] sandbox capability negotiation;
-- [ ] MCP tools/resources over kernel operations.
+- [ ] MCP tools/resources over kernel operations;
+- [ ] compare every adapter against a minimal command baseline for success, cost, duration,
+  safety, and portability.
 
-Exit: the same persisted cycle is consumed by at least two agent clients.
+Exit: the same persisted cycle is consumed by at least two agent clients, and added adapter
+complexity demonstrates measurable value over the minimal baseline.
 
 ## Phase 5 — verification and attestations
 
@@ -100,6 +112,19 @@ support it.
 
 Exit: at least one controlled meta-change improves later comparable cycles; only
 then may Shipkit consider an E3 positive-recursive claim.
+
+## Comparative benchmark program
+
+- durability: kill every persistence boundary and verify deterministic recovery;
+- portability: three unrelated repositories, multiple package managers, and at least two languages;
+- execution: two agent adapters plus one minimal command baseline;
+- containment: hostile filesystem, process, secret, output, timeout, and egress fixtures;
+- policy: allow, deny, and approval cases across every autonomy/risk combination;
+- evidence: tamper, substitution, contradiction, expiry, and unsupported-claim cases;
+- outcome: technical checks and product/user evaluators reported separately;
+- learning: comparable later cycles with and without each promoted memory or meta-change;
+- economics: success, regressions, cost, duration, retries, and human interventions;
+- explainability: durable artifacts alone explain selection, authorization, and verdict.
 
 ## Product metrics
 
