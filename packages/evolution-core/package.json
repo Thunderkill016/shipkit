@@ -2,7 +2,17 @@
   "name": "@shipkit/evolution-core",
   "version": "0.1.0",
   "private": true,
+  "description": "Deterministic lifecycle, evidence, research and governed execution core for Shipkit.",
+  "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=20 <23"
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "bin": {
     "shipkit-evolve": "./dist/cli.js",
     "shipkit-research-public": "./dist/public-cli.js",
@@ -15,8 +25,14 @@
     }
   },
   "scripts": {
-    "typecheck": "pnpm --dir ../../apps/web exec tsc -p ../../packages/evolution-core/tsconfig.json --noEmit",
-    "build": "pnpm --dir ../../apps/web exec tsc -p ../../packages/evolution-core/tsconfig.build.json",
-    "test": "pnpm run build && pnpm --dir ../../apps/web exec vitest run --root ../.. packages/evolution-core/src"
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
+    "test": "npm run build && vitest run src"
+  },
+  "devDependencies": {
+    "@types/node": "20.19.43",
+    "typescript": "5.9.3",
+    "vitest": "4.1.10"
   }
 }
