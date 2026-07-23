@@ -1,6 +1,6 @@
 # Implementation plan: A2 Research Audit pilot operations
 
-- Status: in progress
+- Status: implemented in draft PR #33; pilot not started
 - Date: 2026-07-24
 - Issue: #14
 - Autonomy: A2 research and planning
@@ -30,20 +30,22 @@ Git.
 
 ## Acceptance criteria
 
-- [ ] Fixed protocol values are machine-readable and cannot drift silently.
-- [ ] Pilot state contains exactly six pseudonymous participant/repository slots.
-- [ ] A session cannot start while the PR #31 technical gate is pending.
-- [ ] Session records require eligibility, consent and a saved pre-audit
+- [x] Fixed protocol values are machine-readable and cannot drift silently.
+- [x] Pilot state contains exactly six pseudonymous participant/repository slots.
+- [x] A session cannot start while the PR #31 technical gate is pending.
+- [x] Session records require eligibility, consent and a saved pre-audit
   decision before an outcome can be recorded.
-- [ ] Decision value requires specific evidence plus a causal explanation.
-- [ ] Contradictions, false positives, missing context and rejected
+- [x] Decision value requires specific evidence plus a causal explanation.
+- [x] Contradictions, false positives, missing context and rejected
   recommendations are retained.
-- [ ] Product outcome, technical outcome and repeat-use intent remain separate.
-- [ ] Raw notes, direct identity, repository URLs and secret-bearing material
+- [x] Product outcome, technical outcome and repeat-use intent remain separate.
+- [x] Raw notes, direct identity, repository URLs and secret-bearing material
   are forbidden from committed pilot state.
-- [ ] Negative tests cover protocol drift, duplicate slots, premature start,
+- [x] The checker enforces the 90-minute session limit, the original 14-day
+  clock, pre-audit timestamp ordering and exact state/record identity.
+- [x] Negative tests cover protocol drift, duplicate slots, premature start,
   missing consent, unsupported decision value and metric conflation.
-- [ ] `pnpm check:ai` and the AI workflow run the focused checker and tests.
+- [x] `pnpm check:ai` and the AI workflow run the focused checker and tests.
 
 ## Out of scope
 
@@ -77,4 +79,3 @@ git diff --check
 
 Remove the pilot pack and its workflow wiring. No runtime state, participant
 data, dependency, migration or external service must be cleaned up.
-

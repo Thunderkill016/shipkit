@@ -62,6 +62,14 @@ const expectedProhibitedKeys = [
   "credential",
   "customerData",
 ];
+const expectedStopConditions = [
+  "missing-or-ambiguous-consent",
+  "participant-or-repository-ineligible",
+  "scope-cannot-exclude-sensitive-data",
+  "session-reaches-90-minutes",
+  "participant-withdraws",
+  "serious-evidence-privacy-or-safety-failure",
+];
 const sessionStatuses = new Set([
   "not-started",
   "scheduled",
@@ -97,6 +105,24 @@ function requireText(errors, value, path, minimum = 10) {
   }
 }
 
+function requireTextArray(
+  errors,
+  value,
+  path,
+  { minimumItems = 0, minimumText = 2 } = {}
+) {
+  if (!Array.isArray(value)) {
+    errors.push(`${path} must be an array`);
+    return;
+  }
+  if (value.length < minimumItems) {
+    errors.push(`${path} must contain at least ${minimumItems} item(s)`);
+  }
+  value.forEach((item, index) =>
+    requireText(errors, item, `${path}[${index}]`, minimumText)
+  );
+}
+
 function requireExactKeys(errors, value, path, expectedKeys) {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     errors.push(`${path} must be an object`);
@@ -121,6 +147,39 @@ function findProhibitedKeys(value, prohibited, path = "record", matches = []) {
   for (const [key, child] of Object.entries(value)) {
     if (prohibited.has(key)) matches.push(`${path}.${key}`);
     findProhibitedKeys(child, prohibited, `${path}.${key}`, matches);
+  }
+  return matches;
+}
+
+function findSensitiveStringContent(value, path = "record", matches = []) {
+  if (Array.isArray(value)) {
+    value.forEach((item, index) =>
+      findSensitiveStringContent(item, `${path}[${index}]`, matches)
+    );
+    return matches;
+  }
+  if (value && typeof value === "object") {
+    for (const [key, child] of Object.entries(value)) {
+      findSensitiveStringContent(child, `${path}.${key}`, matches);
+    }
+    return matches;
+  }
+  if (typeof value !== "string") return matches;
+  if (path.endsWith(".issueUrl")) return matches;
+
+  const patterns = [
+    ["email address", /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i],
+    [
+      "repository URL",
+      /(?:https?:\/\/(?:www\.)?(?:github\.com|gitlab\.com|bitbucket\.org)\/[^/\s]+\/[^/\s]+|git@(?:github\.com|gitlab\.com|bitbucket\.org):[^/\s]+\/[^/\s]+)/i,
+    ],
+    [
+      "secret-like token",
+      /(?:-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|github_pat_[A-Za-z0-9_]{20,}|gh[pousr]_[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16})/,
+    ],
+  ];
+  for (const [label, pattern] of patterns) {
+    if (pattern.test(value)) matches.push(`${path} contains ${label}`);
   }
   return matches;
 }
@@ -165,6 +224,27 @@ function validateTemplateShape(template, errors) {
     "withdrawalRightAccepted",
     "redactedRetentionAccepted",
   ]);
+  requireExactKeys(
+    errors,
+    template.recentBehavior,
+    "sessionTemplate.recentBehavior",
+    ["decisionContext", "decisionDeadline", "currentWorkflow", "currentWorkaround"]
+  );
+  requireExactKeys(
+    errors,
+    template.preAuditDecision,
+    "sessionTemplate.preAuditDecision",
+    [
+      "alternatives",
+      "preferredAlternative",
+      "confidence0To100",
+      "evidenceAlreadyUsed",
+      "likelyActionWithoutShipkit",
+      "estimatedWrongDecisionCost",
+      "decisionChangingEvidenceRequested",
+      "capturedAt",
+    ]
+  );
   requireExactKeys(errors, template.audit, "sessionTemplate.audit", [
     "startedAt",
     "completedAt",
@@ -193,17 +273,57 @@ function validateTemplateShape(template, errors) {
     "wouldRunAnotherCycle",
     "reason",
   ]);
+  requireExactKeys(
+    errors,
+    template.experimentFollowup,
+    "sessionTemplate.experimentFollowup",
+    ["experimentDefined", "recommendationSurvived", "wasteAvoidedEvidence"]
+  );
+  requireExactKeys(
+    errors,
+    template.redactionReview,
+    "sessionTemplate.redactionReview",
+    [
+      "directIdentifiersRemoved",
+      "repositoryIdentityRemoved",
+      "sensitiveContentRemoved",
+      "reviewedAt",
+    ]
+  );
 }
 
 export function validatePilotArtifacts({ protocol, state, sessionTemplate }) {
   const errors = [];
 
+  requireExactKeys(errors, protocol, "protocol", [
+    "schemaVersion",
+    "protocolVersion",
+    "issueUrl",
+    "decision",
+    "sample",
+    "eligibility",
+    "exclusions",
+    "consentItems",
+    "preAuditRequired",
+    "primaryOutcomes",
+    "decisionValueOutcomes",
+    "secondaryMetrics",
+    "decisionRule",
+    "dataBoundary",
+    "stopConditions",
+  ]);
   if (protocol.schemaVersion !== 1) errors.push("protocol.schemaVersion must equal 1");
   if (protocol.protocolVersion !== "2026-07-24-v1") {
     errors.push("protocol.protocolVersion must remain 2026-07-24-v1");
   }
   if (protocol.issueUrl !== "https://github.com/Thunderkill016/shipkit/issues/14") {
     errors.push("protocol.issueUrl must reference issue #14");
+  }
+  if (
+    protocol.decision !==
+    "Determine whether one Shipkit A2 Research Audit creates inspectable decision value for solo developers and open-source maintainers already using coding agents."
+  ) {
+    errors.push("protocol.decision changed from the precommitted decision");
   }
 
   const sample = protocol.sample ?? {};
@@ -215,6 +335,7 @@ export function validatePilotArtifacts({ protocol, state, sessionTemplate }) {
     maxSessionMinutes: 90,
     retryMaximum: 1,
   };
+  requireExactKeys(errors, sample, "protocol.sample", Object.keys(fixedSample));
   for (const [key, expected] of Object.entries(fixedSample)) {
     if (sample[key] !== expected) {
       errors.push(`protocol.sample.${key} must equal ${expected}`);
@@ -242,6 +363,15 @@ export function validatePilotArtifacts({ protocol, state, sessionTemplate }) {
   if (!sameArray(protocol.secondaryMetrics, expectedSecondaryMetrics)) {
     errors.push("protocol.secondaryMetrics changed from the fixed outcome form");
   }
+  if (!sameArray(protocol.stopConditions, expectedStopConditions)) {
+    errors.push("protocol.stopConditions changed from the fixed safety boundary");
+  }
+  requireExactKeys(errors, protocol.dataBoundary, "protocol.dataBoundary", [
+    "committedRecords",
+    "participantIdPattern",
+    "repositoryIdPattern",
+    "prohibitedCommittedKeys",
+  ]);
   if (
     protocol.dataBoundary?.committedRecords !== "redacted-only" ||
     protocol.dataBoundary?.participantIdPattern !== "^P0[1-6]$" ||
@@ -255,6 +385,33 @@ export function validatePilotArtifacts({ protocol, state, sessionTemplate }) {
   }
 
   const rule = protocol.decisionRule ?? {};
+  requireExactKeys(errors, rule, "protocol.decisionRule", [
+    "success",
+    "inconclusive",
+    "failure",
+    "unclassified",
+  ]);
+  requireExactKeys(errors, rule.success, "protocol.decisionRule.success", [
+    "decisionValueMinimum",
+    "explainableAndChallengeableMinimum",
+    "repeatedSeriousFailureAllowed",
+  ]);
+  requireExactKeys(
+    errors,
+    rule.inconclusive,
+    "protocol.decisionRule.inconclusive",
+    ["decisionValueExact", "repeatedSeriousFailureAllowed", "retryAllowed"]
+  );
+  requireExactKeys(errors, rule.failure, "protocol.decisionRule.failure", [
+    "decisionValueMaximum",
+    "repeatedSeriousFailureTriggersFailure",
+  ]);
+  requireExactKeys(
+    errors,
+    rule.unclassified,
+    "protocol.decisionRule.unclassified",
+    ["condition", "action"]
+  );
   if (rule.success?.decisionValueMinimum !== 3) {
     errors.push("success decisionValueMinimum must equal 3");
   }
@@ -302,7 +459,14 @@ export function validatePilotArtifacts({ protocol, state, sessionTemplate }) {
   if (state.protocolVersion !== protocol.protocolVersion) {
     errors.push("state.protocolVersion must match protocol.protocolVersion");
   }
+  if (state.issueUrl !== protocol.issueUrl) {
+    errors.push("state.issueUrl must match protocol.issueUrl");
+  }
   if (!pilotStatuses.has(state.status)) errors.push("state.status is not allowed");
+  requireExactKeys(errors, state.technicalGate, "state.technicalGate", [
+    "pullRequest",
+    "status",
+  ]);
   if (state.technicalGate?.pullRequest !== 31) {
     errors.push("state.technicalGate.pullRequest must equal 31");
   }
@@ -357,13 +521,15 @@ export function validatePilotArtifacts({ protocol, state, sessionTemplate }) {
       errors.push(`state.sessions[${index}].startedAt must be null before session start`);
     }
     if (session.status === "completed") {
+      const expectedRecord =
+        `docs/evolution/pilot/sessions/${session.participantId}-${session.repositoryId}.json`;
       if (
         typeof session.redactedRecord !== "string" ||
-        !/^docs\/evolution\/pilot\/sessions\/P0[1-6]-R0[1-6]\.json$/.test(
-          session.redactedRecord
-        )
+        session.redactedRecord !== expectedRecord
       ) {
-        errors.push(`state.sessions[${index}].redactedRecord must link a redacted session`);
+        errors.push(
+          `state.sessions[${index}].redactedRecord must equal ${expectedRecord}`
+        );
       }
     } else if (session.redactedRecord !== null) {
       errors.push(`state.sessions[${index}].redactedRecord must be null until completed`);
@@ -467,6 +633,15 @@ export function validatePilotArtifacts({ protocol, state, sessionTemplate }) {
   )) {
     errors.push(`prohibited committed key: ${match}`);
   }
+  for (const match of findSensitiveStringContent(state, "state")) {
+    errors.push(`prohibited committed content: ${match}`);
+  }
+  for (const match of findSensitiveStringContent(
+    sessionTemplate,
+    "sessionTemplate"
+  )) {
+    errors.push(`prohibited committed content: ${match}`);
+  }
 
   return { errors, completed, started };
 }
@@ -495,6 +670,9 @@ export function validateSessionRecord(record, protocol) {
     "redactionReview",
   ]);
 
+  if (record.schemaVersion !== 1) {
+    errors.push("session.schemaVersion must equal 1");
+  }
   if (!participantPattern.test(record.participantId ?? "")) {
     errors.push("session.participantId must be P01-P06");
   }
@@ -529,6 +707,7 @@ export function validateSessionRecord(record, protocol) {
   ]);
 
   requireText(errors, record.recentBehavior?.decisionContext, "session.recentBehavior.decisionContext");
+  requireText(errors, record.recentBehavior?.decisionDeadline, "session.recentBehavior.decisionDeadline");
   requireText(errors, record.recentBehavior?.currentWorkflow, "session.recentBehavior.currentWorkflow");
   requireText(errors, record.recentBehavior?.currentWorkaround, "session.recentBehavior.currentWorkaround");
   requireExactKeys(errors, record.recentBehavior, "session.recentBehavior", [
@@ -549,10 +728,23 @@ export function validateSessionRecord(record, protocol) {
     "decisionChangingEvidenceRequested",
     "capturedAt",
   ]);
-  if (!Array.isArray(pre.alternatives) || pre.alternatives.length < 2) {
-    errors.push("session.preAuditDecision.alternatives must contain at least 2 alternatives");
-  }
+  requireTextArray(errors, pre.alternatives, "session.preAuditDecision.alternatives", {
+    minimumItems: 2,
+  });
   requireText(errors, pre.preferredAlternative, "session.preAuditDecision.preferredAlternative", 2);
+  if (
+    Array.isArray(pre.alternatives) &&
+    !pre.alternatives.includes(pre.preferredAlternative)
+  ) {
+    errors.push(
+      "session.preAuditDecision.preferredAlternative must be one of alternatives"
+    );
+  }
+  requireTextArray(
+    errors,
+    pre.evidenceAlreadyUsed,
+    "session.preAuditDecision.evidenceAlreadyUsed"
+  );
   if (
     typeof pre.confidence0To100 !== "number" ||
     pre.confidence0To100 < 0 ||
@@ -575,7 +767,9 @@ export function validateSessionRecord(record, protocol) {
     "technicalOutcome",
     "technicalLimitations",
   ]);
-  if (!validIsoTimestamp(audit.startedAt) || !validIsoTimestamp(audit.completedAt)) {
+  const auditTimesValid =
+    validIsoTimestamp(audit.startedAt) && validIsoTimestamp(audit.completedAt);
+  if (!auditTimesValid) {
     errors.push("session.audit start and completion must be ISO timestamps");
   } else {
     const durationMinutes =
@@ -584,10 +778,24 @@ export function validateSessionRecord(record, protocol) {
     if (durationMinutes < 0 || durationMinutes > 90) {
       errors.push("session.audit duration must be between 0 and 90 minutes");
     }
+    if (
+      validIsoTimestamp(pre.capturedAt) &&
+      new Date(pre.capturedAt).valueOf() > new Date(audit.startedAt).valueOf()
+    ) {
+      errors.push("session.preAuditDecision must be captured before audit start");
+    }
   }
-  if (!Array.isArray(audit.approvedInspectionScope) || audit.approvedInspectionScope.length === 0) {
-    errors.push("session.audit.approvedInspectionScope must not be empty");
-  }
+  requireTextArray(
+    errors,
+    audit.approvedInspectionScope,
+    "session.audit.approvedInspectionScope",
+    { minimumItems: 1 }
+  );
+  requireTextArray(
+    errors,
+    audit.technicalLimitations,
+    "session.audit.technicalLimitations"
+  );
   if (!technicalOutcomes.has(audit.technicalOutcome)) {
     errors.push("session.audit.technicalOutcome is not allowed");
   }
@@ -614,11 +822,15 @@ export function validateSessionRecord(record, protocol) {
     errors.push("session.productOutcome.classification is not allowed");
   }
   requireText(errors, outcome.causalExplanation, "session.productOutcome.causalExplanation", 20);
-  if (
-    protocol.decisionValueOutcomes.includes(outcome.classification) &&
-    (!Array.isArray(outcome.specificEvidenceIds) ||
-      outcome.specificEvidenceIds.length === 0)
-  ) {
+  requireTextArray(
+    errors,
+    outcome.specificEvidenceIds,
+    "session.productOutcome.specificEvidenceIds"
+  );
+  const hasDecisionValue = protocol.decisionValueOutcomes.includes(
+    outcome.classification
+  );
+  if (hasDecisionValue && outcome.specificEvidenceIds?.length === 0) {
     errors.push("decision value requires at least one specific evidence ID");
   }
   if (typeof outcome.rankingUnderstood !== "boolean") {
@@ -638,15 +850,58 @@ export function validateSessionRecord(record, protocol) {
   ) {
     errors.push("minutesToFirstDecisionChangingEvidence must be null or 0-90");
   }
+  if (
+    hasDecisionValue &&
+    typeof outcome.minutesToFirstDecisionChangingEvidence !== "number"
+  ) {
+    errors.push(
+      "decision value requires minutesToFirstDecisionChangingEvidence"
+    );
+  }
+  if (
+    outcome.classification === "no-decision-value" &&
+    outcome.minutesToFirstDecisionChangingEvidence !== null
+  ) {
+    errors.push(
+      "no-decision-value requires minutesToFirstDecisionChangingEvidence to be null"
+    );
+  }
+  if (
+    auditTimesValid &&
+    typeof outcome.minutesToFirstDecisionChangingEvidence === "number"
+  ) {
+    const durationMinutes =
+      (new Date(audit.completedAt).valueOf() -
+        new Date(audit.startedAt).valueOf()) /
+      60_000;
+    if (outcome.minutesToFirstDecisionChangingEvidence > durationMinutes) {
+      errors.push(
+        "minutesToFirstDecisionChangingEvidence cannot exceed audit duration"
+      );
+    }
+  }
   for (const field of [
     "contradictions",
     "falsePositives",
     "missingContext",
     "rejectedRecommendations",
   ]) {
-    if (!Array.isArray(outcome[field])) {
-      errors.push(`session.productOutcome.${field} must be an array`);
-    }
+    requireTextArray(
+      errors,
+      outcome[field],
+      `session.productOutcome.${field}`
+    );
+  }
+  if (outcome.recommendationDisposition === "rejected") {
+    requireText(
+      errors,
+      outcome.rejectionReason,
+      "session.productOutcome.rejectionReason"
+    );
+  } else if (outcome.rejectionReason !== null) {
+    errors.push(
+      "session.productOutcome.rejectionReason must be null unless recommendation is rejected"
+    );
   }
   if (
     typeof outcome.seriousEvidenceFailure !== "boolean" ||
@@ -687,6 +942,31 @@ export function validateSessionRecord(record, protocol) {
     "wouldRunAnotherCycle",
     "reason",
   ]);
+  if (typeof record.experimentFollowup?.experimentDefined !== "boolean") {
+    errors.push("session.experimentFollowup.experimentDefined must be boolean");
+  }
+  if (
+    record.experimentFollowup?.recommendationSurvived !== null &&
+    typeof record.experimentFollowup?.recommendationSurvived !== "boolean"
+  ) {
+    errors.push(
+      "session.experimentFollowup.recommendationSurvived must be null or boolean"
+    );
+  }
+  if (
+    record.experimentFollowup?.wasteAvoidedEvidence !== null &&
+    (typeof record.experimentFollowup?.wasteAvoidedEvidence !== "string" ||
+      record.experimentFollowup.wasteAvoidedEvidence.trim().length < 10)
+  ) {
+    errors.push(
+      "session.experimentFollowup.wasteAvoidedEvidence must be null or descriptive text"
+    );
+  }
+  requireText(
+    errors,
+    record.repeatUseIntent?.reason,
+    "session.repeatUseIntent.reason"
+  );
   requireExactKeys(errors, record.redactionReview, "session.redactionReview", [
     "directIdentifiersRemoved",
     "repositoryIdentityRemoved",
@@ -697,6 +977,13 @@ export function validateSessionRecord(record, protocol) {
     if (key === "reviewedAt") {
       if (!validIsoTimestamp(value)) {
         errors.push("session.redactionReview.reviewedAt must be an ISO timestamp");
+      } else if (
+        auditTimesValid &&
+        new Date(value).valueOf() < new Date(audit.completedAt).valueOf()
+      ) {
+        errors.push(
+          "session.redactionReview.reviewedAt cannot precede audit completion"
+        );
       }
     } else if (value !== true) {
       errors.push(`session.redactionReview.${key} must be true`);
@@ -706,6 +993,49 @@ export function validateSessionRecord(record, protocol) {
   const prohibited = new Set(protocol.dataBoundary?.prohibitedCommittedKeys ?? []);
   for (const match of findProhibitedKeys(record, prohibited, "session")) {
     errors.push(`prohibited committed key: ${match}`);
+  }
+  for (const match of findSensitiveStringContent(record, "session")) {
+    errors.push(`prohibited committed content: ${match}`);
+  }
+
+  return { errors };
+}
+
+export function validatePilotRecordsAgainstState({ state, records, protocol }) {
+  const errors = [];
+  const recordsByParticipant = new Map(
+    records.map((record) => [record.participantId, record])
+  );
+  const clockStartedAt = validIsoTimestamp(state.clockStartedAt)
+    ? new Date(state.clockStartedAt).valueOf()
+    : null;
+  const deadline =
+    clockStartedAt === null
+      ? null
+      : clockStartedAt + protocol.sample.maxDurationDays * 24 * 60 * 60 * 1000;
+
+  for (const session of state.sessions ?? []) {
+    if (session.status !== "completed") continue;
+    const record = recordsByParticipant.get(session.participantId);
+    if (!record) {
+      errors.push(`${session.participantId} completed session record is missing`);
+      continue;
+    }
+    if (record.repositoryId !== session.repositoryId) {
+      errors.push(`${session.participantId} record repository ID does not match state`);
+    }
+    if (record.audit?.startedAt !== session.startedAt) {
+      errors.push(`${session.participantId} audit start must match state.startedAt`);
+    }
+    if (
+      deadline !== null &&
+      validIsoTimestamp(record.audit?.completedAt) &&
+      new Date(record.audit.completedAt).valueOf() > deadline
+    ) {
+      errors.push(
+        `${session.participantId} audit completed after the ${protocol.sample.maxDurationDays}-day pilot deadline`
+      );
+    }
   }
 
   return { errors };

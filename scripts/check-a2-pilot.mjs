@@ -1,14 +1,16 @@
-import { access, readFile } from "node:fs/promises";
+import { access, lstat, readFile, realpath } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   classifyPilot,
   validatePilotArtifacts,
+  validatePilotRecordsAgainstState,
   validateSessionRecord,
 } from "./a2-pilot-validation.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const pilotRoot = resolve(root, "docs/evolution/pilot");
+const pilotRootReal = await realpath(pilotRoot);
 
 async function readJson(relativePath) {
   return JSON.parse(await readFile(resolve(pilotRoot, relativePath), "utf8"));
@@ -30,6 +32,16 @@ for (const session of state.sessions ?? []) {
   }
   try {
     await access(absolutePath);
+    const fileStats = await lstat(absolutePath);
+    if (fileStats.isSymbolicLink()) {
+      errors.push(`${session.participantId} redacted record must not be a symlink`);
+      continue;
+    }
+    const realRecordPath = await realpath(absolutePath);
+    if (!realRecordPath.startsWith(`${pilotRootReal}/`)) {
+      errors.push(`${session.participantId} redacted record resolves outside pilot folder`);
+      continue;
+    }
     const record = JSON.parse(await readFile(absolutePath, "utf8"));
     if (
       record.participantId !== session.participantId ||
@@ -43,6 +55,14 @@ for (const session of state.sessions ?? []) {
     errors.push(`${session.participantId} redacted record cannot be read: ${error.message}`);
   }
 }
+
+errors.push(
+  ...validatePilotRecordsAgainstState({
+    state,
+    records: completedRecords,
+    protocol,
+  }).errors
+);
 
 if (completedRecords.length === 6 && errors.length === 0) {
   const classification = classifyPilot(completedRecords, protocol);

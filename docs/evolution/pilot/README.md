@@ -63,3 +63,8 @@ new threshold or silently label it success, inconclusive or failure.
 Do not commit names, contact details, GitHub logins, repository URLs, customer
 data, credentials, secrets or raw notes. Commit only pseudonymous redacted
 evidence necessary to reconstruct the decision-value classification.
+
+The checker rejects unexpected schema fields, common email/repository URL/token
+patterns, mismatched record paths, post-start pre-audit timestamps and
+completions after the original 14-day deadline. This automated screen supports
+but does not replace the required human redaction review.
