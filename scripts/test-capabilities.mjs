@@ -74,6 +74,11 @@ try {
   await writeFile(registryPath, JSON.stringify(wrongProject, null, 2));
   runCheck(false, "must match package.json name");
 
+  const missingPrimaryProduct = structuredClone(original);
+  delete missingPrimaryProduct.primaryProduct;
+  await writeFile(registryPath, JSON.stringify(missingPrimaryProduct, null, 2));
+  runCheck(false, "primaryProduct must name");
+
   console.log("Capability registry tests OK: valid and negative cases behaved correctly.");
 } finally {
   await rm(sandbox, { recursive: true, force: true });
