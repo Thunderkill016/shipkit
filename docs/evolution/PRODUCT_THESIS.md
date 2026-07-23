@@ -1,15 +1,21 @@
 # Shipkit Evolution Engine — product thesis
 
-Status: focused product definition  
+Status: active product definition  
 Issue: #9  
 Date: 2026-07-23
 
 ## Product
 
 Shipkit Evolution Engine is a deterministic control plane around nondeterministic
-human and AI agents. It attaches to a repository, builds an evidence-backed model,
-selects a bounded improvement, coordinates execution, verifies outcomes, retains
-learning, and tests whether a meta-improvement makes later cycles better.
+human and AI agents. It attaches to a project, builds an evidence-backed model,
+researches internal and external signals, discovers development opportunities,
+runs bounded experiments, coordinates implementation, verifies technical and
+product outcomes, retains useful learning, and tests whether a meta-improvement
+makes later cycles better.
+
+It is not only a repair agent. Bugs, security, and technical debt are one candidate
+class alongside product discovery, feature development, optimization,
+experimentation, repositioning, and invention.
 
 ## The chip-fabrication analogy
 
@@ -21,53 +27,62 @@ Evolution Engine should be built the same way:
 
 - models/agents are interchangeable design inputs;
 - the deterministic kernel is the process-control system;
-- repository checks and benchmarks are metrology;
+- repository checks, experiments, and product metrics are metrology;
 - policy gates are process design rules;
 - provenance and event history are the manufacturing record;
 - failed cycles are yield-learning data;
 - meta-improvements are process-node improvements;
-- cross-repository benchmarks measure whether the process generalizes.
+- cross-project benchmarks measure whether the process generalizes.
 
-The moat is the accumulated process knowledge and evaluation infrastructure, not
-a prompt or a single model integration.
+The moat is accumulated process knowledge and evaluation infrastructure, not a
+prompt or a single model integration.
 
 ## Product promise
 
-> Use any agent. Keep repository control. Turn repeated AI work into governed,
-> measurable, compounding project evolution.
+> Use any agent. Keep project control. Turn evidence and research into governed,
+> measurable, compounding product evolution.
+
+Given a repository, mission, and explicit boundaries, the usable product should:
+
+1. persist a resumable evolution cycle;
+2. inspect the repository, product evidence, checks, and trust boundaries;
+3. research relevant technologies, competitors, repositories, papers, and user signals;
+4. create multiple evidence-backed opportunities and preserve contradiction;
+5. choose a reversible experiment that reduces an important uncertainty;
+6. authorize an agent or command runner to implement only the permitted scope;
+7. run independent technical and product evaluators;
+8. recommend keep, iterate, reject, or rollback with inspectable evidence;
+9. create a draft pull request when permitted;
+10. retain applicable learning without claiming recursive improvement prematurely.
 
 ## Core boundary
 
-The kernel owns:
+The engine owns:
 
-- cycle state and legal transitions;
-- autonomy/risk authorization;
-- evidence and provenance references;
-- checkpoints and recovery;
-- verification and outcome claim rules;
+- cycle state, legal transitions, checkpoints, recovery, and migration;
+- autonomy/risk authorization and scoped approval;
+- repository and product perception;
+- research provenance, freshness, confidence, and contradiction;
+- opportunity portfolios and experiment decisions;
+- evidence and outcome claim rules;
 - learning consumption and meta-improvement comparison.
 
 Agents may propose and execute actions through adapters. They do not own state,
 permissions, truth, completion, or recursive-improvement claims.
 
-## Initial wedge
+## Proof threshold
 
-The first paid-value problem is not autonomous coding. It is controlling mixed
-agent workflows across repositories so teams can answer:
+The state machine and CLI are necessary infrastructure, not proof of the final
+product. Shipkit becomes applicable only when the same controlled flow succeeds on
+Shipkit and at least one unrelated real project, and produces a useful development
+decision or verified experiment rather than merely a repository inventory.
 
-1. What is the system trying to improve?
-2. Why was this candidate selected?
-3. What was the agent allowed to do?
-4. What changed and how can it be rolled back?
-5. What evidence proves the outcome?
-6. What learning was retained and consumed later?
-7. Did a meta-change actually improve a comparable future cycle?
-
-## Non-goals until the kernel is proven
+## Non-goals until the core is proven
 
 - hosted app builder or Studio;
 - Product Slice expansion;
 - a proprietary foundation model;
 - automatic merge/deploy/production mutation;
 - multi-agent swarm theater without measurable benefit;
+- treating technical test success as sufficient product value;
 - claims of sentience or guaranteed monotonic improvement.
