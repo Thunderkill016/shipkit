@@ -32,7 +32,7 @@ The Docker invocation uses:
 - an explicit environment allowlist rather than host environment inheritance;
 - forced container removal after timeout plus `--rm` cleanup.
 
-The default image is `node:22-bookworm-slim`. Projects that require other runtimes or isolated dependencies must select a reviewed image that already contains them.
+The backend requires an explicit immutable image digest that already exists locally. Shipkit checks the image with `docker image inspect` and refuses implicit pulls. Projects must select a reviewed image that already contains the required runtime or isolated dependencies.
 
 ## Current honest boundary
 
