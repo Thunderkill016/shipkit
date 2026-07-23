@@ -1,4 +1,5 @@
 import { authorizeAction } from "./policy.js";
+import { emptyResearchRecords, mergeResearchRecords } from "./research-records.js";
 import type {
   ArtifactBucket,
   CreateCycleInput,
@@ -133,6 +134,7 @@ export function createCycle(input: CreateCycleInput): EvolutionCycle {
     artifacts: emptyArtifacts(),
     approvals: [],
     history: [],
+    research: emptyResearchRecords(),
   };
 }
 
@@ -183,6 +185,13 @@ export function transitionCycle(
   const artifacts = mergeArtifacts(cycle.artifacts, input.addArtifacts);
   assertRequiredArtifacts(to, artifacts);
 
+  let research;
+  try {
+    research = mergeResearchRecords(cycle.research, input.appendResearch);
+  } catch (error) {
+    throw new EvolutionError(error instanceof Error ? error.message : String(error));
+  }
+
   const evidenceRefs = unique(
     Object.values(input.addArtifacts ?? {}).flatMap((refs) => refs ?? [])
   );
@@ -193,6 +202,7 @@ export function transitionCycle(
     updatedAt: now,
     artifacts,
     approvals,
+    research,
     history: [
       ...cycle.history,
       {
