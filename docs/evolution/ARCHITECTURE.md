@@ -79,13 +79,30 @@ are rejected.
 
 - `init` — create the local store and project config;
 - `start` — create a cycle with objective, autonomy, and risk;
+- `inspect` — scan an arbitrary project root, register content-addressed baseline evidence,
+  and optionally advance a cycle from `created` to `observed`;
+- `assess` — authorize and run discovered checks, build a scorecard, register evidence,
+  and advance an `observed` cycle to `modeled`;
 - `status` — list stored cycles;
 - `show` / `resume` — load and recover a cycle;
 - `advance` — make one legal, attributable, evidence-backed transition.
 
 The CLI does not call a model, mutate code, merge, deploy, read secrets, or write production
-by itself. Future scanners, research workers, check runners, and agent adapters must call the
-same kernel/store APIs rather than bypassing them.
+by itself. Research workers and agent adapters must call the same kernel/store APIs rather
+than bypassing them.
+
+## Repository assessment boundary
+
+Repository inspection is bounded and records coverage, package managers, manifests,
+languages, checks, CI, documentation, product signals, and structural trust boundaries.
+Registered JSON and file evidence is addressed by SHA-256 and rejects outside-root,
+secret-bearing, symlinked, oversized, or otherwise unsupported inputs.
+
+Discovered package scripts run without a shell in a temporary source copy. The runner applies
+timeouts, bounded output, a reduced environment, and common secret redaction, and it never
+installs dependencies. Existing `node_modules` directories may currently be linked into the
+temporary workspace, and network isolation and filesystem write containment are not yet
+enforced. Untrusted repositories therefore require an external sandbox.
 
 ## Cycle stages
 
@@ -109,13 +126,13 @@ meta-improvement. It may not claim verification without explicit passing evidenc
   secret access, and spending always require explicit scoped approval.
 - R3/R4 code changes require explicit approval even at A3/A4.
 
-## Next kernel modules
+## Next modules
 
 1. Event-schema migration fixtures and kill-process persistence tests.
-2. Repository scanner and project snapshot contract.
-3. Evidence registry with content hashes.
-4. Check runner with timeouts and sanitized output.
-5. Internal/external research source contracts and opportunity portfolio.
+2. Network, filesystem, and dependency isolation for untrusted check execution.
+3. Internal and external research source contracts.
+4. Provenance, freshness, applicability, contradiction, confidence, and expiry records.
+5. Opportunity portfolio, evaluator-backed ranking, and bounded experiment selection.
 6. Agent adapter interface and subprocess boundary.
 7. MCP facade over the same kernel commands.
 8. OpenTelemetry-compatible events.
