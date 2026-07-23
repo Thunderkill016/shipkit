@@ -2,7 +2,7 @@
   "name": "shipkit",
   "version": "0.4.0",
   "private": true,
-  "description": "Shipkit Evolution Engine — deterministic, evidence-backed project evolution across human and AI agents; includes a Starter Kit dogfood project.",
+  "description": "Shipkit — one AI-native system for researching, building, verifying, shipping and continuously improving products.",
   "license": "MIT",
   "packageManager": "pnpm@9.15.0",
   "scripts": {
