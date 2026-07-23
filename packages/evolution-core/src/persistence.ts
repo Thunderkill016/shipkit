@@ -38,6 +38,12 @@ type JournalRecord = {
 
 type StateEnvelope = JournalRecord;
 
+type LockRecord = {
+  token: string;
+  pid: number;
+  acquiredAt: string;
+};
+
 export type CycleSummary = {
   cycleId: string;
   objective: string;
@@ -162,20 +168,47 @@ async function appendJournal(path: string, record: JournalRecord): Promise<void>
   if (!existed) await syncDirectory(dirname(path));
 }
 
+async function readLockRecord(path: string): Promise<LockRecord | null> {
+  try {
+    const value = JSON.parse(await readFile(path, "utf8"));
+    if (
+      isRecord(value) &&
+      typeof value.token === "string" &&
+      typeof value.pid === "number" &&
+      typeof value.acquiredAt === "string"
+    ) {
+      return value as LockRecord;
+    }
+  } catch {
+    // Missing or malformed lock records are handled by timeout/stale-lock logic.
+  }
+  return null;
+}
+
 async function acquireLock(path: string): Promise<() => Promise<void>> {
   await mkdir(dirname(path), { recursive: true });
   const startedAt = Date.now();
   while (Date.now() - startedAt < LOCK_TIMEOUT_MS) {
+    const token = randomUUID();
     try {
       const handle = await open(path, "wx", 0o600);
-      await handle.writeFile(
-        `${JSON.stringify({ pid: process.pid, acquiredAt: new Date().toISOString() })}\n`,
-        "utf8"
-      );
-      await handle.sync();
-      return async () => {
+      try {
+        await handle.writeFile(
+          `${JSON.stringify({ token, pid: process.pid, acquiredAt: new Date().toISOString() })}\n`,
+          "utf8"
+        );
+        await handle.sync();
+      } catch (error) {
         await handle.close();
         await rm(path, { force: true });
+        throw error;
+      }
+      return async () => {
+        await handle.close();
+        const current = await readLockRecord(path);
+        if (current?.token === token) {
+          await rm(path, { force: true });
+        }
       };
     } catch (error) {
       const code = (error as NodeJS.ErrnoException).code;
