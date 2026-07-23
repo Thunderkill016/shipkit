@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "bin": {
-    "shipkit-evolve": "./dist/cli.js"
+    "shipkit-evolve": "./dist/cli.js",
+    "shipkit-research-public": "./dist/public-cli.js"
   },
   "exports": {
     ".": {
