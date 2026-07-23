@@ -346,6 +346,8 @@ export function buildDockerRunArguments(input: DockerRunInput): string[] {
     "--rm",
     "--name",
     input.containerName,
+    "--pull",
+    "never",
     "--network",
     "none",
     "--read-only",
