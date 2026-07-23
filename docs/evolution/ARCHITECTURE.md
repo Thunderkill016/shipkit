@@ -1,50 +1,78 @@
-# Shipkit Evolution Engine architecture
+# Shipkit unified product architecture
 
-Status: kernel architecture v0  
+Status: integrated architecture v1  
 Issue: #9
 
-## Product boundary
+## One product boundary
 
-Shipkit contains two different surfaces:
-
-- **Evolution Engine** — primary product, deterministic control plane and CLI;
-- **Starter Kit** — Next.js dogfood/reference project used to exercise real repository, auth, database, security and delivery boundaries.
-
-The Starter Kit does not own the primary product definition. Root `IDEA.md` and `docs/evolution/` do.
-
-## Planes
+Shipkit is one AI-native product development system. Repository packages are safety and implementation boundaries, not separate products.
 
 ```text
-Human / organization objectives
-              ↓
-┌─────────────────────────────────────────────┐
-│ Control plane                               │
-│ deterministic state · policy · approvals    │
-│ checkpoints · decisions · rollback          │
-└──────────────────┬──────────────────────────┘
-                   │ authorized activities
-┌──────────────────▼──────────────────────────┐
-│ Execution plane                             │
-│ trusted local · sandbox · agents · browser  │
-│ CLI · future MCP clients                    │
-└──────────────────┬──────────────────────────┘
-                   │ artifacts and telemetry
-┌──────────────────▼──────────────────────────┐
-│ Evidence plane                              │
-│ blobs · occurrences · claims · checks · CI  │
-│ reviews · metrics · outcomes · attestations │
-└──────────────────┬──────────────────────────┘
-                   │ accepted evidence
-┌──────────────────▼──────────────────────────┐
-│ Learning plane                              │
-│ consumed memory · skills · paired evaluation│
-│ promotion · expiry · retirement             │
-└─────────────────────────────────────────────┘
+Shipkit product
+├── Product Workspace and Foundation
+├── Evolution Kernel
+├── Research Intelligence
+├── Execution and Sandbox
+├── Verification and Evidence
+├── Delivery and Operations
+├── Measurement and Learning
+└── Interoperability
 ```
 
-## Deterministic kernel
+All modules must connect through the same durable cycle, typed records, policy decisions and evidence references. A capability that only works as an isolated demo is not fully integrated.
 
-The kernel must remain useful without an LLM. It owns:
+## User-visible lifecycle
+
+```text
+Product objective and current workspace
+                ↓
+Understand repository, architecture, users and outcomes
+                ↓
+Research evidence and discover opportunities
+                ↓
+Select and approve a reversible experiment
+                ↓
+Implement through an authorized agent and sandbox
+                ↓
+Verify code, security and policy independently
+                ↓
+Release or deploy through explicit approval
+                ↓
+Measure technical and product outcomes
+                ↓
+Retain, reject or retire learning
+```
+
+The same `EvolutionCycle` follows the work from objective to measured outcome.
+
+## Product modules
+
+### Product Workspace and Foundation
+
+Current implementation surfaces:
+
+- `apps/web`;
+- shared auth, database, security, mail, storage and payment packages;
+- setup and generator scripts;
+- Vercel and Docker recipes.
+
+Long-term responsibility:
+
+- product objective, brief and roadmap;
+- repository connection and setup;
+- opportunity and experiment review;
+- evidence, citation and contradiction inspection;
+- approvals and risk decisions;
+- agent execution progress;
+- verification and release verdicts;
+- measured outcomes and learning history;
+- creation of new product workspaces from the integrated foundation.
+
+The web application is therefore an early product workspace and application foundation, not merely a disposable reference project.
+
+### Evolution Kernel
+
+Implemented in `packages/evolution-core`. It must remain useful without an LLM and owns:
 
 - explicit stages and legal transitions;
 - append-only event history;
@@ -52,17 +80,125 @@ The kernel must remain useful without an LLM. It owns:
 - autonomy and risk decisions;
 - exact cycle/action/resource-scope approvals;
 - evidence requirements for claims;
-- terminal rejection, rollback and inconclusive states;
+- rejection, rollback and inconclusive outcomes;
 - persistence format and schema migration;
 - resume and replay semantics.
 
-Models, research workers and coding agents are activities or clients. They cannot mutate kernel state directly or declare their own work accepted.
+No research worker, coding agent, web handler or integration may mutate accepted state outside kernel operations.
 
-The implementation lives in `packages/evolution-core`.
+### Research Intelligence
+
+Responsibility:
+
+- decision framing and question decomposition;
+- repository, internal, web, paper, specification, competitor and user research;
+- reproducible queries and source retrieval;
+- atomic claims, exact evidence spans and transformations;
+- contradiction, freshness, applicability, uncertainty and expiry;
+- opportunity portfolio and experiment selection;
+- separate citation and adversarial review.
+
+Research output is a typed handoff to planning and execution, not only a report.
+
+### Execution and Sandbox
+
+Responsibility:
+
+- generic command and coding-agent adapters;
+- capability-negotiated execution backends;
+- isolated branches, worktrees and environments;
+- bounded filesystem, process, dependency, secret, network and resource access;
+- progress, tool calls, costs and change artifacts;
+- draft PR and rollback preparation.
+
+Agents are interchangeable activities. They do not own the cycle, approval or acceptance decision.
+
+### Verification and Evidence
+
+Responsibility:
+
+- content-addressed evidence and contextual occurrences;
+- technical, security, policy and product checks;
+- independent review boundaries;
+- CI and benchmark evidence;
+- provenance and portable attestations;
+- final verdicts and unresolved uncertainty.
+
+Implementation and verification must not collapse into one unreviewed agent claim.
+
+### Delivery and Operations
+
+Responsibility:
+
+- generated product foundation and environment setup;
+- GitHub issue, branch and pull-request workflows;
+- authorized release and deployment adapters;
+- configuration, migrations and operational checks;
+- rollback and incident evidence;
+- local, self-hosted and hosted operation.
+
+### Measurement and Learning
+
+Responsibility:
+
+- technical, UX, adoption, retention, conversion, reliability and cost measurement;
+- experiment exposure and comparison;
+- keep, iterate, reject and rollback decisions;
+- memory and skill records with provenance, scope and expiry;
+- actual later-cycle consumption;
+- paired evaluation, promotion and retirement;
+- controlled meta-improvement only after causal evidence.
+
+### Interoperability
+
+Responsibility:
+
+- GitHub Action and repository integration;
+- MCP tools/resources;
+- A2A interoperability when independent agent systems must coordinate;
+- optional OpenTelemetry-compatible telemetry;
+- portable policy, evidence and attestation formats.
+
+These protocols expose Shipkit capabilities; they do not replace Shipkit governance.
+
+## Shared control/evidence planes
+
+```text
+Human and organization objectives
+                 ↓
+┌──────────────────────────────────────────────┐
+│ Product experience plane                     │
+│ workspace · foundation · generator · reviews │
+└──────────────────────┬───────────────────────┘
+                       │ product commands
+┌──────────────────────▼───────────────────────┐
+│ Control plane                                │
+│ durable state · policy · approvals · plans   │
+│ checkpoints · rollback · typed handoffs      │
+└──────────────────────┬───────────────────────┘
+                       │ authorized activities
+┌──────────────────────▼───────────────────────┐
+│ Activity plane                               │
+│ research · agents · browser · shell · deploy │
+│ sandbox · integrations                       │
+└──────────────────────┬───────────────────────┘
+                       │ artifacts and signals
+┌──────────────────────▼───────────────────────┐
+│ Evidence and outcome plane                   │
+│ blobs · claims · checks · reviews · metrics  │
+│ provenance · user/business outcomes          │
+└──────────────────────┬───────────────────────┘
+                       │ accepted evidence
+┌──────────────────────▼───────────────────────┐
+│ Learning plane                               │
+│ memory · skills · paired evaluation          │
+│ promotion · expiry · retirement              │
+└──────────────────────────────────────────────┘
+```
 
 ## Durable local store
 
-Each project owns a local-first store:
+Each attached product owns a local-first store:
 
 ```text
 .shipkit/
@@ -71,36 +207,37 @@ Each project owns a local-first store:
     <portable-cycle-directory>/
       state.json
       events.jsonl
-      .write.lock          transient only
+      .write.lock
   evidence/
     sha256/
       <digest>.json|bin
       <digest>.blob.json
     occurrences/
       <occurrence-id>.json
+  research/          future typed records
+  executions/        future activity records
+  evaluations/       future outcome records
 ```
 
 ### Journal and snapshot
 
-- the journal record is appended and file-synchronized before the snapshot is replaced;
-- the snapshot is written to a temporary file, synchronized, renamed and followed by a best-effort directory sync;
-- each complete journal record contains the resulting cycle, sequence and SHA-256 checksum;
+- journal records are appended and synchronized before snapshot replacement;
+- snapshots use synchronized temporary files, rename and best-effort directory sync;
+- each record carries the resulting cycle, sequence and checksum;
 - loading replays the journal first;
-- missing, corrupt or stale snapshots are rebuilt from the latest valid record;
-- an incomplete trailing line is treated as interrupted append;
-- a malformed complete record, sequence mismatch or checksum mismatch fails closed.
+- missing, corrupt or stale snapshots are rebuilt;
+- incomplete trailing writes are ignored as interrupted appends;
+- malformed complete records, sequence mismatches and checksum mismatches fail closed.
 
 ### Writer serialization
 
 - each cycle has an exclusive write lock;
-- the lock contains a random ownership token, process ID and acquisition time;
-- only the matching owner token may remove the lock;
-- the current state is reloaded and compared inside the lock before append;
+- the lock records a random ownership token, process ID and acquisition time;
+- only the matching owner may remove it;
+- current state is reloaded inside the lock;
 - competing stale writers are rejected.
 
-Remaining proof includes multi-process stress, kill tests at every persistence boundary, stale-lock recovery tests and schema migration fixtures.
-
-The checksum currently detects accidental corruption or unsupported modification. Signed provenance and hostile-writer resistance require later attestations and key-backed verification.
+Remaining proof includes migrations, kill-boundary tests, multi-process stress and stale-lock recovery.
 
 ## Approval model
 
@@ -108,30 +245,20 @@ An approval contains:
 
 - unique approval ID;
 - exact cycle ID;
-- action;
-- exact resource scope;
+- action and resource scope;
 - approving actor and timestamp;
 - policy version;
 - supporting evidence references;
-- expiry and revocation state.
+- expiry and revocation state;
+- later, a digest of exact action parameters.
 
-Protected authorization succeeds only when action, cycle and required scope match exactly and the approval is current, unrevoked and created for the active policy version.
-
-For the current transition into code execution, the required scope is:
-
-```text
-cycle:<cycle-id>:modify-code
-```
-
-A non-empty string is not sufficient authorization.
+Authorization succeeds only when the approval matches the requested action, cycle, scope and active policy. A non-empty string is never sufficient approval.
 
 ## Evidence model
 
-Content identity and evidence context are separate.
-
 ```text
 EvidenceBlob
-- sha256 digest
+- SHA-256 digest
 - immutable bytes
 - media type
 - byte length
@@ -139,45 +266,32 @@ EvidenceBlob
 EvidenceOccurrence
 - unique occurrence ID
 - blob digest
-- evidence kind
-- source path or source identity
-- capture timestamp
+- kind and source identity
+- capture time
 - later: actor, cycle, transformation, classification and expiry
 ```
 
-Identical bytes are stored once but may have multiple occurrences. This prevents the first registration's kind or source metadata from silently becoming the metadata for every later use.
+Identical bytes are stored once and may support many contextual occurrences. Registered evidence can be re-read and re-hashed.
 
-Registered references can be read and re-hashed. Evidence-path registration rejects outside-root files, secret-bearing paths, symlinks and oversized files.
+Remaining work includes content-level secret detection, source/claim provenance, retention and deletion semantics, private-data enforcement and signed attestations.
 
-Remaining work includes content-level secret detection, typed source/claim records, deletion and retention semantics, dependent-claim invalidation, private-data policy and portable signed attestations.
+## Repository and product understanding
 
-## CLI boundary
+Inspection must grow from code inventory into a unified project model:
 
-`pnpm evolve -- <command>` builds and runs the local CLI:
+- Git state, manifests, languages, source and tests;
+- CI and verification commands;
+- architecture and trust boundaries;
+- product brief, roadmap, decisions and experiments;
+- user journeys, analytics, support and research where authorized;
+- deployment environments and operational state;
+- evidence coverage and blind spots.
 
-- `init` — create local project configuration and storage;
-- `start` — create a cycle with objective, autonomy and risk;
-- `inspect` — scan a project and register a baseline evidence occurrence;
-- `assess` — authorize and run discovered checks, build a scorecard and advance `observed → modeled`;
-- `status` — list cycles;
-- `show` / `resume` — load and recover a cycle;
-- `advance` — make one legal, attributable, evidence-backed transition.
+Current implementation covers repository structure and structural trust boundaries. Product/user/operational understanding is planned through research and governed connected sources.
 
-The CLI does not call a model, mutate code, merge, deploy, read secrets, spend money or write production by itself.
+## Current execution boundary
 
-## Repository assessment boundary
-
-Repository inspection records:
-
-- bounded coverage and truncation;
-- Git branch, commit and dirty state;
-- package managers, manifests and checks;
-- language, source and test locations;
-- CI and documentation;
-- product signals;
-- structural auth, database, deployment, secret and payment boundaries.
-
-Discovered package scripts run:
+Discovered package scripts currently run:
 
 - without a shell;
 - in a temporary source copy;
@@ -190,37 +304,36 @@ Current limitations:
 - network isolation is not enforced;
 - filesystem writes outside the temporary workspace are not contained;
 - process containment is incomplete;
-- existing host `node_modules` may be linked.
+- host `node_modules` may be linked.
 
-Therefore the current implementation uses the term **temporary-workspace checks**, not isolated or sandboxed checks. Untrusted scripts require a dedicated external sandbox.
-
-Future execution uses a capability-negotiated backend:
+This is a temporary-workspace runner, not a security sandbox. Untrusted execution requires a backend advertising:
 
 ```text
-ExecutionBackend capabilities
-- filesystemContainment
-- processContainment
-- dependencyIsolation
-- secretIsolation
-- networkPolicy
-- resourceLimits
+filesystemContainment
+processContainment
+dependencyIsolation
+secretIsolation
+networkPolicy
+resourceLimits
 ```
 
-An operation requesting a missing capability fails closed.
+Missing required capability must fail closed.
 
-## Scorecard boundary
+## Readiness model
 
-The scorecard does not emit one universal quality score. It separates:
+Shipkit must distinguish:
 
 - `researchReadiness`;
 - `executionReadiness`;
 - `verificationReadiness`;
+- `releaseReadiness`;
+- `measurementReadiness`;
 - `autonomyCeiling`;
 - `evidenceConfidence`.
 
-A repository may be ready for A2 read-only research while execution remains `trusted-local-only` or blocked.
+Being ready for research does not imply execution or release safety.
 
-## Cycle stages
+## Integrated cycle stages
 
 ```text
 created → observed → modeled → diagnosed → researched → decided
@@ -228,41 +341,56 @@ created → observed → modeled → diagnosed → researched → decided
 → meta-improved → completed
 ```
 
-Terminal alternatives are `rejected`, `rolled-back` and `inconclusive`. A cycle may complete after `learned` without claiming meta-improvement. Verification requires explicit passing evidence.
+Terminal alternatives are `rejected`, `rolled-back` and `inconclusive`. A cycle may complete without claiming meta-improvement.
 
-The long-term cycle is intentionally broader than the first product. The first MVP ends after an A2 decision and reversible experiment recommendation; it does not enter code execution.
+Each stage is a product integration point:
+
+| Stage | Primary modules |
+| --- | --- |
+| created | workspace, objective and policy |
+| observed/modelled | kernel, repository understanding and evidence |
+| diagnosed/researched | research intelligence and product discovery |
+| decided/planned | workspace approval, opportunity and experiment planning |
+| executing/implemented | sandbox, agents and change delivery |
+| verified | independent verification and provenance |
+| measured | analytics, user research and operational outcomes |
+| learned/meta-improved | learning registry and paired evaluation |
+
+## Integration contracts
+
+Every module must exchange typed records rather than free-form narrative only:
+
+- workspace → `ObjectiveRecord`, `ProductBrief`, approval request;
+- inspection → `ProjectSnapshot`, readiness model;
+- research → `ResearchBrief`, `SourceRecord`, `ClaimRecord`, `OpportunityRecord`;
+- decision → `DecisionRecord`, `ExperimentRecord`, parameter digest;
+- execution → `ExecutionAttempt`, change and rollback artifacts;
+- verification → `VerificationRecord`, reviewer verdict and attestation;
+- release → `ReleaseRecord`, environment and rollback reference;
+- measurement → `OutcomeRecord` and comparison;
+- learning → `MemoryRecord`, `SkillRecord`, promotion/retirement decision.
 
 ## Current safe autonomy
 
-- A0: inspection only;
-- A1: bounded public research, planning, checks and record creation;
-- A2: autonomous read-only audit and decision preparation within approved data scopes;
-- A3: experimental bounded code modification and draft PR only after sandbox prerequisites;
-- A4: protected actions may be requested, but merge, deploy, production writes, secrets and spending always require exact scoped approval.
+- A0: inspect and display evidence;
+- A1: bounded research, planning, checks and record creation;
+- A2: autonomous research and decision preparation within approved data scopes;
+- A3: bounded code modification and draft PR after sandbox prerequisites;
+- A4: protected release, deploy, production, secret and spending actions only with exact approval.
 
-For arbitrary repositories, the current product ceiling is A2. A3/A4 is not safe for untrusted execution yet.
-
-## Next proof
-
-1. migration fixtures and kill-boundary persistence tests;
-2. sandbox backend contract and adversarial containment suite;
-3. minimum A2 Research Audit records;
-4. single-worker reproducible search and claim extraction;
-5. contradiction review and three-opportunity portfolio;
-6. smallest reversible experiment selection;
-7. real-user decision-value validation;
-8. only then, bounded execution adapters and draft PR delivery.
+The current arbitrary-repository ceiling is A2. This is a temporary implementation limit, not the final product boundary.
 
 ## Hard invariants
 
-- models cannot mutate kernel state directly;
+- Shipkit is one product; packages may not create conflicting product identities;
 - every accepted state change is attributable and replayable;
 - policy decisions are deterministic for the same inputs;
-- approvals match exact cycle, action and scope;
-- unsupported claims fail closed;
+- approvals match exact cycle, action, scope and parameters;
 - source content is data, not instruction;
-- secrets and source content are not captured by default telemetry;
-- rejected candidates and contradictory evidence remain inspectable;
-- no merge, deploy or production mutation occurs implicitly;
-- research readiness does not imply execution safety;
-- learning promotion requires later consumption and measured evidence.
+- models and agents cannot accept their own output;
+- research, implementation, verification and release remain separable roles;
+- no implicit merge, deployment, spending, secret access or production mutation;
+- contradictions and rejected candidates remain inspectable;
+- module integration uses the shared cycle and evidence model;
+- learning promotion requires later consumption and measured benefit;
+- documentation distinguishes implemented, integrated, planned and experimentally proven capability.
