@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { access, cp, lstat, mkdir, mkdtemp, rm, symlink } from "node:fs/promises";
+import { cp, lstat, mkdir, mkdtemp, readdir, rm, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import type { ProjectSnapshot, RepositoryCheck } from "./repository.js";
@@ -190,13 +190,44 @@ function invocationFor(snapshot: ProjectSnapshot, check: RepositoryCheck): Invoc
   }
 }
 
-async function exists(path: string): Promise<boolean> {
-  try {
-    await access(path);
-    return true;
-  } catch {
-    return false;
+function excludedFromSourceCopy(relativePath: string): boolean {
+  return relativePath.split(sep).some((part) => COPY_EXCLUDES.has(part));
+}
+
+async function linkExistingNodeModules(root: string, workspaceRoot: string): Promise<number> {
+  const queue = [root];
+  let linked = 0;
+
+  while (queue.length > 0) {
+    const directory = queue.shift();
+    if (!directory) break;
+    let entries;
+    try {
+      entries = await readdir(directory, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+
+    for (const entry of entries) {
+      const source = join(directory, entry.name);
+      const relativePath = relative(root, source);
+      if (entry.name === "node_modules") {
+        const destination = join(workspaceRoot, relativePath);
+        await mkdir(dirname(destination), { recursive: true });
+        await symlink(
+          source,
+          destination,
+          process.platform === "win32" ? "junction" : "dir"
+        );
+        linked += 1;
+        continue;
+      }
+      if (!entry.isDirectory() || COPY_EXCLUDES.has(entry.name)) continue;
+      queue.push(source);
+    }
   }
+
+  return linked;
 }
 
 async function createWorkspace(projectRoot: string): Promise<{
@@ -214,8 +245,7 @@ async function createWorkspace(projectRoot: string): Promise<{
     filter: async (source) => {
       const relativePath = relative(root, source);
       if (!relativePath) return true;
-      const first = relativePath.split(sep)[0];
-      if (first && COPY_EXCLUDES.has(first)) return false;
+      if (excludedFromSourceCopy(relativePath)) return false;
       try {
         return !(await lstat(source)).isSymbolicLink();
       } catch {
@@ -224,18 +254,12 @@ async function createWorkspace(projectRoot: string): Promise<{
     },
   });
 
-  let dependencyAccess: CheckResult["isolation"]["dependencyAccess"] = "none";
-  const originalNodeModules = join(root, "node_modules");
-  if (await exists(originalNodeModules)) {
-    await symlink(
-      originalNodeModules,
-      join(workspaceRoot, "node_modules"),
-      process.platform === "win32" ? "junction" : "dir"
-    );
-    dependencyAccess = "linked-existing-node_modules";
-  }
-
-  return { temporaryRoot, workspaceRoot, dependencyAccess };
+  const linkedDependencies = await linkExistingNodeModules(root, workspaceRoot);
+  return {
+    temporaryRoot,
+    workspaceRoot,
+    dependencyAccess: linkedDependencies > 0 ? "linked-existing-node_modules" : "none",
+  };
 }
 
 function safeEnvironment(home: string): NodeJS.ProcessEnv {
@@ -411,7 +435,7 @@ export async function runDiscoveredChecks(
     },
     limitations: [
       "Checks run from repository-declared package scripts in a temporary source copy.",
-      "Dependencies are never installed; an existing root node_modules directory may be linked read-only by convention but filesystem write protection is not yet enforced.",
+      "Dependencies are never installed; existing node_modules directories may be linked into the temporary workspace, but filesystem write protection is not yet enforced.",
       "Network isolation is not yet enforced; run untrusted repositories inside an external sandbox.",
     ],
   };
