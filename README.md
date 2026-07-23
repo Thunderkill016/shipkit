@@ -1,236 +1,163 @@
-# ✦ Shipkit
+# ✦ Shipkit Evolution Engine
 
-**Bộ khung sản phẩm mở cho vibe coding** · **Open product kit for vibe coding**
+**Deterministic, evidence-backed project evolution across human and AI agents.**
 
-Từ **ý tưởng → landing + đăng nhập + app + database + bảo mật + deploy** — không dựng lại nền mỗi lần.  
-MIT · Node ≥ 20 · Next.js · portable Postgres / Supabase
+Shipkit attaches to a repository, preserves a durable evolution cycle, inspects the project, runs bounded checks, and is being developed to turn reproducible research into governed product decisions and reversible experiments.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-7dd3c0.svg)](./LICENSE)
-[![Node >= 20](https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg)](https://nodejs.org)
-[![Version](https://img.shields.io/badge/version-0.4.0-blue.svg)](./package.json)
+Models and coding agents are interchangeable execution inputs. They do not own Shipkit's state, permissions, evidence, verification or final verdict.
 
----
+MIT · Node ≥ 20 · pnpm · local-first
 
-## ⚡ Chạy ngay
+## Current status
+
+**Experimental foundation — draft PR #10, unmerged and undeployed.**
+
+Implemented today:
+
+- deterministic cycle state machine;
+- A0–A4 autonomy and R0–R4 risk policy;
+- exact cycle/scope approvals for protected actions;
+- append-only journal, atomic snapshots, recovery and serialized writers;
+- content-addressed evidence blobs with distinct evidence occurrences;
+- bounded repository inspection and structural trust-boundary discovery;
+- temporary-workspace checks with timeout, output bounds and reduced environment;
+- evidence-backed repository scorecard;
+- CLI dogfood on Shipkit and a pinned unrelated repository.
+
+Not implemented yet:
+
+- complete sandbox containment for untrusted repository scripts;
+- the A2 Research Audit vertical slice;
+- agent execution adapters;
+- MCP, attestations and optional telemetry;
+- product-outcome measurement and controlled learning.
+
+## First usable product target
+
+The first MVP is an **A2 Research Audit** for a solo developer or open-source maintainer:
+
+```text
+inspect → assess → decision brief → bounded research
+→ atomic claims → contradiction review → 3 opportunities
+→ ranking → smallest reversible experiment
+```
+
+The MVP is read-only with respect to product code. It does not merge, deploy, read secrets, spend money or mutate production.
+
+Product source of truth: [`IDEA.md`](./IDEA.md)  
+Detailed roadmap: [`docs/evolution/ROADMAP.md`](./docs/evolution/ROADMAP.md)  
+Research capability: [`docs/evolution/RESEARCH_CAPABILITY.md`](./docs/evolution/RESEARCH_CAPABILITY.md)  
+Comparative analysis: [`docs/evolution/COMPARATIVE_ANALYSIS.md`](./docs/evolution/COMPARATIVE_ANALYSIS.md)
+
+## Try the current Evolution Engine foundation
 
 ```bash
 git clone https://github.com/Thunderkill016/shipkit.git
-cd shipkit && pnpm install
-
-# A) Xem UI (không cần Docker)
-pnpm ready && pnpm dev
-
-# B) Auth + notes thật (cần Docker) — khuyến nghị
-pnpm ready -- --preset=portable-pg
-pnpm db:up && pnpm db:migrate
-pnpm dev
-```
-
-Mở **http://localhost:3000**
-
-| URL | Việc |
-|-----|------|
-| `/` | Landing (VI \| EN) |
-| `/login` | Đăng ký / đăng nhập |
-| `/app` | Shell sau login |
-| `/app/notes` | Notes (lưu DB, tách theo user) |
-| `/app/profile` | Hồ sơ + avatar |
-| `/app/billing` | Stripe (nếu có env) |
-| `/api/health` | Health check |
-
-**Hướng dẫn ngắn:** [docs/QUICKSTART.md](./docs/QUICKSTART.md) · **Deploy:** [docs/DEPLOY.md](./docs/DEPLOY.md)
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FThunderkill016%2Fshipkit&project-name=shipkit&repository-name=shipkit)
-
----
-
-## Shipkit là gì?
-
-| Việc ai cũng phải làm | Shipkit |
-|------------------------|---------|
-| Landing / SEO | ✅ |
-| Auth (email, OAuth tùy chọn) | ✅ Supabase **hoặc** Better Auth |
-| App sau login | ✅ `/app/*` |
-| Database | ✅ Postgres (Docker / Neon / Supabase…) |
-| Bảo mật cơ bản | ✅ CSP, Zod, rate-limit |
-| Mail / file | ✅ Resend hoặc console · S3 hoặc local |
-| Billing | ✅ Stripe khi set env (không bắt buộc) |
-| AI / vibe | ✅ `IDEA.md` + `AGENTS.md` + skills |
-| Deploy | ✅ Vercel + Docker |
-
-**Việc của bạn:** sửa `IDEA.md` → nhờ AI làm tính năng trong `/app` → deploy.
-
-Không phải HTTP micro-framework. Không phải app chat đóng (Lovable). Code **thuộc về bạn**.
-
----
-
-## 🇻🇳 Hướng dẫn nhanh (kể cả người trái ngành)
-
-### Cài một lần
-
-1. **Node.js LTS** — https://nodejs.org → `node -v`  
-2. **pnpm** — `npm install -g pnpm`  
-3. **Git** — https://git-scm.com  
-4. **Docker** (nếu chọn path B) — https://docker.com  
-5. **Cursor** (khuyên) — https://cursor.com để vibe với AI  
-
-### Path A — Chỉ xem giao diện
-
-```bash
+cd shipkit
 pnpm install
-pnpm ready          # tạo apps/web/.env.local demo
-pnpm dev
+
+pnpm evolve -- init
+pnpm evolve -- start \
+  --id shipkit:cycle-001 \
+  --objective "Identify the highest-value bounded improvement" \
+  --autonomy A2 \
+  --risk R1
+
+pnpm evolve -- inspect shipkit:cycle-001 --project-root .
+pnpm evolve -- assess shipkit:cycle-001 --project-root . --check test
+pnpm evolve -- show shipkit:cycle-001
 ```
 
-### Path B — Đăng nhập + ghi chú thật (Docker)
+Current commands:
 
-```bash
-pnpm install
-pnpm ready -- --preset=portable-pg
-pnpm db:up && pnpm db:migrate
-pnpm doctor
-pnpm dev
-```
+| Command | Purpose |
+| --- | --- |
+| `pnpm evolve -- init` | Initialize `.shipkit` local state |
+| `pnpm evolve -- start` | Create a durable cycle |
+| `pnpm evolve -- inspect` | Register repository baseline evidence |
+| `pnpm evolve -- assess` | Run authorized checks and create a scorecard |
+| `pnpm evolve -- status` | List stored cycles |
+| `pnpm evolve -- show` / `resume` | Load and recover a cycle |
+| `pnpm evolve -- advance` | Apply one legal evidence-backed transition |
 
-1. Vào `/login` → tạo tài khoản  
-2. `/app/notes` → thêm ghi chú  
-3. Sửa **`IDEA.md`** → chat AI:
+### Security boundary
 
-> Đọc `IDEA.md` và `AGENTS.md`. Làm mục MVP tiếp theo trong `/app`. Không đổi framework.
+The current check runner is bounded but is **not a security sandbox**:
 
-### Path C — Supabase (không Docker)
+- network isolation is not enforced;
+- filesystem writes outside the temporary workspace are not contained;
+- existing `node_modules` may be linked from the host project.
 
-```bash
-pnpm ready -- --preset=supabase-full
-# Dán URL + anon key vào apps/web/.env.local
-# SQL Editor: 0001_init, 0002_supabase_rls, 0004_notes, 0005_notes_rls
-# Auth redirect: http://localhost:3000/auth/callback
-pnpm doctor && pnpm dev
-```
+Run untrusted repositories only inside a dedicated external sandbox. Shipkit must fail closed when a future operation requests isolation that the selected backend cannot provide.
 
-### Lệnh hay dùng
-
-| Lệnh | Việc |
-|------|------|
-| `pnpm ready` | Setup env + doctor + hướng dẫn path |
-| `pnpm setup -- --preset=…` | Sinh `.env.local` (`demo` / `portable-pg` / `supabase-full`) |
-| `pnpm doctor` | Checklist cấu hình (điểm /100) |
-| `pnpm dev` | Chạy local |
-| `pnpm build` | Build production |
-| `pnpm check:deploy` | Gate trước production |
-| `pnpm create -- my-app` | Clone kit sang project mới |
-| `pnpm db:up` / `db:migrate` | Postgres local |
-
-### Lỗi thường gặp
-
-| Hiện tượng | Cách xử |
-|------------|---------|
-| `pnpm: not found` | `npm install -g pnpm` |
-| Đăng nhập fail | `pnpm doctor` — thiếu env / secret ngắn |
-| Portable không vào `/app` | `pnpm db:up && pnpm db:migrate` rồi restart `pnpm dev` |
-| Đổi `.env` không ăn | `Ctrl+C` → `pnpm dev` lại |
-| AI sửa lung tung | Nhắc: đọc `IDEA.md` + `AGENTS.md` |
-
-Chi tiết dài (từ điển, Vercel từng bước): phần dưới + [docs/QUICKSTART.md](./docs/QUICKSTART.md).
-
----
-
-## 🇬🇧 English overview
-
-### Presets
-
-| Preset | When | Command |
-|--------|------|---------|
-| `demo` | UI only | `pnpm ready` |
-| `portable-pg` | Own Postgres + Better Auth | `pnpm ready -- --preset=portable-pg` |
-| `supabase-full` | Managed Supabase | `pnpm ready -- --preset=supabase-full` |
-
-### What's included
-
-- **App:** Landing (i18n VI/EN), login/OAuth UI, `/app`, notes, profile, billing  
-- **Auth:** Supabase SSR **or** Better Auth + Drizzle (`AUTH_ADAPTER`)  
-- **Security:** Headers (CSP/HSTS…), Zod, rate-limit (memory / Upstash)  
-- **Data:** `profiles` + `notes` (user isolation)  
-- **Mail / storage:** Console·Resend · Local·S3  
-- **Payment:** Stripe adapter when `STRIPE_SECRET_KEY` + `STRIPE_PRICE_ID`  
-- **DX:** `IDEA.md`, `AGENTS.md`, `.agents/skills/*`, `llms.txt`, doctor/setup/ready  
-- **Quality:** Vitest + Playwright (demo + portable-pg CI)  
-- **Deploy:** `vercel.json`, `docker-compose.prod.yml`, `/api/health`  
-
-### Vibe workflow
-
-1. Edit [`IDEA.md`](./IDEA.md)  
-2. `pnpm dev`  
-3. Agent: *“Read IDEA.md + AGENTS.md. Implement next MVP under /app.”*  
-4. Deploy — [docs/DEPLOY.md](./docs/DEPLOY.md)  
-
-### Layout
+## Repository structure
 
 ```text
-IDEA.md                 ← your product (start here)
-AGENTS.md               ← rules for AI agents
-apps/web                ← Next.js UI
-  src/app/app/          ← product features
-  src/lib/adapters/     ← supabase / better-auth only
-packages/               ← auth, db, security, mail, storage, payment, i18n, logger
-presets/                ← supabase-full · portable-pg
-scripts/                ← ready, setup, doctor, db-migrate, check-deploy
-docs/                   ← QUICKSTART, DEPLOY, VIBE, benchmark, …
-.agents/skills/         ← ship-feature, add-entity, security-pass, vibe-setup
+Shipkit
+├── packages/evolution-core   primary product kernel and CLI
+├── docs/evolution            product, architecture, research and roadmap
+├── apps/web                  Starter Kit dogfood/reference application
+├── packages/*                reusable auth, DB, security and delivery packages
+├── templates/STARTER_IDEA.md product template for generated starter projects
+└── scripts                   dogfood, generator and verification scripts
 ```
 
-### Env (essentials)
+## Starter Kit dogfood project
+
+The existing Next.js application remains maintained as a realistic project for Evolution Engine inspection and verification. It provides:
+
+- localized landing and login;
+- Supabase or Better Auth adapters;
+- portable PostgreSQL setup;
+- protected app shell, profile and notes;
+- security, mail, storage and optional Stripe adapters;
+- Vercel and Docker recipes;
+- Vitest and Playwright coverage.
+
+Run it locally:
 
 ```bash
-# portable-pg
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-DATABASE_URL=postgresql://shipkit:shipkit@localhost:5432/shipkit
-BETTER_AUTH_SECRET=<32+ chars>
-BETTER_AUTH_URL=http://localhost:3000
-AUTH_ADAPTER=better-auth
+# UI/demo path
+pnpm ready
+pnpm dev
 
-# optional: RESEND_API_KEY, STRIPE_*, S3_*, SENTRY_DSN, GOOGLE_*/GITHUB_* OAuth
+# Portable PostgreSQL path
+pnpm ready -- --preset=portable-pg
+pnpm db:up
+pnpm db:migrate
+pnpm dev
 ```
 
-Full list: [`.env.example`](./.env.example)
+Open `http://localhost:3000`.
 
-### Docs map
+The Starter Kit is no longer the primary Shipkit roadmap. Generated starter products should copy [`templates/STARTER_IDEA.md`](./templates/STARTER_IDEA.md) and replace it with their own product definition.
 
-| Doc | Purpose |
-|-----|---------|
-| [docs/QUICKSTART.md](./docs/QUICKSTART.md) | 15-minute usable path |
-| [docs/DEPLOY.md](./docs/DEPLOY.md) | Vercel + Docker |
-| [docs/VIBE.md](./docs/VIBE.md) | Vibe coding loop |
-| [docs/TTFP.md](./docs/TTFP.md) | Time-to-first-product |
-| [docs/COMPETITIVE_BENCHMARK.md](./docs/COMPETITIVE_BENCHMARK.md) | vs Open SaaS / MakerKit / ShipFast |
-| [docs/DEVELOPMENT_PLAN.md](./docs/DEVELOPMENT_PLAN.md) | Code audit + plan |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | Ports & packages |
-| [ROADMAP.md](./ROADMAP.md) | Status (honest) |
-| [docs/SENTRY.md](./docs/SENTRY.md) | Optional Sentry |
-| [docs/SECURITY.md](./docs/SECURITY.md) | Security notes |
+## Core principles
 
-### Status (honest)
+1. Deterministic control around nondeterministic agents.
+2. Evidence and exact authorization before autonomy.
+3. One valuable vertical slice before broad infrastructure.
+4. Temporary workspaces are not security sandboxes.
+5. Passing technical checks does not prove user value.
+6. Contradictory evidence and failed candidates remain inspectable.
+7. Simpler baselines must be beaten before adding agent complexity.
+8. No positive-recursion claim without controlled later-cycle evidence.
 
-**v0.4 — usable** for daily vibe products: auth, notes, profile, optional Stripe, deploy recipes, agent DX.
+## Documentation
 
-Not aiming to replace MakerKit multi-tenant B2B or supastarter multi-framework on day one. See [COMPETITIVE_BENCHMARK.md](./docs/COMPETITIVE_BENCHMARK.md).
+| Document | Purpose |
+| --- | --- |
+| [`IDEA.md`](./IDEA.md) | Primary product source of truth |
+| [`ROADMAP.md`](./ROADMAP.md) | Repository-level gates and priorities |
+| [`docs/evolution/PRODUCT_THESIS.md`](./docs/evolution/PRODUCT_THESIS.md) | Product thesis and boundaries |
+| [`docs/evolution/ARCHITECTURE.md`](./docs/evolution/ARCHITECTURE.md) | Kernel and plane architecture |
+| [`docs/evolution/ROADMAP.md`](./docs/evolution/ROADMAP.md) | Detailed build roadmap |
+| [`docs/evolution/RESEARCH_CAPABILITY.md`](./docs/evolution/RESEARCH_CAPABILITY.md) | Modern research operating model |
+| [`docs/evolution/COMPARATIVE_ANALYSIS.md`](./docs/evolution/COMPARATIVE_ANALYSIS.md) | External-system comparison and decisions |
+| [`docs/CAPABILITIES.json`](./docs/CAPABILITIES.json) | Machine-readable implementation evidence |
+| [`docs/QUICKSTART.md`](./docs/QUICKSTART.md) | Starter Kit local setup |
+| [`docs/DEPLOY.md`](./docs/DEPLOY.md) | Starter Kit deployment recipes |
 
----
+## Contribution rule
 
-## Deploy (tóm tắt)
-
-1. `pnpm build` green  
-2. `pnpm check:deploy` (URL production, không localhost)  
-3. **Vercel:** import repo, env từ `.env.example`, root `vercel.json`  
-4. **Docker:** `docker compose -f docker-compose.prod.yml up -d --build`  
-
-Chi tiết: [docs/DEPLOY.md](./docs/DEPLOY.md)
-
----
-
-## License
-
-MIT © [Thunderkill016](https://github.com/Thunderkill016)
-
-**Bớt cấu hình. Bắt đầu ship ý tưởng.**  
-**Stop configuring. Start shipping ideas.**
+A change is not complete because an agent says it is complete. Material claims must link to code, tests, evidence or user outcome data. The PR remains draft until independent persistence, security/policy and product/API reviews are complete.
