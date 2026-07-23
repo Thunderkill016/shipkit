@@ -91,6 +91,16 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
           path: artifacts/candidate-research-proof.json
+      - name: Run deterministic public-search proof
+        run: node scripts/test-public-search.mjs
+      - name: Upload public-search proof
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-search-proof
+          if-no-files-found: warn
+          retention-days: 14
+          path: artifacts/public-search-proof.json
 
   sandbox-docker-proof:
     name: Sandbox / hostile Docker proof
