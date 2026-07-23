@@ -7,12 +7,16 @@ on:
       - "AI_WORKFLOW.md"
       - "docs/CAPABILITIES.json"
       - "docs/ai/**"
+      - "docs/evolution/EXTERNAL_SYSTEMS.json"
       - "prompts/**"
       - ".agents/**"
       - ".github/**"
       - "scripts/check-ai-workflow.mjs"
       - "scripts/check-capabilities.mjs"
       - "scripts/test-capabilities.mjs"
+      - "scripts/check-external-systems.mjs"
+      - "scripts/external-systems-validation.mjs"
+      - "scripts/test-external-systems.mjs"
       - "scripts/create-shipkit.mjs"
       - "scripts/test-create-shipkit.mjs"
       - "package.json"
@@ -31,4 +35,6 @@ jobs:
           node-version: 20
       - run: node scripts/check-ai-workflow.mjs
       - run: node scripts/test-capabilities.mjs
+      - run: node scripts/check-external-systems.mjs
+      - run: node scripts/test-external-systems.mjs
       - run: node scripts/test-create-shipkit.mjs
