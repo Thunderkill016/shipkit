@@ -63,6 +63,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Upload backend source for exact patching
+        uses: actions/upload-artifact@v4
+        with:
+          name: sandbox-backend-source
+          retention-days: 1
+          path: packages/evolution-core/src/execution-backend.ts
       - uses: pnpm/action-setup@v4
         with:
           version: 9.15.0
