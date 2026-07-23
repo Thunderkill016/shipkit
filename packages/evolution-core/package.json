@@ -16,6 +16,6 @@
   "scripts": {
     "typecheck": "pnpm --dir ../../apps/web exec tsc -p ../../packages/evolution-core/tsconfig.json --noEmit",
     "build": "pnpm --dir ../../apps/web exec tsc -p ../../packages/evolution-core/tsconfig.build.json",
-    "test": "pnpm --dir ../../apps/web exec vitest run --root ../.. packages/evolution-core/src"
+    "test": "pnpm run build && pnpm --dir ../../apps/web exec vitest run --root ../.. packages/evolution-core/src"
   }
 }
