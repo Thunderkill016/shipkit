@@ -1,21 +1,22 @@
 name: Public Search Scaffold
 
 on:
-  push:
+  pull_request:
     branches:
-      - agent/minimal-public-search-discovery
+      - main
 
 permissions:
   contents: write
 
 jobs:
   scaffold:
-    if: ${{ github.actor != 'github-actions[bot]' }}
+    if: ${{ github.actor != 'github-actions[bot]' && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: agent/minimal-public-search-discovery
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
@@ -36,4 +37,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Add minimal reproducible public search discovery"
-          git push origin HEAD:agent/minimal-public-search-discovery
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
