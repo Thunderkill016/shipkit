@@ -6,6 +6,7 @@ export * from "./research-review.js";
 export * from "./repository-research.js";
 export * from "./public-source.js";
 export * from "./public-research.js";
+export * from "./public-cli.js";
 export * from "./state-machine.js";
 export * from "./persistence.js";
 export * from "./repository.js";
