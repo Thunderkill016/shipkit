@@ -28,8 +28,8 @@ jobs:
           if text.count(old) != 1:
               raise SystemExit('failure-path artifact anchor missing or duplicated')
           text = text.replace(old, new)
-          old_time = '          Math.max(0, Date.now() - Date.parse(startedAt)) / 60_000'
-          new_time = '          Math.max(0, Date.parse(now) - Date.parse(startedAt)) / 60_000'
+          old_time = 'Date.now() - Date.parse(startedAt)'
+          new_time = 'Date.parse(now) - Date.parse(startedAt)'
           if text.count(old_time) != 1:
               raise SystemExit('time-budget anchor missing or duplicated')
           text = text.replace(old_time, new_time)
