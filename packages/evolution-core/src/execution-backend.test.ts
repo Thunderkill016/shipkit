@@ -49,6 +49,23 @@ describe("execution backend contract", () => {
     ).toThrow(/immutable image digest/);
   });
 
+  it("rejects a working directory that escapes the copied workspace", async () => {
+    const workspaceRoot = await mkdtemp(join(tmpdir(), "shipkit-docker-traversal-"));
+    temporaryRoots.push(workspaceRoot);
+    expect(() =>
+      buildDockerRunArguments({
+        containerName: "shipkit-check-traversal",
+        image: IMMUTABLE_IMAGE,
+        workspaceRoot,
+        relativeWorkingDirectory: "../host",
+        executable: "node",
+        arguments: ["--version"],
+        environment: { CI: "true" },
+        limits: { timeoutMs: 5_000, maxOutputBytes: 4_096 },
+      })
+    ).toThrow(/escapes the sandbox workspace/);
+  });
+
   it("declares the Docker untrusted baseline without claiming a hard disk quota", () => {
     const backend = new DockerExecutionBackend({
       image: IMMUTABLE_IMAGE,
