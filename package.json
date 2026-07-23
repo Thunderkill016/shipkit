@@ -14,6 +14,7 @@
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "test:e2e": "pnpm --filter @shipkit/web test:e2e",
+    "test:sandbox:docker": "pnpm --filter @shipkit/evolution-core build && node scripts/test-sandbox-docker.mjs",
     "doctor": "node scripts/doctor.mjs",
     "setup": "node scripts/setup.mjs",
     "check:deploy": "node scripts/check-deploy.mjs",
@@ -22,6 +23,7 @@
     "create": "node scripts/create-shipkit.mjs",
     "evolve": "pnpm --filter @shipkit/evolution-core build && node packages/evolution-core/dist/cli.js",
     "research:public": "pnpm --filter @shipkit/evolution-core build && node packages/evolution-core/dist/public-cli.js",
+    "sandbox:check": "pnpm --filter @shipkit/evolution-core build && node packages/evolution-core/dist/sandbox-cli.js",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "db:migrate": "node scripts/db-migrate.mjs"

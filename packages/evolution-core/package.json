@@ -5,7 +5,8 @@
   "type": "module",
   "bin": {
     "shipkit-evolve": "./dist/cli.js",
-    "shipkit-research-public": "./dist/public-cli.js"
+    "shipkit-research-public": "./dist/public-cli.js",
+    "shipkit-sandbox-check": "./dist/sandbox-cli.js"
   },
   "exports": {
     ".": {
