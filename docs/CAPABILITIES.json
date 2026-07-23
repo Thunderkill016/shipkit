@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "project": "shipkit",
-  "lastVerified": "2026-07-22",
+  "lastVerified": "2026-07-23",
   "verificationScope": "Repository evidence paths and CI state on pull request #1; production usage and analytics are not available.",
   "capabilities": [
     {
@@ -21,16 +21,18 @@
       "id": "email-password-auth",
       "category": "auth",
       "status": "implemented",
-      "verificationStatus": "failing",
+      "verificationStatus": "passing",
       "summary": "Email/password sign-up and sign-in through the AuthPort with validation and rate limiting.",
       "evidence": [
         "apps/web/src/app/login/page.tsx",
         "apps/web/src/app/login/login-form.tsx",
         "apps/web/src/app/actions/auth.ts",
-        "apps/web/e2e/auth-portable.spec.ts"
+        "apps/web/e2e/auth-portable.spec.ts",
+        "packages/db/src/schema.ts"
       ],
       "checks": [
-        "CI: E2E / portable-pg failed on initial run and failed-job rerun (issue #3)"
+        "CI run 39: E2E / portable-pg passed",
+        "CI run 39 focused portable-pg rerun passed"
       ]
     },
     {
@@ -51,28 +53,29 @@
       "id": "protected-app-shell",
       "category": "product",
       "status": "implemented",
-      "verificationStatus": "unstable",
+      "verificationStatus": "passing",
       "summary": "Protected app shell exposes session, profile, notes, billing, locale switching, and demo mode.",
       "evidence": [
-        "apps/web/src/app/app/page.tsx"
+        "apps/web/src/app/app/page.tsx",
+        "apps/web/e2e/auth-portable.spec.ts"
       ],
       "checks": [
         "CI: E2E / demo mode passes",
-        "CI: E2E / portable-pg fails repeatedly (issue #3)"
+        "CI run 39: E2E / portable-pg passed twice"
       ]
     },
     {
       "id": "notes",
       "category": "data",
       "status": "partial",
-      "verificationStatus": "failing",
+      "verificationStatus": "passing",
       "summary": "Notes use Postgres when available and an in-memory fallback otherwise; every operation is scoped by user ID.",
       "evidence": [
         "apps/web/src/lib/notes-store.ts",
         "apps/web/e2e/notes-isolation.spec.ts"
       ],
       "checks": [
-        "CI: E2E / portable-pg failed on initial run and failed-job rerun (issue #3)"
+        "CI run 39: portable-pg cross-user isolation passed twice"
       ]
     },
     {
