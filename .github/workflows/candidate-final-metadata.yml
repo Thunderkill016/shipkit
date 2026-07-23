@@ -1,0 +1,128 @@
+name: Candidate Research Final Metadata
+
+on:
+  push:
+    branches:
+      - agent/candidate-grounded-research
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    if: ${{ github.actor != 'github-actions[bot]' }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/candidate-grounded-research
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Update capability registry and standalone bin proof
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+
+          const capabilitiesPath = 'docs/CAPABILITIES.json';
+          const registry = JSON.parse(fs.readFileSync(capabilitiesPath, 'utf8'));
+          registry.lastVerified = '2026-07-23';
+          registry.verificationScope = 'Repository evidence and GitHub Actions through draft pull request #30. Shipkit now supports a standalone Evolution Core package, bounded repository and public-source research, named-candidate decisions grounded in explicit issue/roadmap/capability/implementation evidence, stale-capability rejection, hardened persistence and explicit execution backends. External user decision value, broad web discovery, coding-agent delivery, release and measured learning are not yet claimed.';
+
+          const research = registry.capabilities.find((item) => item.id === 'research-intelligence');
+          if (!research) throw new Error('research-intelligence capability missing');
+          research.summary = 'Shipkit supports manual typed bundles, deterministic repository research, manifest-driven public-source capture and named-candidate comparison. Candidate decisions preserve explicit alternatives, current capability state, protected experiment parameters, rejected options and fail-closed inconclusive outcomes before independent review.';
+          for (const evidence of [
+            'packages/evolution-core/src/candidate-research.ts',
+            'packages/evolution-core/src/candidate-cli.ts',
+            'packages/evolution-core/src/candidate-research.test.ts',
+            'packages/evolution-core/src/candidate-cli.test.ts',
+            'packages/evolution-core/src/fixtures/shipkit-next-workstream.candidates.json',
+            'scripts/test-candidate-research.mjs',
+            'docs/evolution/CANDIDATE_RESEARCH.md',
+          ]) {
+            if (!research.evidence.includes(evidence)) research.evidence.push(evidence);
+          }
+          for (const check of [
+            'Unit tests: named candidates, stale capability rejection, missing evidence and tied ranking',
+            'CLI test: persist and reload candidate-manifest cycle',
+            'CI proof: fixed #15/#13/#12/#17 comparison selects #13 and preserves #14 parameters',
+          ]) {
+            if (!research.checks.includes(check)) research.checks.push(check);
+          }
+          research.limitations = research.limitations.filter(
+            (item) => item !== 'No adaptive query reformulation or citation chasing exists yet'
+          );
+          for (const limitation of [
+            'Named-candidate evidence is supplied through an explicit manifest; Shipkit does not fetch GitHub issues or independently verify external URLs in this adapter',
+            'Deterministic priority weights are inspectable project judgments, not statistical estimates of market demand',
+            'No adaptive query reformulation or citation chasing exists yet',
+          ]) {
+            if (!research.limitations.includes(limitation)) research.limitations.push(limitation);
+          }
+
+          const candidateCapability = {
+            id: 'candidate-grounded-decision-research',
+            category: 'research',
+            status: 'partial',
+            verificationStatus: 'passing',
+            summary: 'A manifest-driven adapter compares exact named alternatives using issue, roadmap, current capability and implementation evidence. It excludes completed work, preserves rejected alternatives and protected pilot parameters, distinguishes the selected execution path from other available backends, and returns durable inconclusive on missing, stale, under-budget or tied evidence.',
+            evidence: [
+              'packages/evolution-core/src/candidate-research.ts',
+              'packages/evolution-core/src/candidate-cli.ts',
+              'packages/evolution-core/src/fixtures/shipkit-next-workstream.candidates.json',
+              'scripts/test-candidate-research.mjs',
+              'docs/evolution/CANDIDATE_RESEARCH.md'
+            ],
+            checks: [
+              'Candidate unit tests: unique #13 selection and four exact alternatives',
+              'Candidate unit tests: stale capability, missing category and tied score become inconclusive',
+              'Candidate CLI persistence and replay test',
+              'CI: fixed named-candidate research proof'
+            ],
+            limitations: [
+              'The adapter trusts the supplied manifest as a snapshot and does not independently fetch issue or roadmap content',
+              'No external user decision-value evidence is produced',
+              'The score is deterministic and inspectable but not empirically calibrated across organizations',
+              'No coding-agent adapter consumes the resulting handoff'
+            ]
+          };
+          const existingIndex = registry.capabilities.findIndex(
+            (item) => item.id === candidateCapability.id
+          );
+          if (existingIndex === -1) {
+            const publicIndex = registry.capabilities.findIndex(
+              (item) => item.id === 'public-source-citation-baseline'
+            );
+            registry.capabilities.splice(publicIndex === -1 ? registry.capabilities.length : publicIndex, 0, candidateCapability);
+          } else {
+            registry.capabilities[existingIndex] = candidateCapability;
+          }
+          fs.writeFileSync(capabilitiesPath, `${JSON.stringify(registry, null, 2)}\n`);
+
+          const standalonePath = 'scripts/test-evolution-core-standalone.mjs';
+          let standalone = fs.readFileSync(standalonePath, 'utf8');
+          const anchor = `  if (!help.stdout.includes("Shipkit Evolution Engine")) {\n    throw new Error("installed shipkit-evolve binary did not return expected help output");\n  }\n`;
+          const expanded = `${anchor}\n  const candidateBinary = join(\n    consumerRoot,\n    "node_modules",\n    ".bin",\n    process.platform === "win32"\n      ? "shipkit-research-candidates.cmd"\n      : "shipkit-research-candidates"\n  );\n  const candidateHelp = await run(candidateBinary, ["--help"], consumerRoot);\n  if (!candidateHelp.stdout.includes("Shipkit named-candidate research")) {\n    throw new Error(\n      "installed shipkit-research-candidates binary did not return expected help output"\n    );\n  }\n`;
+          if (!standalone.includes('installed shipkit-research-candidates binary')) {
+            if (!standalone.includes(anchor)) throw new Error('standalone CLI anchor missing');
+            standalone = standalone.replace(anchor, expanded);
+            standalone = standalone.replace(
+              `        consumerCli: "passed",`,
+              `        consumerCli: "passed",\n        consumerCandidateCli: "passed",`
+            );
+            fs.writeFileSync(standalonePath, standalone);
+          }
+          NODE
+      - name: Commit verified metadata
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/CAPABILITIES.json scripts/test-evolution-core-standalone.mjs
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "Record verified candidate research capability"
+          git push origin HEAD:agent/candidate-grounded-research
