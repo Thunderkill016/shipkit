@@ -7,6 +7,7 @@ import { runDiscoveredChecks } from "./check-runner.js";
 import { EvidenceRegistry } from "./evidence.js";
 import { EvolutionStore } from "./persistence.js";
 import { authorizeAction } from "./policy.js";
+import { prepareRepositoryResearch } from "./repository-research.js";
 import { prepareResearchToExecution } from "./research.js";
 import { inspectRepository } from "./repository.js";
 import { createProjectScorecard } from "./scorecard.js";
@@ -22,6 +23,7 @@ import {
   type EvolutionAction,
   type EvolutionApproval,
   type EvolutionStage,
+  type ResearchBudget,
   type RiskClass,
 } from "./types.js";
 
@@ -43,6 +45,9 @@ Usage:
   shipkit-evolve inspect [cycle-id] [--project-root .] [--actor shipkit-inspector]
   shipkit-evolve assess <cycle-id> [--project-root .] [--check test]...
     [--timeout-ms 120000] [--max-output-bytes 65536] [--actor shipkit-assessor]
+  shipkit-evolve research-repository <cycle-id> [--project-root .] [--check test]...
+    [--max-queries 8] [--max-sources 8] [--max-minutes 15]
+    [--actor shipkit-repository-researcher] [--reviewer shipkit-research-reviewer]
   shipkit-evolve prepare-handoff <cycle-id> --bundle research.json
     [--project-root .] [--actor shipkit-researcher]
   shipkit-evolve research-show <cycle-id> [--root .shipkit]
@@ -53,6 +58,12 @@ Usage:
     [--artifact bucket=reference]...
     [--approval action|approved-by|exact-scope|expires-at]...
     [--verification-passed]
+
+research-repository runs a deterministic single-worker repository adapter. It captures a fresh
+snapshot, executes only discovered checks in temporary source copies, builds a bounded coverage
+plan, creates source-backed claims and three opportunities, then requires a distinct reviewer.
+Repository evidence may support readiness decisions but cannot establish user demand or current
+external facts. Insufficient inventory or budget produces a durable inconclusive result.
 
 prepare-handoff requires a modeled cycle and a JSON bundle containing a research brief,
 plan, queries, sources, claims, contradictions, at least three opportunities, a decision,
@@ -295,6 +306,101 @@ export async function runEvolutionCli(
       snapshot,
       checkReport,
       scorecard,
+      cycle,
+    });
+    return 0;
+  }
+
+  if (command === "research-repository") {
+    const cycleId = parsed.positionals[1];
+    if (!cycleId) throw new Error("research-repository requires a cycle ID");
+    const previous = await store.load(cycleId);
+    if (previous.stage !== "modeled") {
+      throw new Error(
+        `research-repository requires a modeled cycle; current stage is ${previous.stage}`
+      );
+    }
+    const authorization = authorizeAction({
+      autonomy: previous.autonomy,
+      risk: previous.risk,
+      action: "run-checks",
+      cycleId: previous.cycleId,
+      requiredScope: `cycle:${previous.cycleId}:run-checks`,
+      approvals: previous.approvals,
+    });
+    if (!authorization.allowed) throw new Error(authorization.reason);
+
+    const startedAt = new Date().toISOString();
+    const projectRoot = projectRootFrom(parsed);
+    const snapshot = await inspectRepository(projectRoot);
+    const checkReport = await runDiscoveredChecks(snapshot, {
+      projectRoot,
+      checkNames: parsed.options.get("check") ?? [],
+      timeoutMs: optionalPositiveInteger(parsed, "timeout-ms"),
+      maxOutputBytes: optionalPositiveInteger(parsed, "max-output-bytes"),
+    });
+    const scorecard = createProjectScorecard(snapshot, checkReport);
+    const registry = new EvidenceRegistry(store.rootDir, projectRoot);
+    const snapshotEvidence = await registry.registerJson("research-project-snapshot", snapshot);
+    const checkEvidence = await registry.registerJson("research-check-report", checkReport);
+    const scorecardEvidence = await registry.registerJson("research-project-scorecard", scorecard);
+    const budget: Partial<ResearchBudget> = {
+      maxQueries: optionalPositiveInteger(parsed, "max-queries"),
+      maxSources: optionalPositiveInteger(parsed, "max-sources"),
+      maxMinutes: optionalPositiveInteger(parsed, "max-minutes"),
+      maxCostUsd: 0,
+    };
+    const prepared = prepareRepositoryResearch(previous, snapshot, scorecard, {
+      actor: one(parsed, "actor")?.trim() || "shipkit-repository-researcher",
+      reviewerActor: one(parsed, "reviewer")?.trim() || "shipkit-research-reviewer",
+      startedAt,
+      budget,
+      evidenceRefs: {
+        snapshot: `evidence:${snapshotEvidence.occurrenceId}`,
+        checks: `evidence:${checkEvidence.occurrenceId}`,
+        scorecard: `evidence:${scorecardEvidence.occurrenceId}`,
+      },
+    });
+
+    if (prepared.outcome === "inconclusive") {
+      const diagnosed = await store.save(previous, prepared.diagnosed);
+      const cycle = await store.save(diagnosed, prepared.inconclusive);
+      printJson(io, {
+        authorization,
+        outcome: prepared.outcome,
+        reason: prepared.reason,
+        evidence: { snapshot: snapshotEvidence, checks: checkEvidence, scorecard: scorecardEvidence },
+        snapshot,
+        checkReport,
+        scorecard,
+        run: prepared.run,
+        evaluation: prepared.evaluation,
+        cycle,
+      });
+      return 0;
+    }
+
+    const diagnosed = await store.save(previous, prepared.diagnosed);
+    const researched = await store.save(diagnosed, prepared.researched);
+    const decided = await store.save(researched, prepared.decided);
+    const cycle = await store.save(decided, prepared.planned);
+    const bundleEvidence = await registry.registerJson("generated-repository-research-bundle", prepared.bundle);
+    printJson(io, {
+      authorization,
+      outcome: prepared.outcome,
+      evidence: {
+        snapshot: snapshotEvidence,
+        checks: checkEvidence,
+        scorecard: scorecardEvidence,
+        generatedBundle: bundleEvidence,
+      },
+      snapshot,
+      checkReport,
+      scorecard,
+      run: prepared.run,
+      evaluation: prepared.evaluation,
+      records: prepared.records,
+      executionHandoff: prepared.records.executionHandoff,
       cycle,
     });
     return 0;
