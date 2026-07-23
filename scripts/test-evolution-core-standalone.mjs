@@ -157,6 +157,21 @@ try {
     throw new Error("installed shipkit-evolve binary did not return expected help output");
   }
 
+  const candidateBinary = join(
+    consumerRoot,
+    "node_modules",
+    ".bin",
+    process.platform === "win32"
+      ? "shipkit-research-candidates.cmd"
+      : "shipkit-research-candidates"
+  );
+  const candidateHelp = await run(candidateBinary, ["--help"], consumerRoot);
+  if (!candidateHelp.stdout.includes("Shipkit named-candidate research")) {
+    throw new Error(
+      "installed shipkit-research-candidates binary did not return expected help output"
+    );
+  }
+
   await persistDiagnostics();
   process.stdout.write(
     `${JSON.stringify(
@@ -170,6 +185,7 @@ try {
         pack: "passed",
         consumerImport: "passed",
         consumerCli: "passed",
+        consumerCandidateCli: "passed",
       },
       null,
       2
