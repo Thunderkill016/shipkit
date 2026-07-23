@@ -16,7 +16,8 @@
   "bin": {
     "shipkit-evolve": "./dist/bin-evolve.js",
     "shipkit-research-public": "./dist/bin-public-research.js",
-    "shipkit-sandbox-check": "./dist/bin-sandbox-check.js"
+    "shipkit-sandbox-check": "./dist/bin-sandbox-check.js",
+    "shipkit-research-candidates": "./dist/bin-candidate-research.js"
   },
   "exports": {
     ".": {

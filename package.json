@@ -26,7 +26,8 @@
     "sandbox:check": "pnpm --filter @shipkit/evolution-core build && node packages/evolution-core/dist/sandbox-cli.js",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
-    "db:migrate": "node scripts/db-migrate.mjs"
+    "db:migrate": "node scripts/db-migrate.mjs",
+    "research:candidates": "pnpm --filter @shipkit/evolution-core build && node packages/evolution-core/dist/candidate-cli.js"
   },
   "engines": {
     "node": ">=20"

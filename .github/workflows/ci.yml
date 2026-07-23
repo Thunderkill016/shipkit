@@ -81,6 +81,16 @@ jobs:
           path: artifacts/evolution-dogfood-report.json
       - name: Assess pinned external repository
         run: node scripts/test-evolution-external-repo.mjs
+      - name: Run fixed named-candidate research proof
+        run: node scripts/test-candidate-research.mjs
+      - name: Upload named-candidate research proof
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: candidate-research-proof
+          if-no-files-found: warn
+          retention-days: 14
+          path: artifacts/candidate-research-proof.json
 
   sandbox-docker-proof:
     name: Sandbox / hostile Docker proof
