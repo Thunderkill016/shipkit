@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
 import { basename, resolve } from "node:path";
-import { createCycle, transitionCycle } from "./state-machine.js";
+import { EvidenceRegistry } from "./evidence.js";
 import { EvolutionStore } from "./persistence.js";
+import { inspectRepository } from "./repository.js";
+import { createCycle, transitionCycle } from "./state-machine.js";
 import {
   AUTONOMY_LEVELS,
   EVOLUTION_ACTIONS,
@@ -31,6 +33,7 @@ const HELP = `Shipkit Evolution Engine
 Usage:
   shipkit-evolve init [--root .shipkit]
   shipkit-evolve start --objective "..." [--id repo:cycle] [--autonomy A2] [--risk R1]
+  shipkit-evolve inspect [cycle-id] [--project-root .] [--actor shipkit-inspector]
   shipkit-evolve status [--root .shipkit]
   shipkit-evolve show <cycle-id> [--root .shipkit]
   shipkit-evolve resume <cycle-id> [--root .shipkit]
@@ -131,6 +134,10 @@ function rootFrom(args: ParsedArgs): string {
   return resolve(one(args, "root") ?? ".shipkit");
 }
 
+function projectRootFrom(args: ParsedArgs): string {
+  return resolve(one(args, "project-root") ?? process.cwd());
+}
+
 function printJson(io: CliIo, value: unknown): void {
   io.stdout(`${JSON.stringify(value, null, 2)}\n`);
 }
@@ -153,7 +160,7 @@ export async function runEvolutionCli(
   const store = new EvolutionStore(rootFrom(parsed));
 
   if (command === "init") {
-    const configPath = await store.initializeProject(process.cwd());
+    const configPath = await store.initializeProject(projectRootFrom(parsed));
     printJson(io, { initialized: true, root: store.rootDir, configPath });
     return 0;
   }
@@ -164,7 +171,7 @@ export async function runEvolutionCli(
     if (!AUTONOMY_LEVELS.includes(autonomy)) throw new Error(`invalid autonomy: ${autonomy}`);
     if (!RISK_CLASSES.includes(risk)) throw new Error(`invalid risk: ${risk}`);
 
-    const project = basename(process.cwd()).replace(/[^A-Za-z0-9._-]/g, "-") || "project";
+    const project = basename(projectRootFrom(parsed)).replace(/[^A-Za-z0-9._-]/g, "-") || "project";
     const defaultId = `${project}:${new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14)}`;
     const cycle = createCycle({
       cycleId: one(parsed, "id") ?? defaultId,
@@ -174,6 +181,28 @@ export async function runEvolutionCli(
     });
     await store.create(cycle);
     printJson(io, cycle);
+    return 0;
+  }
+
+  if (command === "inspect") {
+    const projectRoot = projectRootFrom(parsed);
+    const snapshot = await inspectRepository(projectRoot);
+    const evidence = await new EvidenceRegistry(store.rootDir, projectRoot).registerJson(
+      "project-snapshot",
+      snapshot
+    );
+    const cycleId = parsed.positionals[1];
+    let cycle = null;
+    if (cycleId) {
+      const previous = await store.load(cycleId);
+      const next = transitionCycle(previous, "observed", {
+        actor: one(parsed, "actor")?.trim() || "shipkit-inspector",
+        reason: "Captured repository structure, checks, product signals, and trust boundaries",
+        addArtifacts: { baseline: [`evidence:${evidence.id}`] },
+      });
+      cycle = await store.save(previous, next);
+    }
+    printJson(io, { evidence, snapshot, cycle });
     return 0;
   }
 
