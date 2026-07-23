@@ -85,6 +85,160 @@ export type EvolutionEvent = {
   evidenceRefs: string[];
 };
 
+export type ResearchRecordBase = {
+  recordId: string;
+  cycleId: string;
+  actor: string;
+  createdAt: string;
+  evidenceRefs: string[];
+};
+
+export type ResearchBrief = ResearchRecordBase & {
+  kind: "research-brief";
+  decisionQuestion: string;
+  owner: string;
+  deadline: string | null;
+  assumptions: string[];
+  constraints: string[];
+  evidenceThreshold: string;
+  protectedOutcomes: string[];
+};
+
+export type ResearchBudget = {
+  maxQueries: number;
+  maxSources: number;
+  maxMinutes: number;
+  maxCostUsd: number;
+};
+
+export type ResearchPlan = ResearchRecordBase & {
+  kind: "research-plan";
+  briefId: string;
+  questions: string[];
+  sourceStrategy: string[];
+  budget: ResearchBudget;
+  stopConditions: string[];
+};
+
+export type QueryRecord = ResearchRecordBase & {
+  kind: "query";
+  query: string;
+  rationale: string;
+  tool: string;
+  parentQueryId: string | null;
+  resultRefs: string[];
+};
+
+export type ResearchSourceClass =
+  | "repository"
+  | "user-research"
+  | "primary-technical"
+  | "official-documentation"
+  | "independent-reproduction"
+  | "community"
+  | "unverified";
+
+export type SourceRecord = ResearchRecordBase & {
+  kind: "source";
+  canonicalId: string;
+  title: string;
+  publisher: string;
+  sourceClass: ResearchSourceClass;
+  version: string | null;
+  accessedAt: string;
+  license: string | null;
+  authority: number;
+  directness: number;
+  freshness: number;
+  applicability: number;
+  independence: number;
+  conflictOfInterest: string | null;
+};
+
+export type ResearchClaimType =
+  | "fact"
+  | "mechanism"
+  | "limitation"
+  | "user-problem"
+  | "prediction"
+  | "recommendation";
+
+export type ClaimRecord = ResearchRecordBase & {
+  kind: "claim";
+  statement: string;
+  claimType: ResearchClaimType;
+  confidence: number;
+  uncertainty: string;
+  supportingSourceIds: string[];
+  contradictingSourceIds: string[];
+  expiresAt: string | null;
+};
+
+export type ContradictionRecord = ResearchRecordBase & {
+  kind: "contradiction";
+  claimIds: string[];
+  summary: string;
+  suspectedCause: string;
+  affectedDecision: string;
+  status: "open" | "resolved" | "accepted-uncertainty";
+};
+
+export type OpportunityRecord = ResearchRecordBase & {
+  kind: "opportunity";
+  title: string;
+  problem: string;
+  expectedOutcome: string;
+  evidenceClaimIds: string[];
+  alternatives: string[];
+  estimatedCost: string;
+  risk: string;
+  uncertainty: string;
+  learningValue: string;
+  smallestExperiment: string;
+};
+
+export type DecisionRecord = ResearchRecordBase & {
+  kind: "decision";
+  selectedOpportunityId: string;
+  rejectedOpportunityIds: string[];
+  rationale: string;
+};
+
+export type ExperimentRecord = ResearchRecordBase & {
+  kind: "experiment";
+  decisionId: string;
+  hypothesis: string;
+  method: string;
+  successCriteria: string[];
+  guardrails: string[];
+  rollbackPlan: string[];
+};
+
+export type ExecutionHandoff = ResearchRecordBase & {
+  kind: "execution-handoff";
+  experimentId: string;
+  objective: string;
+  allowedScope: string[];
+  forbiddenScope: string[];
+  acceptanceCriteria: string[];
+  verificationPlan: string[];
+  rollbackPlan: string[];
+  parameterDigest: string;
+};
+
+export type EvolutionResearchRecords = {
+  briefs: ResearchBrief[];
+  plans: ResearchPlan[];
+  queries: QueryRecord[];
+  sources: SourceRecord[];
+  claims: ClaimRecord[];
+  contradictions: ContradictionRecord[];
+  opportunities: OpportunityRecord[];
+  decisions: DecisionRecord[];
+  experiments: ExperimentRecord[];
+  executionHandoffs: ExecutionHandoff[];
+};
+
 export type EvolutionCycle = {
   schemaVersion: 1;
   cycleId: string;
@@ -97,6 +251,7 @@ export type EvolutionCycle = {
   artifacts: EvolutionArtifacts;
   approvals: EvolutionApproval[];
   history: EvolutionEvent[];
+  research?: EvolutionResearchRecords;
 };
 
 export type CreateCycleInput = {
@@ -112,6 +267,7 @@ export type TransitionInput = {
   reason: string;
   now?: string;
   addArtifacts?: Partial<Record<ArtifactBucket, string[]>>;
+  appendResearch?: Partial<EvolutionResearchRecords>;
   approvals?: EvolutionApproval[];
   verificationPassed?: boolean;
 };
