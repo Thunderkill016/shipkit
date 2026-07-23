@@ -14,19 +14,73 @@ const temporaryRoot = await mkdtemp(join(tmpdir(), "shipkit-evolution-core-stand
 const isolatedPackageRoot = join(temporaryRoot, "package");
 const tarballDirectory = join(temporaryRoot, "tarballs");
 const consumerRoot = join(temporaryRoot, "consumer");
+const diagnosticsPath = join(
+  repositoryRoot,
+  "artifacts",
+  `evolution-core-standalone-diagnostics-node-${process.versions.node}.json`
+);
+const commands = [];
+
+async function persistDiagnostics(error = null) {
+  await mkdir(dirname(diagnosticsPath), { recursive: true });
+  await writeFile(
+    diagnosticsPath,
+    `${JSON.stringify(
+      {
+        node: process.version,
+        platform: process.platform,
+        packageRoot: sourcePackageRoot,
+        commands,
+        error:
+          error instanceof Error
+            ? { name: error.name, message: error.message, stack: error.stack }
+            : error === null
+              ? null
+              : { message: String(error) },
+      },
+      null,
+      2
+    )}\n`,
+    "utf8"
+  );
+}
 
 async function run(executable, args, cwd) {
-  return await execFileAsync(executable, args, {
-    cwd,
-    env: {
-      ...process.env,
-      CI: "true",
-      npm_config_audit: "false",
-      npm_config_fund: "false",
-      npm_config_update_notifier: "false",
-    },
-    maxBuffer: 20 * 1024 * 1024,
-  });
+  const command = { executable, args, cwd, status: "running" };
+  commands.push(command);
+  try {
+    const result = await execFileAsync(executable, args, {
+      cwd,
+      env: {
+        ...process.env,
+        CI: "true",
+        npm_config_audit: "false",
+        npm_config_fund: "false",
+        npm_config_update_notifier: "false",
+      },
+      maxBuffer: 20 * 1024 * 1024,
+    });
+    Object.assign(command, {
+      status: "passed",
+      stdout: result.stdout,
+      stderr: result.stderr,
+    });
+    return result;
+  } catch (error) {
+    Object.assign(command, {
+      status: "failed",
+      code: error?.code ?? null,
+      signal: error?.signal ?? null,
+      stdout: error?.stdout ?? "",
+      stderr: error?.stderr ?? "",
+      message: error instanceof Error ? error.message : String(error),
+    });
+    await persistDiagnostics(error);
+    throw new Error(
+      `standalone command failed: ${executable} ${args.join(" ")}\nstdout:\n${command.stdout || "<empty>"}\nstderr:\n${command.stderr || "<empty>"}`,
+      { cause: error }
+    );
+  }
 }
 
 function copyFilter(source) {
@@ -103,6 +157,7 @@ try {
     throw new Error("installed shipkit-evolve binary did not return expected help output");
   }
 
+  await persistDiagnostics();
   process.stdout.write(
     `${JSON.stringify(
       {
@@ -120,6 +175,9 @@ try {
       2
     )}\n`
   );
+} catch (error) {
+  await persistDiagnostics(error);
+  throw error;
 } finally {
   await rm(temporaryRoot, { recursive: true, force: true });
 }
