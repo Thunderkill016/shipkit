@@ -47,6 +47,14 @@ jobs:
         run: pnpm --filter @shipkit/evolution-core build
       - name: Dogfood Shipkit assessment
         run: node scripts/test-evolution-cli.mjs
+      - name: Upload Evolution dogfood diagnostics
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: evolution-dogfood-diagnostics
+          if-no-files-found: warn
+          retention-days: 7
+          path: artifacts/evolution-dogfood-report.json
       - name: Assess pinned external repository
         run: node scripts/test-evolution-external-repo.mjs
 
