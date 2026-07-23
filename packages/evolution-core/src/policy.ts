@@ -1,9 +1,10 @@
-import type {
-  AuthorizationDecision,
-  AutonomyLevel,
-  EvolutionAction,
-  EvolutionApproval,
-  RiskClass,
+import {
+  EVOLUTION_POLICY_VERSION,
+  type AuthorizationDecision,
+  type AutonomyLevel,
+  type EvolutionAction,
+  type EvolutionApproval,
+  type RiskClass,
 } from "./types.js";
 
 const autonomyRank: Record<AutonomyLevel, number> = {
@@ -45,17 +46,41 @@ const protectedActions = new Set<EvolutionAction>([
   "spend",
 ]);
 
-function hasApproval(action: EvolutionAction, approvals: EvolutionApproval[]): boolean {
-  return approvals.some(
-    (approval) => approval.action === action && approval.scope.trim().length > 0
-  );
+function validDate(value: string | null): number | null {
+  if (value === null) return null;
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function matchingApproval(input: {
+  action: EvolutionAction;
+  cycleId: string;
+  requiredScope: string;
+  approvals: EvolutionApproval[];
+  now: string;
+}): EvolutionApproval | undefined {
+  const now = Date.parse(input.now);
+  return input.approvals.find((approval) => {
+    const expiry = validDate(approval.expiresAt);
+    return (
+      approval.action === input.action &&
+      approval.cycleId === input.cycleId &&
+      approval.scope === input.requiredScope &&
+      approval.policyVersion === EVOLUTION_POLICY_VERSION &&
+      approval.revokedAt === null &&
+      (expiry === null || expiry > now)
+    );
+  });
 }
 
 export function authorizeAction(input: {
   autonomy: AutonomyLevel;
   risk: RiskClass;
   action: EvolutionAction;
+  cycleId?: string;
+  requiredScope?: string;
   approvals?: EvolutionApproval[];
+  now?: string;
 }): AuthorizationDecision {
   const approvals = input.approvals ?? [];
   const required = minimumAutonomy[input.action];
@@ -64,6 +89,7 @@ export function authorizeAction(input: {
     return {
       allowed: false,
       requiresApproval: false,
+      matchedApprovalId: null,
       reason: `${input.action} requires ${required}; cycle is ${input.autonomy}`,
     };
   }
@@ -73,17 +99,46 @@ export function authorizeAction(input: {
     (riskRank[input.risk] >= riskRank.R3 &&
       (input.action === "modify-code" || input.action === "open-draft-pr"));
 
-  if (needsApproval && !hasApproval(input.action, approvals)) {
+  if (!needsApproval) {
+    return {
+      allowed: true,
+      requiresApproval: false,
+      matchedApprovalId: null,
+      reason: `${input.action} is permitted for ${input.autonomy}/${input.risk}`,
+    };
+  }
+
+  const cycleId = input.cycleId?.trim();
+  const requiredScope = input.requiredScope?.trim();
+  if (!cycleId || !requiredScope) {
     return {
       allowed: false,
       requiresApproval: true,
-      reason: `${input.action} requires explicit scoped approval at ${input.risk}`,
+      matchedApprovalId: null,
+      reason: `${input.action} requires an exact cycle and resource scope`,
+    };
+  }
+
+  const approval = matchingApproval({
+    action: input.action,
+    cycleId,
+    requiredScope,
+    approvals,
+    now: input.now ?? new Date().toISOString(),
+  });
+  if (!approval) {
+    return {
+      allowed: false,
+      requiresApproval: true,
+      matchedApprovalId: null,
+      reason: `${input.action} requires a current approval for ${cycleId} and scope ${requiredScope}`,
     };
   }
 
   return {
     allowed: true,
-    requiresApproval: needsApproval,
-    reason: `${input.action} is permitted for ${input.autonomy}/${input.risk}`,
+    requiresApproval: true,
+    matchedApprovalId: approval.approvalId,
+    reason: `${input.action} is permitted by approval ${approval.approvalId}`,
   };
 }
