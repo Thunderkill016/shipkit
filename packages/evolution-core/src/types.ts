@@ -122,7 +122,7 @@ export type ResearchPlan = ResearchRecordBase & {
 
 export type ResearchRunRecord = ResearchRecordBase & {
   kind: "research-run";
-  adapter: "manual-bundle" | "repository-single-worker" | "public-http-manifest" | "candidate-manifest";
+  adapter: "manual-bundle" | "repository-single-worker" | "public-http-manifest" | "candidate-manifest" | "public-search";
   startedAt: string;
   completedAt: string;
   budget: ResearchBudget;
@@ -292,7 +292,10 @@ export type ResearchReviewCheck = {
     | "citation-integrity"
     | "source-safety"
     | "source-strength"
-    | "source-deduplication";
+    | "source-deduplication"
+    | "search-reproducibility"
+    | "search-result-integrity"
+    | "falsification-search";
   passed: boolean;
   summary: string;
   evidenceRefs: string[];
