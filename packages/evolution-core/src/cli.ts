@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 
 import { createHash, randomUUID } from "node:crypto";
+import { readFile } from "node:fs/promises";
 import { basename, resolve } from "node:path";
 import { runDiscoveredChecks } from "./check-runner.js";
 import { EvidenceRegistry } from "./evidence.js";
 import { EvolutionStore } from "./persistence.js";
 import { authorizeAction } from "./policy.js";
+import { prepareResearchToExecution } from "./research.js";
 import { inspectRepository } from "./repository.js";
 import { createProjectScorecard } from "./scorecard.js";
 import { createCycle, transitionCycle } from "./state-machine.js";
@@ -41,6 +43,9 @@ Usage:
   shipkit-evolve inspect [cycle-id] [--project-root .] [--actor shipkit-inspector]
   shipkit-evolve assess <cycle-id> [--project-root .] [--check test]...
     [--timeout-ms 120000] [--max-output-bytes 65536] [--actor shipkit-assessor]
+  shipkit-evolve prepare-handoff <cycle-id> --bundle research.json
+    [--project-root .] [--actor shipkit-researcher]
+  shipkit-evolve research-show <cycle-id> [--root .shipkit]
   shipkit-evolve status [--root .shipkit]
   shipkit-evolve show <cycle-id> [--root .shipkit]
   shipkit-evolve resume <cycle-id> [--root .shipkit]
@@ -48,6 +53,11 @@ Usage:
     [--artifact bucket=reference]...
     [--approval action|approved-by|exact-scope|expires-at]...
     [--verification-passed]
+
+prepare-handoff requires a modeled cycle and a JSON bundle containing a research brief,
+plan, queries, sources, claims, contradictions, at least three opportunities, a decision,
+a reversible experiment, and an execution handoff. It advances the durable cycle through
+modeled → diagnosed → researched → decided → planned without modifying product code.
 
 For code execution, the exact approval scope is cycle:<cycle-id>:modify-code.
 The CLI never calls a model, merges, deploys, reads secrets, or writes production by itself.
@@ -286,6 +296,57 @@ export async function runEvolutionCli(
       checkReport,
       scorecard,
       cycle,
+    });
+    return 0;
+  }
+
+  if (command === "prepare-handoff") {
+    const cycleId = parsed.positionals[1];
+    if (!cycleId) throw new Error("prepare-handoff requires a cycle ID");
+    const previous = await store.load(cycleId);
+    const bundlePath = resolve(required(parsed, "bundle"));
+    let bundle: unknown;
+    try {
+      bundle = JSON.parse(await readFile(bundlePath, "utf8"));
+    } catch (error) {
+      throw new Error(
+        `cannot read research bundle ${bundlePath}: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+
+    const projectRoot = projectRootFrom(parsed);
+    const evidence = await new EvidenceRegistry(store.rootDir, projectRoot).registerJson(
+      "research-to-execution-bundle",
+      bundle
+    );
+    const evidenceRef = `evidence:${evidence.occurrenceId}`;
+    const prepared = prepareResearchToExecution(previous, bundle, {
+      actor: one(parsed, "actor")?.trim() || "shipkit-researcher",
+      evidenceRefs: [evidenceRef],
+    });
+
+    const diagnosed = await store.save(previous, prepared.diagnosed);
+    const researched = await store.save(diagnosed, prepared.researched);
+    const decided = await store.save(researched, prepared.decided);
+    const planned = await store.save(decided, prepared.planned);
+
+    printJson(io, {
+      evidence,
+      records: prepared.records,
+      executionHandoff: prepared.records.executionHandoff,
+      cycle: planned,
+    });
+    return 0;
+  }
+
+  if (command === "research-show") {
+    const cycleId = parsed.positionals[1];
+    if (!cycleId) throw new Error("research-show requires a cycle ID");
+    const cycle = await store.load(cycleId);
+    printJson(io, {
+      cycleId: cycle.cycleId,
+      stage: cycle.stage,
+      research: cycle.research ?? null,
     });
     return 0;
   }
