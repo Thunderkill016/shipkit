@@ -47,11 +47,39 @@ type HandoffView = {
   verificationPlan: string[];
 };
 
+type ResearchRunView = {
+  adapter: string;
+  outcome: string;
+  usage: {
+    queries: number;
+    sources: number;
+    minutes: number;
+    costUsd: number;
+  };
+  coverage: {
+    required: string[];
+    answered: string[];
+    gaps: string[];
+  };
+  stopReason: string;
+};
+
+type ResearchEvaluationView = {
+  actor: string;
+  verdict: string;
+  checks: Array<{ id: string; passed: boolean; summary: string }>;
+  unsupportedClaimIds: string[];
+  unresolvedContradictionIds: string[];
+  limitations: string[];
+};
+
 type ResearchView = {
+  runs?: ResearchRunView[];
   sources: Array<{ recordId: string }>;
   claims: Array<{ recordId: string }>;
   contradictions: Array<{ recordId: string }>;
   opportunities: OpportunityView[];
+  evaluations?: ResearchEvaluationView[];
   decisions: DecisionView[];
   experiments: ExperimentView[];
   executionHandoffs: HandoffView[];
@@ -139,6 +167,8 @@ export default async function EvolutionWorkspacePage({ searchParams }: PageProps
   const workspace = await loadWorkspace(params.cycle);
   const selected = workspace.selected;
   const research = selected?.research;
+  const run = research?.runs?.at(-1) ?? null;
+  const evaluation = research?.evaluations?.at(-1) ?? null;
   const decision = research?.decisions.at(-1) ?? null;
   const experiment = research?.experiments.at(-1) ?? null;
   const handoff = research?.executionHandoffs.at(-1) ?? null;
@@ -184,11 +214,14 @@ export default async function EvolutionWorkspacePage({ searchParams }: PageProps
         <section className="mt-8 rounded-2xl border border-border bg-card p-6">
           <h2 className="font-medium text-foreground">No durable cycle found</h2>
           <p className="mt-2 text-sm text-muted">
-            Initialize a cycle with the CLI, inspect and assess the repository, then prepare a research
-            handoff.
+            Initialize a cycle, inspect and assess the repository, then run bounded repository research.
           </p>
           <pre className="mt-4 overflow-x-auto rounded-xl bg-background p-4 text-xs text-muted">
-            {`pnpm evolve -- init\npnpm evolve -- start --id shipkit:cycle-001 --objective "Choose the next product experiment"\npnpm evolve -- inspect shipkit:cycle-001 --project-root .\npnpm evolve -- assess shipkit:cycle-001 --project-root .\npnpm evolve -- prepare-handoff shipkit:cycle-001 --bundle research.json --project-root .`}
+            {`pnpm evolve -- init
+pnpm evolve -- start --id shipkit:cycle-001 --objective "Choose the next product experiment"
+pnpm evolve -- inspect shipkit:cycle-001 --project-root .
+pnpm evolve -- assess shipkit:cycle-001 --project-root .
+pnpm evolve -- research-repository shipkit:cycle-001 --project-root .`}
           </pre>
         </section>
       ) : (
@@ -249,6 +282,66 @@ export default async function EvolutionWorkspacePage({ searchParams }: PageProps
                     <p className="mt-2 text-3xl font-semibold text-foreground">{value}</p>
                   </div>
                 ))}
+              </section>
+
+              <section className="grid gap-6 xl:grid-cols-2">
+                <div className="rounded-2xl border border-border bg-card p-6">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <h3 className="font-medium text-foreground">Research run</h3>
+                    {run && <Badge>{run.outcome}</Badge>}
+                  </div>
+                  {run ? (
+                    <div className="mt-4 space-y-3 text-sm text-muted">
+                      <p>
+                        Adapter: <span className="text-foreground">{run.adapter}</span>
+                      </p>
+                      <p>
+                        Usage: {run.usage.queries} queries · {run.usage.sources} sources · {run.usage.minutes}
+                        min · ${run.usage.costUsd.toFixed(2)}
+                      </p>
+                      <p>
+                        Coverage: {run.coverage.answered.length}/{run.coverage.required.length} questions
+                        answered
+                      </p>
+                      <p className="text-foreground">Stop reason: {run.stopReason}</p>
+                      {run.coverage.gaps.length > 0 && (
+                        <p>Remaining gaps: {run.coverage.gaps.join(" · ")}</p>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="mt-4 text-sm text-muted">No durable research run has been persisted.</p>
+                  )}
+                </div>
+
+                <div className="rounded-2xl border border-border bg-card p-6">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <h3 className="font-medium text-foreground">Independent research review</h3>
+                    {evaluation && <Badge>{evaluation.verdict}</Badge>}
+                  </div>
+                  {evaluation ? (
+                    <div className="mt-4 space-y-3 text-sm text-muted">
+                      <p>
+                        Reviewer: <span className="text-foreground">{evaluation.actor}</span>
+                      </p>
+                      <p>
+                        Checks: {evaluation.checks.filter((item) => item.passed).length}/
+                        {evaluation.checks.length} passed
+                      </p>
+                      <ul className="space-y-1">
+                        {evaluation.checks.map((item) => (
+                          <li key={item.id} className={item.passed ? "text-muted" : "text-red-300"}>
+                            {item.passed ? "✓" : "×"} {item.id}: {item.summary}
+                          </li>
+                        ))}
+                      </ul>
+                      {evaluation.limitations.length > 0 && (
+                        <p>Limitations: {evaluation.limitations.join(" · ")}</p>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="mt-4 text-sm text-muted">No independent review has been persisted.</p>
+                  )}
+                </div>
               </section>
 
               <section className="rounded-2xl border border-border bg-card p-6">
@@ -359,7 +452,7 @@ export default async function EvolutionWorkspacePage({ searchParams }: PageProps
                   </div>
                 ) : (
                   <p className="mt-4 text-sm text-muted">
-                    Run <code className="text-foreground">prepare-handoff</code> after the cycle reaches
+                    Run <code className="text-foreground">research-repository</code> after the cycle reaches
                     modeled.
                   </p>
                 )}
