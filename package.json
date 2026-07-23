@@ -2,7 +2,7 @@
   "name": "shipkit",
   "version": "0.4.0",
   "private": true,
-  "description": "Open product kit for vibe coding — idea to landing, auth, app, security, deploy.",
+  "description": "Shipkit Evolution Engine — deterministic, evidence-backed project evolution across human and AI agents; includes a Starter Kit dogfood project.",
   "license": "MIT",
   "packageManager": "pnpm@9.15.0",
   "scripts": {
