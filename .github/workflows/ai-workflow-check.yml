@@ -1,0 +1,34 @@
+name: AI workflow check
+
+on:
+  pull_request:
+    paths:
+      - "AGENTS.md"
+      - "AI_WORKFLOW.md"
+      - "docs/CAPABILITIES.json"
+      - "docs/ai/**"
+      - "prompts/**"
+      - ".agents/**"
+      - ".github/**"
+      - "scripts/check-ai-workflow.mjs"
+      - "scripts/check-capabilities.mjs"
+      - "scripts/test-capabilities.mjs"
+      - "scripts/create-shipkit.mjs"
+      - "scripts/test-create-shipkit.mjs"
+      - "package.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/check-ai-workflow.mjs
+      - run: node scripts/test-capabilities.mjs
+      - run: node scripts/test-create-shipkit.mjs

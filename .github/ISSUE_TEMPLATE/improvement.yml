@@ -1,0 +1,58 @@
+name: Project improvement
+description: Audit, prioritize, research, and deliver one evidence-backed project improvement
+title: "improvement: "
+labels:
+  - improvement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for a bounded autonomous improvement cycle. Open separate issues for unrelated candidates.
+  - type: input
+    id: outcome
+    attributes:
+      label: Outcome to improve
+      description: Product or engineering outcome, not “make the code better.”
+      placeholder: Reduce failed onboarding attempts or shorten local feedback time.
+    validations:
+      required: true
+  - type: dropdown
+    id: autonomy
+    attributes:
+      label: Maximum autonomy
+      options:
+        - A0 — observe only
+        - A1 — diagnose and rank
+        - A2 — research and plan
+        - A3 — bounded low/medium-risk delivery
+        - A4 — sensitive delivery with explicit gates
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Known evidence and symptoms
+      description: Link issues, metrics, errors, code, user feedback, or state that evidence is missing.
+    validations:
+      required: true
+  - type: textarea
+    id: coverage
+    attributes:
+      label: Areas to inspect
+      description: Journeys, packages, services, environments, or repositories in scope.
+    validations:
+      required: true
+  - type: textarea
+    id: protected
+    attributes:
+      label: Protected areas and approval gates
+      placeholder: No production writes, no auth changes, no new paid services.
+    validations:
+      required: true
+  - type: textarea
+    id: completion
+    attributes:
+      label: Completion condition
+      description: What evidence proves this cycle is complete?
+    validations:
+      required: true

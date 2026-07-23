@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
+import { account, session, user, verification } from "@shipkit/db";
 import { createDb } from "@/lib/db";
 
 /**
@@ -36,7 +37,10 @@ function buildAuth() {
   }
 
   return betterAuth({
-    database: drizzleAdapter(db, { provider: "pg" }),
+    database: drizzleAdapter(db, {
+      provider: "pg",
+      schema: { user, session, account, verification },
+    }),
     secret,
     baseURL,
     emailAndPassword: {

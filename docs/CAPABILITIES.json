@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "project": "shipkit",
+  "lastVerified": "2026-07-23",
+  "verificationScope": "Repository evidence paths and CI state on pull request #1; production usage and analytics are not available.",
+  "capabilities": [
+    {
+      "id": "public-landing",
+      "category": "product",
+      "status": "implemented",
+      "verificationStatus": "passing",
+      "summary": "Localized public landing page with JSON-LD, navigation, and app entry points.",
+      "evidence": [
+        "apps/web/src/app/page.tsx"
+      ],
+      "checks": [
+        "CI: E2E / demo mode"
+      ]
+    },
+    {
+      "id": "email-password-auth",
+      "category": "auth",
+      "status": "implemented",
+      "verificationStatus": "passing",
+      "summary": "Email/password sign-up and sign-in through the AuthPort with validation and rate limiting.",
+      "evidence": [
+        "apps/web/src/app/login/page.tsx",
+        "apps/web/src/app/login/login-form.tsx",
+        "apps/web/src/app/actions/auth.ts",
+        "apps/web/e2e/auth-portable.spec.ts",
+        "packages/db/src/schema.ts"
+      ],
+      "checks": [
+        "CI run 39: E2E / portable-pg passed",
+        "CI run 39 focused portable-pg rerun passed"
+      ]
+    },
+    {
+      "id": "oauth-auth",
+      "category": "auth",
+      "status": "partial",
+      "verificationStatus": "not-run",
+      "summary": "Google and GitHub OAuth are env-gated in UI and adapters; no full live-provider CI path is recorded.",
+      "evidence": [
+        "apps/web/src/app/login/login-form.tsx",
+        "apps/web/src/app/actions/auth.ts"
+      ],
+      "checks": [
+        "Manual provider configuration required"
+      ]
+    },
+    {
+      "id": "protected-app-shell",
+      "category": "product",
+      "status": "implemented",
+      "verificationStatus": "passing",
+      "summary": "Protected app shell exposes session, profile, notes, billing, locale switching, and demo mode.",
+      "evidence": [
+        "apps/web/src/app/app/page.tsx",
+        "apps/web/e2e/auth-portable.spec.ts"
+      ],
+      "checks": [
+        "CI: E2E / demo mode passes",
+        "CI run 39: E2E / portable-pg passed twice"
+      ]
+    },
+    {
+      "id": "notes",
+      "category": "data",
+      "status": "partial",
+      "verificationStatus": "passing",
+      "summary": "Notes use Postgres when available and an in-memory fallback otherwise; every operation is scoped by user ID.",
+      "evidence": [
+        "apps/web/src/lib/notes-store.ts",
+        "apps/web/e2e/notes-isolation.spec.ts"
+      ],
+      "checks": [
+        "CI run 39: portable-pg cross-user isolation passed twice"
+      ]
+    },
+    {
+      "id": "localization",
+      "category": "product",
+      "status": "implemented",
+      "verificationStatus": "passing",
+      "summary": "Landing, login, and app shell read translated strings and expose a locale switcher.",
+      "evidence": [
+        "apps/web/src/app/page.tsx",
+        "apps/web/src/app/login/page.tsx",
+        "apps/web/src/app/app/page.tsx"
+      ],
+      "checks": [
+        "CI: E2E / demo mode"
+      ]
+    },
+    {
+      "id": "welcome-email",
+      "category": "integration",
+      "status": "implemented",
+      "verificationStatus": "not-run",
+      "summary": "Successful sign-up sends a non-blocking welcome email through the configured MailPort.",
+      "evidence": [
+        "apps/web/src/app/actions/auth.ts"
+      ],
+      "checks": [
+        "Unit or integration delivery assertion not yet recorded"
+      ]
+    },
+    {
+      "id": "billing",
+      "category": "integration",
+      "status": "partial",
+      "verificationStatus": "not-run",
+      "summary": "Billing page and Stripe-backed checkout are env-gated; no production webhook lifecycle is claimed.",
+      "evidence": [
+        "apps/web/src/app/app/billing/page.tsx",
+        "apps/web/package.json"
+      ],
+      "checks": [
+        "Manual Stripe configuration required"
+      ]
+    },
+    {
+      "id": "health-endpoint",
+      "category": "platform",
+      "status": "implemented",
+      "verificationStatus": "passing",
+      "summary": "A lightweight health endpoint reports service state and selected auth adapter.",
+      "evidence": [
+        "apps/web/src/app/api/health/route.ts"
+      ],
+      "checks": [
+        "Production build passes"
+      ]
+    },
+    {
+      "id": "project-generator",
+      "category": "dx",
+      "status": "implemented",
+      "verificationStatus": "passing",
+      "summary": "The generator copies the foundation and AI workflow, seeds product/project-model files, and avoids recursive self-copy.",
+      "evidence": [
+        "scripts/create-shipkit.mjs",
+        "scripts/test-create-shipkit.mjs"
+      ],
+      "checks": [
+        "AI workflow check: generator integration test"
+      ]
+    },
+    {
+      "id": "ai-engineering-workflow",
+      "category": "dx",
+      "status": "implemented",
+      "verificationStatus": "passing",
+      "summary": "Repository-first delivery, research, autonomous improvement, safety, prompts, issue forms, and CI validation are included.",
+      "evidence": [
+        "AGENTS.md",
+        "AI_WORKFLOW.md",
+        "docs/ai/AUTONOMOUS_IMPROVEMENT.md",
+        "docs/ai/DISCOVERY_RESEARCH.md",
+        "scripts/check-ai-workflow.mjs",
+        ".github/workflows/ai-workflow-check.yml"
+      ],
+      "checks": [
+        "AI workflow check"
+      ]
+    }
+  ]
+}

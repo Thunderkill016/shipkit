@@ -13,10 +13,18 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   timeout: 60_000,
   expect: { timeout: 15_000 },
-  reporter: process.env.CI ? "github" : "list",
+  reporter: process.env.CI
+    ? [
+        ["github"],
+        ["html", { outputFolder: "playwright-report", open: "never" }],
+      ]
+    : "list",
+  outputDir: "test-results",
   use: {
     baseURL,
     trace: "on-first-retry",
+    screenshot: "only-on-failure",
+    video: "retain-on-failure",
     actionTimeout: 15_000,
     navigationTimeout: 30_000,
   },

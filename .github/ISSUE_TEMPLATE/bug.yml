@@ -1,0 +1,41 @@
+name: Bug report
+description: Capture a reproducible failure and its expected behavior.
+title: "[Bug]: "
+body:
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Logs, screenshots, failing tests, routes, environment, or commit.
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Fix acceptance criteria
+      value: |
+        - [ ] A test reproduces the bug when practical
+        - [ ] The fix passes `pnpm verify`
+        - [ ] No unrelated behavior changes
+    validations:
+      required: true

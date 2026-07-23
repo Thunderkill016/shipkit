@@ -1,0 +1,53 @@
+name: Feature slice
+description: Define one small, testable user outcome for an AI or human contributor.
+title: "[Feature]: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or user outcome
+      description: Describe the need, not only the proposed implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: Current behavior
+      description: Include routes, files, screenshots, or examples when known.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Use checkboxes and make every item observable.
+      value: |
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints and out-of-scope work
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification
+      value: |
+        - [ ] Focused tests
+        - [ ] `pnpm verify`
+        - [ ] Manual user-flow check when UI changes
+    validations:
+      required: true
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Highest risk
+      options:
+        - Low — reversible local change
+        - Medium — multi-file or domain behavior
+        - High — auth, data, billing, secrets, or production
+    validations:
+      required: true

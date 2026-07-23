@@ -1,0 +1,62 @@
+name: Research or opportunity discovery
+description: Research a product, market, user, or technical decision before implementation
+title: "research: "
+labels:
+  - research
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Research must change a decision. This issue does not authorize product-code implementation.
+  - type: input
+    id: decision
+    attributes:
+      label: Decision to make
+      placeholder: Decide whether to prototype post-session speaking feedback for returning learners.
+    validations:
+      required: true
+  - type: input
+    id: target
+    attributes:
+      label: Target user, buyer, or subsystem
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome and current baseline
+      description: State the measurable or observable outcome. Say when the baseline is unknown.
+    validations:
+      required: true
+  - type: textarea
+    id: belief
+    attributes:
+      label: Current belief and assumptions
+    validations:
+      required: true
+  - type: textarea
+    id: reversal
+    attributes:
+      label: Evidence that would change the decision
+      description: What would support, weaken, or reverse the current belief?
+    validations:
+      required: true
+  - type: textarea
+    id: internal
+    attributes:
+      label: Internal evidence to inspect
+      placeholder: Analytics, support, code, prior experiments, issues, architecture, cost.
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints, ethics, and non-goals
+    validations:
+      required: true
+  - type: input
+    id: timebox
+    attributes:
+      label: Timebox or stop condition
+    validations:
+      required: true
