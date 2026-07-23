@@ -155,6 +155,17 @@ describe("repository single-worker research", () => {
     expect(prepared.planned.research?.opportunities).toHaveLength(3);
     expect(prepared.records.claims.some((claim) => claim.claimType === "user-problem")).toBe(false);
     expect(prepared.records.executionHandoff.parameterDigest).toMatch(/^[a-f0-9]{64}$/);
+    expect(
+      prepared.records.claims.some((claim) =>
+        claim.statement.includes("This repository assessment used the trusted-local path")
+      )
+    ).toBe(true);
+    expect(
+      prepared.records.claims.some((claim) => claim.statement.includes("verified Docker sandbox baseline"))
+    ).toBe(true);
+    expect(
+      prepared.records.claims.some((claim) => claim.statement.includes("future sandbox backend"))
+    ).toBe(false);
   });
 
   it("returns a durable inconclusive result when the query budget cannot cover the plan", () => {

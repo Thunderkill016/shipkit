@@ -349,10 +349,10 @@ function createBundle(
     },
     {
       statement:
-        "A technically green temporary workspace remains trusted-local-only because filesystem, process, dependency, secret, and network containment are not proven.",
+        "This repository assessment used the trusted-local path, which is not a security sandbox. Shipkit separately exposes a verified Docker sandbox baseline; its current capability limits must be read from the capability registry before any execution handoff.",
       claimType: "limitation",
       confidence: 0.98,
-      uncertainty: "A future sandbox backend may prove stronger containment for a specific environment.",
+      uncertainty: "The selected assessment path and the available Docker backend provide different guarantees; neither establishes product value or authorizes agent execution.",
       supportingSourceIndexes: [1, 2],
       contradictingSourceIndexes: [],
       expiresAt: null,
@@ -486,9 +486,9 @@ function createBundle(
       {
         claimIndexes: [1, 6],
         summary:
-          "Passing technical checks can coexist with an unproven execution-security boundary.",
+          "Passing trusted-local checks can coexist with a separately available Docker sandbox baseline and different remaining limitations.",
         suspectedCause:
-          "Technical correctness checks and sandbox containment answer different questions.",
+          "Technical correctness, the selected trusted-local path, and the available Docker containment capability answer different questions.",
         affectedDecision:
           "Whether the selected experiment may enter autonomous code execution.",
         status: "accepted-uncertainty",
