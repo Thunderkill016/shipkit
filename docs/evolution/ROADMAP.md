@@ -6,7 +6,7 @@ Product definition: [`../../IDEA.md`](../../IDEA.md)
 
 Shipkit is one product. This roadmap sequences implementation by dependency and safety while retaining the full destination: workspace, application foundation, evolution kernel, research, execution, sandbox, verification, release, deployment, measurement, learning and interoperability.
 
-The current implementation reaches a reviewed repository research decision and typed execution handoff (`created → observed → modeled → diagnosed → researched → decided → planned`) and includes an application foundation. It does not yet connect sandboxed implementation, release, measurement and learning into one complete user-visible cycle.
+The current implementation reaches reviewed repository and explicit-public-source research decisions with typed execution handoffs (`created → observed → modeled → diagnosed → researched → decided → planned`) and includes an application foundation. It does not yet provide broad web discovery, direct user evidence, sandboxed implementation, release, measurement or learning in one complete user-visible cycle.
 
 ## Roadmap rules
 
@@ -118,29 +118,39 @@ Exit: Shipkit understands both the codebase and the product context required to 
 ### D2 — modern retrieval
 
 - [x] repository/internal evidence adapter using fresh snapshot, checks and scorecard;
-- [x] reproducible `QueryRecord` with exact query, rationale, tool and result references for repository research;
+- [x] manifest-driven public HTTP adapter for explicit URLs;
+- [x] HTTP(S), standard-port, credential, DNS and redirect validation before public retrieval;
+- [x] bounded sequential retrieval by source count, query count, time, response size and zero provider cost;
+- [x] HTML/text/Markdown/JSON normalization into immutable evidence;
+- [x] direct hostile-instruction screening with source quarantine and fail-closed outcome;
+- [x] reproducible `QueryRecord` with exact query, rationale, tool and result references;
 - [x] authority, directness, freshness, applicability, independence, conflict and limitation scoring;
-- [x] bounded query, source, time and monetary budget accounting;
-- [ ] public web, paper, specification, competitor, changelog, incident and dataset adapters;
+- [ ] public search discovery and ranking beyond an explicit URL manifest;
+- [ ] paper/PDF, specification-specific, competitor, changelog, incident and dataset adapters;
 - [ ] authorized private-source adapters under data governance;
 - [ ] adaptive reformulation, citation chasing, entity resolution and multilingual/domain search;
 - [ ] negative, failure, postmortem and falsification search over external sources;
-- [ ] prompt-injection and hostile-source defenses.
+- [ ] browser rendering and stronger prompt-injection/hostile-source defenses;
+- [ ] DNS pinning or network-sandbox enforcement for source retrieval.
 
 ### D3 — claims and contradictions
 
 - [x] typed `SourceRecord`, `ClaimRecord` and `ContradictionRecord`;
+- [x] typed `CitationSpanRecord` linked to claim and source IDs;
+- [x] normalized-text quote, occurrence, offsets, quote digest, source-content digest and transformation version;
 - [x] confidence, uncertainty and expiry fields;
 - [x] preserve disagreement instead of silently selecting a favored answer;
-- [x] prevent repository-only evidence from supporting user-problem claims;
+- [x] prevent repository-only or public-page evidence from being mislabeled as direct user research;
 - [x] require every repository research claim to resolve to persisted supporting sources;
-- [ ] exact evidence spans, transformations and calculation provenance;
+- [x] require every public-source claim to have exact verified supporting text before decision acceptance;
+- [ ] original DOM/PDF locators and richer transformation/calculation provenance;
 - [ ] richer observation/interpretation/estimate/calculation/recommendation claim taxonomy;
 - [ ] source circularity, citation laundering and stale-version detection.
 
 ### D4 — product discovery
 
 - [x] repository research explicitly records that repository evidence cannot prove user demand;
+- [x] public HTTP ingestion rejects `user-research` source classification;
 - [x] opportunity portfolio includes direct user research as a distinct reversible experiment when it is the largest evidence gap;
 - [ ] typed user-research records and consent boundaries;
 - [ ] observed recent behavior rather than hypothetical preference only;
@@ -150,25 +160,30 @@ Exit: Shipkit understands both the codebase and the product context required to 
 
 ### D5 — synthesis and review
 
-- [x] distinct deterministic reviewer actor required for repository research;
+- [x] distinct deterministic reviewer actor required for repository and public-source research;
 - [x] reviewer checks budget, source support, user-evidence boundary, contradiction visibility, opportunity portfolio, rejected alternatives, scope separation and stop reason;
+- [x] public-source reviewer checks source safety, citation integrity, source strength and canonical-source duplication;
+- [x] verified/unverified citation-span IDs and quarantined source IDs remain inspectable;
 - [x] at least three distinct opportunities;
 - [x] expected outcome, evidence, cost, risk, uncertainty, reversibility and learning value remain inspectable;
 - [x] typed `DecisionRecord`, `ExperimentRecord`, `ResearchRunRecord` and `ResearchEvaluationRecord`;
 - [x] explicit stop reason and durable automated `inconclusive` result;
 - [x] persisted handoff to planning/execution;
-- [ ] exact external citation precision/completeness and calculation verification;
-- [ ] alternative causal explanation and full report reconstruction checks for external research.
+- [ ] calculation verification, alternative causal explanations and full report reconstruction;
+- [ ] broader citation precision/completeness benchmarks across discovered external sources.
 
 ### D6 — research orchestration and evaluation
 
 - [x] deterministic single-worker repository baseline;
+- [x] deterministic single-worker explicit-public-source baseline;
 - [x] durable query/source/time/cost usage and coverage gaps;
-- [x] Shipkit dogfood run with journal reload and passing independent review;
+- [x] Shipkit repository dogfood run with journal reload and passing independent review;
 - [x] tests for insufficient budget, reviewer separation and unsupported user claims;
+- [x] tests for private-network destinations, unsafe redirects, hostile source content and missing exact quotes;
+- [x] public research CLI journal reload retains runs, evaluation and citation spans;
 - [ ] bounded parallel research for genuinely independent branches;
-- [ ] compare deterministic, single-worker, multi-worker and human-assisted configurations;
-- [ ] autonomous research proof on an unrelated real product;
+- [ ] compare manifest, search, single-worker, multi-worker and human-assisted configurations;
+- [ ] autonomous external research proof on Shipkit and an unrelated real product using pinned live sources;
 - [ ] retrieval correctness, external citation precision/completeness and contradiction recall benchmarks;
 - [ ] decision usefulness, recommendation survival, avoided waste, cost and latency across real users;
 - [ ] research skill registry only after baseline evidence exists.
@@ -308,7 +323,7 @@ Kernel hardening + workspace onboarding + repository/product model.
 
 ### Milestone 2 — research-to-decision
 
-Repository objective → bounded autonomous repository research → independent review → experiment → execution handoff. Public-web and user-research expansion remains open.
+Repository objective → bounded repository research or explicit-public-source capture → exact citation review → experiment → execution handoff. Search discovery and direct user-research expansion remain open.
 
 ### Milestone 3 — decision-to-change
 
