@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   public-search-tests:
+    name: Focused public search tests
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
