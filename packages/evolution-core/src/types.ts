@@ -43,6 +43,8 @@ export const EVOLUTION_ACTIONS = [
 
 export type EvolutionAction = (typeof EVOLUTION_ACTIONS)[number];
 
+export const EVOLUTION_POLICY_VERSION = 1 as const;
+
 export type ArtifactBucket =
   | "baseline"
   | "model"
@@ -61,10 +63,16 @@ export type ArtifactBucket =
 export type EvolutionArtifacts = Record<ArtifactBucket, string[]>;
 
 export type EvolutionApproval = {
+  approvalId: string;
+  cycleId: string;
   action: EvolutionAction;
   approvedBy: string;
   approvedAt: string;
   scope: string;
+  policyVersion: typeof EVOLUTION_POLICY_VERSION;
+  evidenceRefs: string[];
+  expiresAt: string | null;
+  revokedAt: string | null;
 };
 
 export type EvolutionEvent = {
@@ -112,4 +120,5 @@ export type AuthorizationDecision = {
   allowed: boolean;
   reason: string;
   requiresApproval: boolean;
+  matchedApprovalId: string | null;
 };
