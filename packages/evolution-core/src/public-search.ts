@@ -849,7 +849,7 @@ function emptySearchFailure(input: {
     actor: input.actor,
     reason: "Public search discovery started but could not produce a reviewable source set",
     now: input.now,
-    addArtifacts: { diagnosis: input.evidenceRefs },
+    addArtifacts: { diagnosis: input.evidenceRefs, candidates: input.evidenceRefs },
   });
   const payload = {
     adapter: "public-search" as const,
@@ -988,7 +988,7 @@ export async function preparePublicSearchResearch(
   for (const query of manifest.queries) {
     const elapsedMinutes = Math.max(
       1,
-      Math.ceil(Math.max(0, Date.now() - Date.parse(startedAt)) / 60_000)
+      Math.ceil(Math.max(0, Date.parse(now) - Date.parse(startedAt)) / 60_000)
     );
     if (elapsedMinutes > manifest.plan.budget.maxMinutes) {
       const reason = `Research time budget ${manifest.plan.budget.maxMinutes} minute(s) was exhausted before query ${query.query}.`;
