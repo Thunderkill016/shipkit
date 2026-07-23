@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { createHash, randomUUID } from "node:crypto";
 import { basename, resolve } from "node:path";
 import { runDiscoveredChecks } from "./check-runner.js";
 import { EvidenceRegistry } from "./evidence.js";
@@ -11,6 +12,7 @@ import { createCycle, transitionCycle } from "./state-machine.js";
 import {
   AUTONOMY_LEVELS,
   EVOLUTION_ACTIONS,
+  EVOLUTION_POLICY_VERSION,
   EVOLUTION_STAGES,
   RISK_CLASSES,
   type ArtifactBucket,
@@ -44,9 +46,10 @@ Usage:
   shipkit-evolve resume <cycle-id> [--root .shipkit]
   shipkit-evolve advance <cycle-id> --to <stage> --actor <name> --reason "..."
     [--artifact bucket=reference]...
-    [--approval action|approved-by|scope]...
+    [--approval action|approved-by|exact-scope|expires-at]...
     [--verification-passed]
 
+For code execution, the exact approval scope is cycle:<cycle-id>:modify-code.
 The CLI never calls a model, merges, deploys, reads secrets, or writes production by itself.
 Repository checks are selected only from discovered package scripts and run in temporary source copies.
 `;
@@ -54,14 +57,12 @@ Repository checks are selected only from discovered package scripts and run in t
 function parseArgs(argv: string[]): ParsedArgs {
   const positionals: string[] = [];
   const options = new Map<string, string[]>();
-
   for (let index = 0; index < argv.length; index += 1) {
     const token = argv[index];
     if (!token?.startsWith("--")) {
       if (token) positionals.push(token);
       continue;
     }
-
     const equal = token.indexOf("=");
     const key = token.slice(2, equal === -1 ? undefined : equal);
     let value = equal === -1 ? undefined : token.slice(equal + 1);
@@ -73,7 +74,6 @@ function parseArgs(argv: string[]): ParsedArgs {
     values.push(value ?? "true");
     options.set(key, values);
   }
-
   return { positionals, options };
 }
 
@@ -114,7 +114,6 @@ function parseArtifacts(values: string[]): Partial<Record<ArtifactBucket, string
     "memory",
     "metaChanges",
   ]);
-
   for (const value of values) {
     const separator = value.indexOf("=");
     if (separator <= 0 || separator === value.length - 1) {
@@ -128,20 +127,38 @@ function parseArtifacts(values: string[]): Partial<Record<ArtifactBucket, string
   return result;
 }
 
-function parseApprovals(values: string[]): EvolutionApproval[] {
+function parseApprovals(values: string[], cycleId: string): EvolutionApproval[] {
   return values.map((value) => {
-    const [action, approvedBy, ...scopeParts] = value.split("|");
-    const scope = scopeParts.join("|").trim();
-    if (!EVOLUTION_ACTIONS.includes(action as EvolutionAction) || !approvedBy?.trim() || !scope) {
+    const [action, approvedBy, scope, expiresAt, ...extra] = value.split("|");
+    const expiry = expiresAt?.trim();
+    if (
+      extra.length > 0 ||
+      !EVOLUTION_ACTIONS.includes(action as EvolutionAction) ||
+      !approvedBy?.trim() ||
+      !scope?.trim() ||
+      !expiry ||
+      !Number.isFinite(Date.parse(expiry))
+    ) {
       throw new Error(
-        `invalid --approval value: ${value}; expected action|approved-by|scope`
+        `invalid --approval value: ${value}; expected action|approved-by|exact-scope|expires-at`
       );
     }
+    const approvedAt = new Date().toISOString();
+    if (Date.parse(expiry) <= Date.parse(approvedAt)) {
+      throw new Error(`approval expiry must be in the future: ${expiry}`);
+    }
+    const seed = `${cycleId}|${action}|${approvedBy}|${scope}|${approvedAt}|${randomUUID()}`;
     return {
+      approvalId: `approval:${createHash("sha256").update(seed).digest("hex").slice(0, 24)}`,
+      cycleId,
       action: action as EvolutionAction,
       approvedBy: approvedBy.trim(),
-      approvedAt: new Date().toISOString(),
-      scope,
+      approvedAt,
+      scope: scope.trim(),
+      policyVersion: EVOLUTION_POLICY_VERSION,
+      evidenceRefs: [],
+      expiresAt: expiry,
+      revokedAt: null,
     };
   });
 }
@@ -167,7 +184,6 @@ export async function runEvolutionCli(
 ): Promise<number> {
   const parsed = parseArgs(argv);
   const command = parsed.positionals[0];
-
   if (!command || command === "help" || parsed.options.has("help")) {
     io.stdout(HELP);
     return 0;
@@ -186,7 +202,6 @@ export async function runEvolutionCli(
     const risk = (one(parsed, "risk") ?? "R1") as RiskClass;
     if (!AUTONOMY_LEVELS.includes(autonomy)) throw new Error(`invalid autonomy: ${autonomy}`);
     if (!RISK_CLASSES.includes(risk)) throw new Error(`invalid risk: ${risk}`);
-
     const project = basename(projectRootFrom(parsed)).replace(/[^A-Za-z0-9._-]/g, "-") || "project";
     const defaultId = `${project}:${new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14)}`;
     const cycle = createCycle({
@@ -214,7 +229,7 @@ export async function runEvolutionCli(
       const next = transitionCycle(previous, "observed", {
         actor: one(parsed, "actor")?.trim() || "shipkit-inspector",
         reason: "Captured repository structure, checks, product signals, and trust boundaries",
-        addArtifacts: { baseline: [`evidence:${evidence.id}`] },
+        addArtifacts: { baseline: [`evidence:${evidence.occurrenceId}`] },
       });
       cycle = await store.save(previous, next);
     }
@@ -233,6 +248,8 @@ export async function runEvolutionCli(
       autonomy: previous.autonomy,
       risk: previous.risk,
       action: "run-checks",
+      cycleId: previous.cycleId,
+      requiredScope: `cycle:${previous.cycleId}:run-checks`,
       approvals: previous.approvals,
     });
     if (!authorization.allowed) throw new Error(authorization.reason);
@@ -252,20 +269,19 @@ export async function runEvolutionCli(
     const scorecardEvidence = await registry.registerJson("project-scorecard", scorecard);
     const next = transitionCycle(previous, "modeled", {
       actor: one(parsed, "actor")?.trim() || "shipkit-assessor",
-      reason: "Built a repository model from isolated checks and an evidence-backed scorecard",
+      reason: "Built a repository model from temporary-workspace checks and an evidence-backed scorecard",
       addArtifacts: {
-        baseline: [`evidence:${snapshotEvidence.id}`, `evidence:${checkEvidence.id}`],
-        model: [`evidence:${scorecardEvidence.id}`],
+        baseline: [
+          `evidence:${snapshotEvidence.occurrenceId}`,
+          `evidence:${checkEvidence.occurrenceId}`,
+        ],
+        model: [`evidence:${scorecardEvidence.occurrenceId}`],
       },
     });
     const cycle = await store.save(previous, next);
     printJson(io, {
       authorization,
-      evidence: {
-        snapshot: snapshotEvidence,
-        checks: checkEvidence,
-        scorecard: scorecardEvidence,
-      },
+      evidence: { snapshot: snapshotEvidence, checks: checkEvidence, scorecard: scorecardEvidence },
       snapshot,
       checkReport,
       scorecard,
@@ -292,13 +308,12 @@ export async function runEvolutionCli(
     if (!cycleId) throw new Error("advance requires a cycle ID");
     const to = required(parsed, "to") as EvolutionStage;
     if (!EVOLUTION_STAGES.includes(to)) throw new Error(`invalid stage: ${to}`);
-
     const previous = await store.load(cycleId);
     const next = transitionCycle(previous, to, {
       actor: required(parsed, "actor"),
       reason: required(parsed, "reason"),
       addArtifacts: parseArtifacts(parsed.options.get("artifact") ?? []),
-      approvals: parseApprovals(parsed.options.get("approval") ?? []),
+      approvals: parseApprovals(parsed.options.get("approval") ?? [], cycleId),
       verificationPassed: one(parsed, "verification-passed") === "true",
     });
     await store.save(previous, next);
