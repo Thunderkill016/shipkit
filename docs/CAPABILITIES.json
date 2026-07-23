@@ -1,168 +1,150 @@
 {
   "schemaVersion": 1,
-  "project": "shipkit",
+  "project": "shipkit-evolution-engine",
   "lastVerified": "2026-07-23",
-  "verificationScope": "Repository evidence paths and CI state on pull request #1; production usage and analytics are not available.",
+  "verificationScope": "Repository evidence and GitHub Actions on draft pull request #10. Production use, product-market fit, complete sandboxing, external research quality and positive recursive improvement are not claimed.",
   "capabilities": [
     {
-      "id": "public-landing",
-      "category": "product",
+      "id": "evolution-state-machine",
+      "category": "evolution-core",
       "status": "implemented",
       "verificationStatus": "passing",
-      "summary": "Localized public landing page with JSON-LD, navigation, and app entry points.",
+      "summary": "Deterministic evidence-gated cycle stages with terminal rejection, rollback and inconclusive paths.",
       "evidence": [
-        "apps/web/src/app/page.tsx"
+        "packages/evolution-core/src/types.ts",
+        "packages/evolution-core/src/state-machine.ts",
+        "packages/evolution-core/src/state-machine.test.ts"
       ],
       "checks": [
-        "CI: E2E / demo mode"
+        "CI: Test & Build",
+        "CI: Evolution Engine Proof"
       ]
     },
     {
-      "id": "email-password-auth",
-      "category": "auth",
+      "id": "evolution-policy",
+      "category": "policy",
       "status": "implemented",
       "verificationStatus": "passing",
-      "summary": "Email/password sign-up and sign-in through the AuthPort with validation and rate limiting.",
+      "summary": "A0-A4 autonomy and R0-R4 risk policy with cycle-bound exact-scope, versioned, expiring and revocable approval records.",
       "evidence": [
-        "apps/web/src/app/login/page.tsx",
-        "apps/web/src/app/login/login-form.tsx",
-        "apps/web/src/app/actions/auth.ts",
-        "apps/web/e2e/auth-portable.spec.ts",
-        "packages/db/src/schema.ts"
+        "packages/evolution-core/src/policy.ts",
+        "packages/evolution-core/src/types.ts",
+        "packages/evolution-core/src/state-machine.test.ts"
       ],
       "checks": [
-        "CI run 39: E2E / portable-pg passed",
-        "CI run 39 focused portable-pg rerun passed"
+        "Unit tests cover wrong scope and expired approval rejection"
       ]
     },
     {
-      "id": "oauth-auth",
-      "category": "auth",
+      "id": "durable-cycle-store",
+      "category": "persistence",
+      "status": "implemented",
+      "verificationStatus": "passing",
+      "summary": "Append-only synchronized journal, atomic snapshots, corruption recovery, checksums, serialized writers and stale-writer rejection.",
+      "evidence": [
+        "packages/evolution-core/src/persistence.ts",
+        "packages/evolution-core/src/persistence.test.ts"
+      ],
+      "checks": [
+        "Competing-writer test accepts one transition",
+        "Snapshot recovery and interrupted trailing-write tests"
+      ],
+      "limitations": [
+        "Event-schema migration fixtures are not complete",
+        "Kill-process tests at every persistence boundary are not complete",
+        "A multi-process stress suite is not complete"
+      ]
+    },
+    {
+      "id": "content-addressed-evidence",
+      "category": "evidence",
+      "status": "implemented",
+      "verificationStatus": "passing",
+      "summary": "Immutable SHA-256 blobs are deduplicated separately from contextual evidence occurrences; read-time digest verification is available.",
+      "evidence": [
+        "packages/evolution-core/src/evidence.ts",
+        "packages/evolution-core/src/repository-evidence.test.ts"
+      ],
+      "checks": [
+        "Stable canonical JSON hashing",
+        "Distinct occurrence records for identical blobs",
+        "Changed-blob verification failure",
+        "Secret-path and outside-root rejection"
+      ]
+    },
+    {
+      "id": "repository-inspection",
+      "category": "perception",
+      "status": "implemented",
+      "verificationStatus": "passing",
+      "summary": "Bounded repository inventory, package/check discovery, CI and product-signal detection, Git state and structural trust-boundary mapping.",
+      "evidence": [
+        "packages/evolution-core/src/repository.ts",
+        "packages/evolution-core/src/repository-evidence.test.ts",
+        "packages/evolution-core/src/inspect-cli.test.ts"
+      ],
+      "checks": [
+        "Synthetic unrelated repository tests",
+        "Pinned external repository proof"
+      ]
+    },
+    {
+      "id": "repository-assessment",
+      "category": "verification",
       "status": "partial",
-      "verificationStatus": "not-run",
-      "summary": "Google and GitHub OAuth are env-gated in UI and adapters; no full live-provider CI path is recorded.",
+      "verificationStatus": "passing",
+      "summary": "Discovered package scripts run without a shell in temporary source copies with timeout, bounded output, reduced environment and secret redaction; results feed an evidence-backed scorecard.",
       "evidence": [
-        "apps/web/src/app/login/login-form.tsx",
-        "apps/web/src/app/actions/auth.ts"
+        "packages/evolution-core/src/check-runner.ts",
+        "packages/evolution-core/src/check-runner.test.ts",
+        "packages/evolution-core/src/scorecard.ts",
+        "packages/evolution-core/src/assess-cli.test.ts"
       ],
       "checks": [
-        "Manual provider configuration required"
+        "CI: Evolution Engine Proof",
+        "Shipkit dogfood assessment",
+        "Pinned sindresorhus/is-plain-obj assessment"
+      ],
+      "limitations": [
+        "Temporary workspace is not a security sandbox",
+        "Network isolation is not enforced",
+        "Filesystem write containment is not enforced",
+        "Host node_modules may be linked"
       ]
     },
     {
-      "id": "protected-app-shell",
+      "id": "a2-research-audit",
       "category": "product",
-      "status": "implemented",
-      "verificationStatus": "passing",
-      "summary": "Protected app shell exposes session, profile, notes, billing, locale switching, and demo mode.",
-      "evidence": [
-        "apps/web/src/app/app/page.tsx",
-        "apps/web/e2e/auth-portable.spec.ts"
-      ],
-      "checks": [
-        "CI: E2E / demo mode passes",
-        "CI run 39: E2E / portable-pg passed twice"
-      ]
-    },
-    {
-      "id": "notes",
-      "category": "data",
-      "status": "partial",
-      "verificationStatus": "passing",
-      "summary": "Notes use Postgres when available and an in-memory fallback otherwise; every operation is scoped by user ID.",
-      "evidence": [
-        "apps/web/src/lib/notes-store.ts",
-        "apps/web/e2e/notes-isolation.spec.ts"
-      ],
-      "checks": [
-        "CI run 39: portable-pg cross-user isolation passed twice"
-      ]
-    },
-    {
-      "id": "localization",
-      "category": "product",
-      "status": "implemented",
-      "verificationStatus": "passing",
-      "summary": "Landing, login, and app shell read translated strings and expose a locale switcher.",
-      "evidence": [
-        "apps/web/src/app/page.tsx",
-        "apps/web/src/app/login/page.tsx",
-        "apps/web/src/app/app/page.tsx"
-      ],
-      "checks": [
-        "CI: E2E / demo mode"
-      ]
-    },
-    {
-      "id": "welcome-email",
-      "category": "integration",
-      "status": "implemented",
+      "status": "planned",
       "verificationStatus": "not-run",
-      "summary": "Successful sign-up sends a non-blocking welcome email through the configured MailPort.",
+      "summary": "Read-only decision framing, reproducible research, atomic claims, contradiction review, three opportunities and a smallest reversible experiment.",
       "evidence": [
-        "apps/web/src/app/actions/auth.ts"
+        "IDEA.md",
+        "docs/evolution/RESEARCH_CAPABILITY.md",
+        "docs/evolution/ROADMAP.md"
       ],
       "checks": [
-        "Unit or integration delivery assertion not yet recorded"
+        "No complete product-interface cycle yet"
       ]
     },
     {
-      "id": "billing",
-      "category": "integration",
-      "status": "partial",
-      "verificationStatus": "not-run",
-      "summary": "Billing page and Stripe-backed checkout are env-gated; no production webhook lifecycle is claimed.",
-      "evidence": [
-        "apps/web/src/app/app/billing/page.tsx",
-        "apps/web/package.json"
-      ],
-      "checks": [
-        "Manual Stripe configuration required"
-      ]
-    },
-    {
-      "id": "health-endpoint",
-      "category": "platform",
+      "id": "starter-kit-dogfood",
+      "category": "reference-product",
       "status": "implemented",
       "verificationStatus": "passing",
-      "summary": "A lightweight health endpoint reports service state and selected auth adapter.",
+      "summary": "Next.js reference product provides landing, auth, protected app, notes, profile, optional billing and realistic trust boundaries for Evolution Engine dogfood.",
       "evidence": [
-        "apps/web/src/app/api/health/route.ts"
-      ],
-      "checks": [
-        "Production build passes"
-      ]
-    },
-    {
-      "id": "project-generator",
-      "category": "dx",
-      "status": "implemented",
-      "verificationStatus": "passing",
-      "summary": "The generator copies the foundation and AI workflow, seeds product/project-model files, and avoids recursive self-copy.",
-      "evidence": [
+        "apps/web",
+        "packages/auth",
+        "packages/db",
+        "packages/security",
         "scripts/create-shipkit.mjs",
-        "scripts/test-create-shipkit.mjs"
+        "templates/STARTER_IDEA.md"
       ],
       "checks": [
-        "AI workflow check: generator integration test"
-      ]
-    },
-    {
-      "id": "ai-engineering-workflow",
-      "category": "dx",
-      "status": "implemented",
-      "verificationStatus": "passing",
-      "summary": "Repository-first delivery, research, autonomous improvement, safety, prompts, issue forms, and CI validation are included.",
-      "evidence": [
-        "AGENTS.md",
-        "AI_WORKFLOW.md",
-        "docs/ai/AUTONOMOUS_IMPROVEMENT.md",
-        "docs/ai/DISCOVERY_RESEARCH.md",
-        "scripts/check-ai-workflow.mjs",
-        ".github/workflows/ai-workflow-check.yml"
-      ],
-      "checks": [
-        "AI workflow check"
+        "CI: E2E / demo mode",
+        "CI: E2E / portable-pg",
+        "AI workflow check: generator integration"
       ]
     }
   ]
