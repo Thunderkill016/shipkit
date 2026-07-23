@@ -161,17 +161,20 @@ function containedWorkingDirectory(workspaceRoot: string, relativeWorkingDirecto
   return workingDirectory;
 }
 
-async function terminateProcess(child: ReturnType<SpawnLike>): Promise<void> {
+async function terminateProcess(
+  child: ReturnType<SpawnLike>,
+  detached: boolean
+): Promise<void> {
   if (!child.pid) return;
   try {
-    if (process.platform !== "win32") process.kill(-child.pid, "SIGTERM");
+    if (process.platform !== "win32" && detached) process.kill(-child.pid, "SIGTERM");
     else child.kill("SIGTERM");
   } catch {
     return;
   }
   await new Promise((resolvePromise) => setTimeout(resolvePromise, 250));
   try {
-    if (process.platform !== "win32") process.kill(-child.pid, "SIGKILL");
+    if (process.platform !== "win32" && detached) process.kill(-child.pid, "SIGKILL");
     else child.kill("SIGKILL");
   } catch {
     // Process already exited.
@@ -186,13 +189,14 @@ async function runProcess(
   const stdout = collector(options.maxOutputBytes);
   const stderr = collector(options.maxOutputBytes);
   const launch = options.spawnProcess ?? spawn;
+  const detached = options.detached ?? process.platform !== "win32";
 
   return await new Promise<ExecutionBackendResult>((resolveResult) => {
     const child = launch(executable, args, {
       cwd: options.cwd,
       env: options.env,
       shell: false,
-      detached: options.detached ?? process.platform !== "win32",
+      detached,
       stdio: ["ignore", "pipe", "pipe"],
     });
     let timedOut = false;
@@ -216,7 +220,7 @@ async function runProcess(
     };
     const timer = setTimeout(() => {
       timedOut = true;
-      void terminateProcess(child);
+      void terminateProcess(child, detached);
     }, options.timeoutMs);
 
     child.stdout?.on("data", stdout.append);
@@ -296,6 +300,10 @@ export type DockerExecutionBackendOptions = {
   spawnProcess?: SpawnLike;
 };
 
+function immutableDockerImage(image: string): boolean {
+  return /^sha256:[a-f0-9]{64}$/i.test(image) || /@sha256:[a-f0-9]{64}$/i.test(image);
+}
+
 export type DockerRunInput = {
   containerName: string;
   image: string;
@@ -316,10 +324,7 @@ export function buildDockerRunArguments(input: DockerRunInput): string[] {
   if (workspaceRoot.includes(",")) {
     throw new ExecutionBackendError("sandbox workspace path cannot contain a comma");
   }
-  const workingDirectory = containedWorkingDirectory(
-    workspaceRoot,
-    input.relativeWorkingDirectory
-  );
+  const workingDirectory = containedWorkingDirectory(workspaceRoot, input.relativeWorkingDirectory);
   const relativeWorkingDirectory = portablePath(relative(workspaceRoot, workingDirectory));
   const cpus = positiveNumber(input.limits.cpus, DEFAULT_CPUS, "cpus");
   const memoryMb = positiveInteger(input.limits.memoryMb, DEFAULT_MEMORY_MB, "memoryMb");
@@ -393,26 +398,55 @@ export class DockerExecutionBackend implements ExecutionBackend {
   private readonly spawnProcess?: SpawnLike;
 
   constructor(options: DockerExecutionBackendOptions = {}) {
-    this.image = options.image?.trim() || "node:22-bookworm-slim";
+    const image = options.image?.trim();
+    if (!image || !immutableDockerImage(image)) {
+      throw new ExecutionBackendError(
+        "docker execution backend requires an explicit immutable image digest"
+      );
+    }
+    this.image = image;
     this.executable = options.executable?.trim() || "docker";
     this.probe = options.probe;
     this.spawnProcess = options.spawnProcess;
   }
 
   async assertAvailable(): Promise<void> {
-    const available = this.probe
-      ? await this.probe()
-      : (
-          await runProcess(this.executable, ["version", "--format", "{{.Server.Version}}"], {
-            timeoutMs: 5_000,
-            maxOutputBytes: 4_096,
-            detached: false,
-            spawnProcess: this.spawnProcess,
-          })
-        ).status === "passed";
-    if (!available) {
+    if (this.probe) {
+      if (await this.probe()) return;
       throw new ExecutionBackendError(
         "docker execution backend is unavailable; refusing to run untrusted checks without the requested isolation"
+      );
+    }
+
+    const daemon = await runProcess(
+      this.executable,
+      ["version", "--format", "{{.Server.Version}}"],
+      {
+        timeoutMs: 5_000,
+        maxOutputBytes: 4_096,
+        detached: false,
+        spawnProcess: this.spawnProcess,
+      }
+    );
+    if (daemon.status !== "passed") {
+      throw new ExecutionBackendError(
+        "docker execution backend is unavailable; refusing to run untrusted checks without the requested isolation"
+      );
+    }
+
+    const image = await runProcess(
+      this.executable,
+      ["image", "inspect", "--format", "{{.Id}}", this.image],
+      {
+        timeoutMs: 5_000,
+        maxOutputBytes: 4_096,
+        detached: false,
+        spawnProcess: this.spawnProcess,
+      }
+    );
+    if (image.status !== "passed") {
+      throw new ExecutionBackendError(
+        `sandbox image ${this.image} is not available locally; refusing an implicit image pull`
       );
     }
   }
