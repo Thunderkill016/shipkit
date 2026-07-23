@@ -29,6 +29,8 @@ jobs:
       - run: pnpm build
       - name: Evolution CLI dogfood
         run: node scripts/test-evolution-cli.mjs
+      - name: Evolution external repository proof
+        run: node scripts/test-evolution-external-repo.mjs
       - run: pnpm doctor || true
       - run: pnpm check:deploy || true
 
