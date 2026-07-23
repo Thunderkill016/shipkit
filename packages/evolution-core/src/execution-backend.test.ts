@@ -32,6 +32,23 @@ describe("execution backend contract", () => {
     );
   });
 
+  it("rejects mutable images even when building a Docker invocation directly", async () => {
+    const workspaceRoot = await mkdtemp(join(tmpdir(), "shipkit-docker-mutable-"));
+    temporaryRoots.push(workspaceRoot);
+    expect(() =>
+      buildDockerRunArguments({
+        containerName: "shipkit-check-mutable",
+        image: "node:22-bookworm-slim",
+        workspaceRoot,
+        relativeWorkingDirectory: ".",
+        executable: "node",
+        arguments: ["--version"],
+        environment: { CI: "true" },
+        limits: { timeoutMs: 5_000, maxOutputBytes: 4_096 },
+      })
+    ).toThrow(/immutable image digest/);
+  });
+
   it("declares the Docker untrusted baseline without claiming a hard disk quota", () => {
     const backend = new DockerExecutionBackend({
       image: IMMUTABLE_IMAGE,
