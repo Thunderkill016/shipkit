@@ -368,7 +368,7 @@ export function buildDockerRunArguments(input: DockerRunInput): string[] {
     "--workdir",
     containerWorkingDirectory,
     "--mount",
-    `type=bind,source=${workspaceRoot},target=/workspace,rw`,
+    `type=bind,source=${workspaceRoot},target=/workspace`,
   ];
 
   if (
