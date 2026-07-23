@@ -4,3 +4,5 @@ export * from "./state-machine.js";
 export * from "./persistence.js";
 export * from "./repository.js";
 export * from "./evidence.js";
+export * from "./check-runner.js";
+export * from "./scorecard.js";
