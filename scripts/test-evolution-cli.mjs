@@ -91,7 +91,9 @@ try {
     throw new Error("assessment did not advance the persisted cycle to modeled");
   }
   if (assessed.checkReport?.summary?.passed !== 1) {
-    throw new Error("isolated Shipkit test check did not pass");
+    throw new Error(
+      `isolated Shipkit test check did not pass:\n${JSON.stringify(assessed.checkReport, null, 2)}`
+    );
   }
   if (!/^sha256:[a-f0-9]{64}$/.test(assessed.evidence?.scorecard?.id ?? "")) {
     throw new Error("assessment did not produce a content-addressed scorecard");
