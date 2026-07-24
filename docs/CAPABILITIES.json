@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "project": "shipkit",
   "primaryProduct": "Shipkit",
-  "lastVerified": "2026-07-23",
-  "verificationScope": "Repository evidence and GitHub Actions through draft pull request #31. Shipkit now supports a standalone Evolution Core package, durable repository and explicit-source research, manifest-grounded named-candidate decisions, and a bounded GitHub public repository-search provider with persisted ranks, timestamps, digests, falsification queries, exact citations and fail-closed outcomes. General web discovery, direct user decision-value proof, coding-agent delivery, release and measured learning are not yet claimed.",
+  "lastVerified": "2026-07-24",
+  "verificationScope": "Repository evidence and GitHub Actions through merged pull request #33. Shipkit supports a standalone Evolution Core package, durable repository and explicit-source research, manifest-grounded named-candidate decisions, bounded GitHub public repository discovery, and a fail-closed six-session external decision-value pilot protocol whose technical gate is ready. The pilot remains 0/6 with its clock not started; general web discovery, direct user decision-value proof, coding-agent delivery, release and measured learning are not claimed.",
   "capabilities": [
     {
       "id": "integrated-product-workspace",
@@ -338,6 +338,36 @@
         "Pattern screening can miss obfuscated hostile content",
         "No user-research consent provenance",
         "Search discovery exists as a separate GitHub repository-search baseline; general web, browser-rendered and PDF discovery remain unavailable"
+      ]
+    },
+    {
+      "id": "a2-external-decision-value-pilot",
+      "category": "research",
+      "status": "partial",
+      "verificationStatus": "passing",
+      "summary": "A repository-backed, fail-closed protocol precommits six external A2 Research Audits, separates technical success from product decision value, preserves negative evidence and derives the aggregate verdict without changing thresholds after results are observed.",
+      "evidence": [
+        "docs/evolution/pilot/A2_RESEARCH_AUDIT_PROTOCOL.json",
+        "docs/evolution/pilot/PILOT_STATE.json",
+        "docs/evolution/pilot/SESSION_TEMPLATE.json",
+        "docs/evolution/pilot/REPORT_TEMPLATE.md",
+        "docs/evolution/pilot/README.md",
+        "docs/ai/plans/2026-07-24-a2-research-audit-pilot-operations.md",
+        "scripts/a2-pilot-validation.mjs",
+        "scripts/check-a2-pilot.mjs",
+        "scripts/test-a2-pilot.mjs",
+        ".github/workflows/ai-workflow-check.yml"
+      ],
+      "checks": [
+        "AI workflow check: fixed protocol, six-slot state and redacted session schema",
+        "Negative tests: protocol/privacy drift, premature start, consent, causality, metric separation, timestamp order, record identity and 14-day timebox",
+        "GitHub Actions on merged PR #33: 8/8 checks passed"
+      ],
+      "limitations": [
+        "External completed audits remain 0/6 and the 14-day clock has not started",
+        "No participant or external repository has been contacted or accessed",
+        "Operational and technical readiness do not establish user decision value",
+        "Sensitive-content pattern checks support but do not replace human redaction review"
       ]
     },
     {
