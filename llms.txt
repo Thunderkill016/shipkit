@@ -1,6 +1,6 @@
 # CycleWarden
 
-> Open product foundation kit for vibe coding — idea to shipped web product.
+> Open AI-native product kit — idea to governed, evidence-backed shipped web product.
 
 ## Start here
 
@@ -10,19 +10,27 @@
 - [Vibe guide](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/VIBE.md): human+agent workflow
 - [Architecture](https://github.com/Thunderkill016/cyclewarden/blob/main/ARCHITECTURE.md): packages and ports
 - [Standards](https://github.com/Thunderkill016/cyclewarden/blob/main/STANDARDS.md): 12-factor, ASVS, agents.md
-- [Decisions](https://github.com/Thunderkill016/cyclewarden/blob/main/DECISIONS.md): locked product choices
+- [Decisions](https://github.com/Thunderkill016/cyclewarden/blob/main/DECISIONS.md): locked product choices + evolution engine decisions
 - [Production checklist](https://github.com/Thunderkill016/cyclewarden/blob/main/PRODUCTION_CHECKLIST.md)
 - [Deployment guide](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/DEPLOY.md): production Vercel + Docker deployment
 - [Security guide](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/SECURITY.md): CSRF, headers, secrets, upload
 - [API key rotation](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/API_KEY_ROTATION.md): rotate secrets safely
 - [Multi-framework guide](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/MULTI_FRAMEWORK.md): integrate Nuxt, SvelteKit, etc.
 
+## Evolution engine
+
+- [Roadmap](https://github.com/Thunderkill016/cyclewarden/blob/main/ROADMAP.md): integrated product roadmap
+- [Evolution Architecture](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/evolution/ARCHITECTURE.md): state machine, policy, evidence
+- [Research Capability](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/evolution/RESEARCH_CAPABILITY.md): public search, claim extraction, contradiction detection
+- [Product Thesis](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/evolution/PRODUCT_THESIS.md): why deterministic agent governance
+- [Data Governance](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/evolution/DATA_GOVERNANCE.md): event journal, evidence, approvals
+- [Execution Backends](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/evolution/EXECUTION_BACKENDS.md): trusted-local, Docker sandbox, future microVM
+
 ## Presets & research
 
 - [supabase-full](https://github.com/Thunderkill016/cyclewarden/blob/main/presets/supabase-full.md)
 - [portable-pg](https://github.com/Thunderkill016/cyclewarden/blob/main/presets/portable-pg.md) (Better Auth)
 - [Research notes](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/RESEARCH_NOTES.md)
-- [Roadmap](https://github.com/Thunderkill016/cyclewarden/blob/main/ROADMAP.md)
 - [Development plan / audit](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/DEVELOPMENT_PLAN.md)
 - [Competitive benchmark](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/COMPETITIVE_BENCHMARK.md)
 - [Quickstart (usable)](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/QUICKSTART.md)
@@ -30,11 +38,12 @@
 
 ## Code map
 
-- apps/web — Next.js UI adapter
+- apps/web — Next.js UI adapter (landing, auth, dashboard, evolution UI, notes, billing)
+- packages/evolution-core — Deterministic lifecycle engine (state machine, policy, evidence, research, CLI)
 - packages/config — env + presets
 - packages/security — headers, rate limit, validation
-- packages/db — schema + SQL
-- packages/auth — AuthPort
+- packages/db — schema + SQL (Drizzle ORM)
+- packages/auth — AuthPort (framework-agnostic)
 - packages/mail — MailPort + createConsoleMailer + createResendMailer
 - packages/storage — StoragePort + createLocalStorage + createS3Storage
 - packages/logger — LoggerPort + getLogger (structured logging, Pino/Sentry-ready)
@@ -45,3 +54,12 @@
 
 - supabase/ — Supabase auth + SSR client
 - better-auth/ — Better Auth (self-hosted, Drizzle/Postgres)
+
+## CLI commands
+
+- `pnpm evolve` — Evolution state machine (init, start, inspect, assess, research, handoff, advance)
+- `pnpm dev` — Launch web + engine dev mode
+- `pnpm verify` — Full quality gate (typecheck + lint + test + build + check:ai)
+- `pnpm doctor` — Environment health check
+- `pnpm create` — Scaffold new project from template
+

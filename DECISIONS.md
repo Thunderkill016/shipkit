@@ -44,3 +44,32 @@ We explicitly **do not** ship three UI frameworks half-broken on day one.
 1. Newcomer runs `pnpm dev` and sees a real product shell  
 2. Agent can implement a feature from `IDEA.md` without inventing a new stack  
 3. Switching deploy/DB is a **preset/env** change, not a rewrite  
+4. Every agent action is governed by the Evolution Engine — auditable, policy-checked, evidence-backed  
+
+## Evolution Engine decisions
+
+CycleWarden is not just a starter kit — it wraps probabilistic AI in a **deterministic control harness**:
+
+| Decision | Rationale |
+|----------|-----------|
+| Append-only JSONL event journal | Immutable audit trail; crash-recovery via replay; SLSA-compatible provenance |
+| SHA-256 content-addressed evidence | Tamper-evident research claims; zero-trust verification of agent outputs |
+| A0–A4 graduated autonomy levels | Mirrors L0–L5 autonomous driving; prevents "all or nothing" agent trust |
+| R0–R4 risk classification | High-risk actions (deploy, spend, secrets) require explicit human approval |
+| Scoped, expiring approvals | No permanent "sudo" for agents; every approval has a bounded time window |
+| Agents cannot self-approve transitions | Structural enforcement, not prompt-based trust |
+
+## Compliance positioning
+
+CycleWarden's Evolution Kernel natively satisfies core requirements of the **EU AI Act** (effective Aug 2, 2026):
+
+| EU AI Act Requirement | CycleWarden Implementation |
+|-----------------------|---------------------------|
+| Automatic Logging (Art. 12) | Append-only event journal + SHA-256 checksum chains |
+| Human Oversight (Art. 14) | A0–A4 autonomy gates + explicit approval records |
+| Transparency (Art. 13) | Evidence registry with citation auditing |
+| Risk Management (Art. 9) | R0–R4 risk classification per action |
+| Technical Documentation (Art. 11) | IDEA.md + AGENTS.md + llms.txt + PROJECT_MODEL.md |
+
+This is a **structural competitive advantage** — no other SaaS boilerplate has built-in AI governance.
+
