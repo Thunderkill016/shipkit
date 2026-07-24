@@ -5,7 +5,10 @@ import { join, parse } from "node:path";
 
 vi.mock("server-only", () => ({}));
 
-import { assertEvolutionProjectRoot } from "./evolution-workspace";
+import {
+  assertEvolutionProjectRoot,
+  resolveEvolutionProjectRoot,
+} from "./evolution-workspace";
 
 const originalEnv = { ...process.env };
 const roots: string[] = [];
@@ -16,6 +19,16 @@ afterEach(async () => {
 });
 
 describe("Evolution workspace project-root boundary", () => {
+  it("keeps the configured absolute path out of the client-facing label", async () => {
+    const root = await mkdtemp(join(tmpdir(), "cyclewarden-workspace-label-"));
+    roots.push(root);
+    process.env.CYCLEWARDEN_PROJECT_ROOT = root;
+
+    const label = resolveEvolutionProjectRoot();
+    expect(label).toBe("server-configured trusted repository");
+    expect(label).not.toContain(root);
+  });
+
   it("returns the canonical real path for a configured directory", async () => {
     const root = await mkdtemp(join(tmpdir(), "cyclewarden-workspace-root-"));
     roots.push(root);
