@@ -14,6 +14,7 @@ import {
   requestDeliveryCancellation,
   showDeliveryCancellation,
 } from "./delivery-cancel.js";
+import { showDeliveryProgress } from "./delivery-progress.js";
 import { EvolutionStore } from "./persistence.js";
 import { resolveDefaultStateRoot } from "./runtime-paths.js";
 
@@ -48,6 +49,7 @@ Usage:
   cyclewarden-deliver cancel <cycle-id> --operation-id <exact-operation-id>
     [--root .cyclewarden] [--project-root .] [--actor cyclewarden-cancellation-operator]
     [--apply]
+  cyclewarden-deliver progress <cycle-id> [--root .cyclewarden]
   cyclewarden-deliver show <cycle-id> [--root .cyclewarden]
 
 execute requires a planned A3/A4 cycle and a manifest whose expectedParameterDigest matches the
@@ -63,8 +65,8 @@ It never merges, deploys, writes production, or accepts implementation output wi
 independent verifier.
 
 execute, verify and publish use the same lease-protected public API exported by the package. Direct
-library callers and the CLI therefore share write-ahead checkpoints, overlap prevention and stale
-operation recovery.
+library callers and the CLI therefore share write-ahead checkpoints, overlap prevention, stale
+operation recovery and an integrity-chained append-only progress timeline.
 
 recover inspects cycle, control-sidecar, branch and worktree state. It is read-only by default.
 Use --apply only after reviewing the proposed transition. Recovery never treats an unrecorded
@@ -77,6 +79,8 @@ cancel is read-only by default. With --apply it records a durable cancellation i
 SIGTERM only to the exact integrity-valid active child process group on the current host. The
 operation ID, heartbeat and process start identity are rechecked immediately before signalling.
 Cancellation never escalates to SIGKILL, merges, deploys or writes production.
+
+progress reads the integrity-chained append-only timeline without requiring delivery control state.
 `;
 
 function parseArgs(argv: string[]): ParsedArgs {
@@ -230,6 +234,11 @@ export async function runDeliveryCli(
     return 0;
   }
 
+  if (command === "progress") {
+    printJson(io, showDeliveryProgress(store, cycleId));
+    return 0;
+  }
+
   if (command === "show") {
     printJson(io, {
       ...(await showDelivery(store, cycleId)),
@@ -237,6 +246,7 @@ export async function runDeliveryCli(
       ...(await showDeliveryRecovery(store, cycleId)),
       ...showDeliveryOperation(store, cycleId),
       ...showDeliveryCancellation(store, cycleId),
+      ...showDeliveryProgress(store, cycleId),
     });
     return 0;
   }

@@ -44,6 +44,33 @@ export type DeliveryOperationView = {
   } | null;
 };
 
+export type DeliveryProgressView = {
+  controlStatus: string;
+  truncated: boolean;
+  findings: string[];
+  latestOperationId: string | null;
+  activeStep: {
+    stepIndex: number;
+    stepId: string;
+    childPid: number | null;
+  } | null;
+  events: Array<{
+    eventId: string;
+    sequence: number;
+    operationId: string;
+    operation: string;
+    occurredAt: string;
+    phase: string;
+    status: string;
+    stepIndex: number | null;
+    stepId: string | null;
+    childPid: number | null;
+    executable: string | null;
+    exitCode: number | null;
+    signal: string | null;
+  }>;
+};
+
 export type DeliveryWorkspaceView = {
   cycleId: string;
   branchName: string | null;
@@ -73,6 +100,7 @@ export type DeliveryWorkspaceView = {
   } | null;
   recovery: JsonRecord | null;
   operation: DeliveryOperationView;
+  progress: DeliveryProgressView;
 };
 
 function deliveryCliPath(): string {
@@ -115,6 +143,14 @@ function text(value: unknown, fallback = "unknown"): string {
 
 function nullableText(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value : null;
+}
+
+function integer(value: unknown, fallback = 0): number {
+  return Number.isInteger(value) ? Number(value) : fallback;
+}
+
+function nullableInteger(value: unknown): number | null {
+  return Number.isInteger(value) ? Number(value) : null;
 }
 
 function strings(value: unknown): string[] {
@@ -184,6 +220,49 @@ function operationView(value: unknown, cancellationValue: unknown): DeliveryOper
   };
 }
 
+function progressView(value: unknown): DeliveryProgressView {
+  const outer = record(value);
+  const inspection = record(outer?.deliveryProgress ?? value) ?? {};
+  const events = Array.isArray(inspection.events) ? inspection.events : [];
+  const latest = record(inspection.latest);
+  const activeStep = record(inspection.activeStep);
+  return {
+    controlStatus: text(inspection.controlStatus, "missing"),
+    truncated: inspection.truncated === true,
+    findings: strings(inspection.findings),
+    latestOperationId: nullableText(latest?.operationId),
+    activeStep:
+      activeStep && Number.isInteger(activeStep.stepIndex)
+        ? {
+            stepIndex: integer(activeStep.stepIndex),
+            stepId: text(activeStep.stepId),
+            childPid: nullableInteger(activeStep.childPid),
+          }
+        : null,
+    events: events.flatMap((item) => {
+      const event = record(item);
+      if (!event || !Number.isInteger(event.sequence)) return [];
+      return [
+        {
+          eventId: text(event.eventId),
+          sequence: integer(event.sequence),
+          operationId: text(event.operationId),
+          operation: text(event.operation),
+          occurredAt: text(event.occurredAt),
+          phase: text(event.phase),
+          status: text(event.status),
+          stepIndex: nullableInteger(event.stepIndex),
+          stepId: nullableText(event.stepId),
+          childPid: nullableInteger(event.childPid),
+          executable: nullableText(event.executable),
+          exitCode: nullableInteger(event.exitCode),
+          signal: nullableText(event.signal),
+        },
+      ];
+    }),
+  };
+}
+
 export function normalizeDeliveryWorkspace(
   cycleId: string,
   showOutput: unknown,
@@ -238,6 +317,7 @@ export function normalizeDeliveryWorkspace(
       : null,
     recovery: record(show.recovery),
     operation: operationView(operationOutput, show.deliveryCancellation),
+    progress: progressView(show.deliveryProgress),
   };
 }
 
@@ -245,16 +325,45 @@ export async function loadDeliveryWorkspace(cycleId: string) {
   const root = resolveEvolutionStateRoot();
   try {
     const projectRoot = await assertEvolutionProjectRoot();
-    const operation = await runDeliveryCoreCli<unknown>([
-      "operation",
-      cycleId,
-      "--root",
-      root,
-      "--project-root",
-      projectRoot,
-      "--actor",
-      "cyclewarden-web:delivery-observer",
+    const [operation, progress] = await Promise.all([
+      runDeliveryCoreCli<unknown>([
+        "operation",
+        cycleId,
+        "--root",
+        root,
+        "--project-root",
+        projectRoot,
+        "--actor",
+        "cyclewarden-web:delivery-observer",
+      ]),
+      runDeliveryCoreCli<unknown>(["progress", cycleId, "--root", root]),
     ]);
+
+    const operationOuter = record(operation);
+    const operationInspection = record(
+      operationOuter?.inspection ?? operationOuter?.deliveryOperation ?? operation
+    );
+    const exactOperationId = nullableText(record(operationInspection?.record)?.operationId);
+    let cancellation: unknown = {
+      deliveryCancellation: { cancellable: false, request: null },
+    };
+    if (exactOperationId) {
+      const cancellationPlan = await runDeliveryCoreCli<unknown>([
+        "cancel",
+        cycleId,
+        "--root",
+        root,
+        "--project-root",
+        projectRoot,
+        "--actor",
+        "cyclewarden-web:delivery-observer",
+        "--operation-id",
+        exactOperationId,
+      ]);
+      cancellation = {
+        deliveryCancellation: record(record(cancellationPlan)?.inspection) ?? {},
+      };
+    }
 
     let show: unknown = {};
     try {
@@ -264,7 +373,18 @@ export async function loadDeliveryWorkspace(cycleId: string) {
       if (!/cannot read delivery control|no such file|enoent/i.test(message)) throw error;
     }
 
-    return { state: normalizeDeliveryWorkspace(cycleId, show, operation), error: null };
+    return {
+      state: normalizeDeliveryWorkspace(
+        cycleId,
+        {
+          ...(record(show) ?? {}),
+          ...(record(progress) ?? {}),
+          ...(record(cancellation) ?? {}),
+        },
+        operation
+      ),
+      error: null,
+    };
   } catch (error) {
     return {
       state: null as DeliveryWorkspaceView | null,
