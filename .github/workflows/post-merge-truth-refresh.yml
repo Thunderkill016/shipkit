@@ -63,5 +63,6 @@ This order is a product-value gate, not a deletion of the intended full product.
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add docs/CAPABILITIES.json docs/ai/PROJECT_MODEL.md
           git rm .github/workflows/post-merge-truth-refresh.yml
+          git rm -f .github/truth-refresh-trigger
           git commit -m "Refresh post-merge capability truth"
           git push origin HEAD:agent/post-merge-truth-refresh
