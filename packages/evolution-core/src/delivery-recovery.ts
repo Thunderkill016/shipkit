@@ -1,6 +1,14 @@
 import { createHash, randomUUID } from "node:crypto";
 import { execFile } from "node:child_process";
-import { mkdir, readFile, realpath, rename, writeFile } from "node:fs/promises";
+import {
+  lstat,
+  mkdir,
+  readFile,
+  readlink,
+  realpath,
+  rename,
+  writeFile,
+} from "node:fs/promises";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { promisify } from "node:util";
 import { EvidenceRegistry } from "./evidence.js";
@@ -77,6 +85,7 @@ type WorktreeInspection = {
   head: string | null;
   branchHead: string | null;
   changedFiles: string[];
+  patchDigest: string | null;
   findings: string[];
 };
 
@@ -102,6 +111,8 @@ export type DeliveryRecoveryRecord = {
   projectRoot: string;
   controlStatus: ControlInspection["status"];
   worktreeStatus: DeliveryWorktreeStatus;
+  recordedPatchDigest: string | null;
+  observedPatchDigest: string | null;
   decision: DeliveryRecoveryDecision;
   targetStage: EvolutionStage | null;
   findings: string[];
@@ -140,6 +151,10 @@ function sha256(value: string): string {
 
 function digestJson(value: unknown): string {
   return sha256(JSON.stringify(value));
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function safeEnvironment(): NodeJS.ProcessEnv {
@@ -219,14 +234,59 @@ async function listChangedFiles(worktreePath: string): Promise<string[]> {
     .sort();
 }
 
+async function patchDigest(worktreePath: string, changedFiles: string[]): Promise<string> {
+  const worktreeRoot = resolve(worktreePath);
+  const digest = createHash("sha256");
+  for (const changedFile of changedFiles) {
+    const path = normalizeRepositoryPath(changedFile);
+    const absolutePath = resolve(worktreeRoot, path);
+    const offset = relative(worktreeRoot, absolutePath);
+    if (offset === ".." || offset.startsWith(`..${sep}`) || isAbsolute(offset)) {
+      throw new DeliveryRecoveryError(`changed path escapes the delivery worktree: ${path}`);
+    }
+    let info;
+    try {
+      info = await lstat(absolutePath);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+        digest.update(`deleted\0${path}\0`);
+        continue;
+      }
+      throw error;
+    }
+    if (info.isSymbolicLink()) {
+      const target = await readlink(absolutePath);
+      const resolvedTarget = resolve(dirname(absolutePath), target);
+      const targetOffset = relative(worktreeRoot, resolvedTarget);
+      if (
+        isAbsolute(target) ||
+        targetOffset === ".." ||
+        targetOffset.startsWith(`..${sep}`) ||
+        isAbsolute(targetOffset)
+      ) {
+        throw new DeliveryRecoveryError(`changed symlink escapes the delivery worktree: ${path}`);
+      }
+      digest.update(`symlink\0${path}\0${target}\0`);
+      continue;
+    }
+    if (!info.isFile()) {
+      throw new DeliveryRecoveryError(`changed path is not a regular file: ${path}`);
+    }
+    digest.update(`file\0${path}\0${info.mode}\0`);
+    digest.update(await readFile(absolutePath));
+    digest.update("\0");
+  }
+  return digest.digest("hex");
+}
+
 async function inspectControl(
   store: EvolutionStore,
   cycleId: string,
   projectRoot: string
 ): Promise<ControlInspection> {
-  let parsed: DeliveryControlFile;
+  let value: unknown;
   try {
-    parsed = JSON.parse(await readFile(controlPath(store, cycleId), "utf8")) as DeliveryControlFile;
+    value = JSON.parse(await readFile(controlPath(store, cycleId), "utf8"));
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
       return { status: "missing", findings: ["delivery control sidecar is missing"] };
@@ -236,23 +296,44 @@ async function inspectControl(
       findings: [`delivery control sidecar cannot be read: ${error instanceof Error ? error.message : String(error)}`],
     };
   }
+  if (!isRecord(value)) {
+    return { status: "invalid", findings: ["delivery control sidecar must be a JSON object"] };
+  }
 
+  const parsed = value as DeliveryControlFile;
   const findings: string[] = [];
   if (parsed.schemaVersion !== 1 || parsed.cycleId !== cycleId) {
     findings.push("delivery control sidecar does not match the requested cycle");
   }
   const { integrityDigest, ...payload } = parsed;
-  if (!/^[a-f0-9]{64}$/i.test(integrityDigest) || integrityDigest !== digestJson(payload)) {
+  if (
+    typeof integrityDigest !== "string" ||
+    !/^[a-f0-9]{64}$/i.test(integrityDigest) ||
+    integrityDigest !== digestJson(payload)
+  ) {
     findings.push("delivery control integrity digest mismatch");
   }
   if (parsed.projectRoot !== projectRoot) {
     findings.push("delivery control project root does not match the requested repository");
   }
-  if (!parsed.execution || parsed.execution.cycleId !== cycleId || !parsed.executionEvidenceRef) {
-    findings.push("delivery execution record is missing or does not match the cycle");
+  if (
+    !isRecord(parsed.execution) ||
+    parsed.execution.cycleId !== cycleId ||
+    typeof parsed.execution.baseCommit !== "string" ||
+    typeof parsed.execution.branchName !== "string" ||
+    !Array.isArray(parsed.execution.changedFiles) ||
+    parsed.execution.changedFiles.some((item) => typeof item !== "string") ||
+    typeof parsed.execution.patchDigest !== "string" ||
+    !/^[a-f0-9]{64}$/i.test(parsed.execution.patchDigest) ||
+    typeof parsed.executionEvidenceRef !== "string" ||
+    !parsed.executionEvidenceRef
+  ) {
+    findings.push("delivery execution record is missing or invalid");
   }
-  if (parsed.verification && parsed.verification.cycleId !== cycleId) {
-    findings.push("delivery verification record does not match the cycle");
+  if (parsed.verification !== null && parsed.verification !== undefined) {
+    if (!isRecord(parsed.verification) || parsed.verification.cycleId !== cycleId) {
+      findings.push("delivery verification record does not match the cycle");
+    }
   }
   if (findings.length > 0) return { status: "invalid", findings };
   return { status: "valid", control: parsed, findings: [] };
@@ -265,6 +346,7 @@ async function inspectWorktree(controlInspection: ControlInspection): Promise<Wo
       head: null,
       branchHead: null,
       changedFiles: [],
+      patchDigest: null,
       findings: ["worktree cannot be inspected without a valid delivery control sidecar"],
     };
   }
@@ -279,6 +361,7 @@ async function inspectWorktree(controlInspection: ControlInspection): Promise<Wo
         head: null,
         branchHead: null,
         changedFiles: [],
+        patchDigest: null,
         findings: ["delivery worktree path is not its git worktree root"],
       };
     }
@@ -288,6 +371,7 @@ async function inspectWorktree(controlInspection: ControlInspection): Promise<Wo
       runGit(worktreePath, ["status", "--porcelain=v1", "--untracked-files=all"]),
       listChangedFiles(worktreePath),
     ]);
+    const observedPatchDigest = await patchDigest(worktreePath, changedFiles);
     const verificationCommit =
       control.verification?.verdict === "accepted" ? control.verification.commitSha : null;
     if (
@@ -301,19 +385,22 @@ async function inspectWorktree(controlInspection: ControlInspection): Promise<Wo
         head,
         branchHead,
         changedFiles,
+        patchDigest: observedPatchDigest,
         findings: [],
       };
     }
     if (
       head === control.execution.baseCommit &&
       branchHead === control.execution.baseCommit &&
-      sameStrings(changedFiles, control.execution.changedFiles)
+      sameStrings(changedFiles, control.execution.changedFiles) &&
+      observedPatchDigest === control.execution.patchDigest
     ) {
       return {
         status: "implementation-intact",
         head,
         branchHead,
         changedFiles,
+        patchDigest: observedPatchDigest,
         findings: [],
       };
     }
@@ -323,6 +410,7 @@ async function inspectWorktree(controlInspection: ControlInspection): Promise<Wo
         head,
         branchHead,
         changedFiles,
+        patchDigest: observedPatchDigest,
         findings: [
           "the isolated branch contains a clean commit that is absent from the durable verification record",
         ],
@@ -333,8 +421,13 @@ async function inspectWorktree(controlInspection: ControlInspection): Promise<Wo
       head,
       branchHead,
       changedFiles,
+      patchDigest: observedPatchDigest,
       findings: [
-        "delivery branch or worktree content no longer matches the durable execution and verification records",
+        sameStrings(changedFiles, control.execution.changedFiles) &&
+        head === control.execution.baseCommit &&
+        branchHead === control.execution.baseCommit
+          ? "delivery patch content digest no longer matches the durable execution record"
+          : "delivery branch or worktree content no longer matches the durable execution and verification records",
       ],
     };
   } catch (error) {
@@ -344,6 +437,7 @@ async function inspectWorktree(controlInspection: ControlInspection): Promise<Wo
       head: null,
       branchHead: null,
       changedFiles: [],
+      patchDigest: null,
       findings: [
         `delivery worktree inspection failed: ${error instanceof Error ? error.message : String(error)}`,
       ],
@@ -568,6 +662,9 @@ export async function recoverDelivery(input: RecoverDeliveryInput) {
     projectRoot,
     controlStatus: controlInspection.status,
     worktreeStatus: worktree.status,
+    recordedPatchDigest:
+      controlInspection.status === "valid" ? controlInspection.control.execution.patchDigest : null,
+    observedPatchDigest: worktree.patchDigest,
     decision: plan.decision,
     targetStage: plan.targetStage,
     findings: [...new Set(plan.findings)],
@@ -575,6 +672,7 @@ export async function recoverDelivery(input: RecoverDeliveryInput) {
       ? plan.nextAction
       : `Inspect this plan, then rerun with --apply. ${plan.nextAction}`,
     limitations: [
+      "recovery requires the exact execution patch digest before treating an uncommitted implementation as intact",
       "recovery never infers a passing verification verdict from an unrecorded commit",
       "recovery does not rerun implementation commands, merge pull requests, deploy, or write production",
       "trusted-local git and filesystem inspection remains inside the current operating-system user's trust boundary",
@@ -611,14 +709,15 @@ export async function recoverDelivery(input: RecoverDeliveryInput) {
       head: worktree.head,
       branchHead: worktree.branchHead,
       changedFiles: worktree.changedFiles,
+      patchDigest: worktree.patchDigest,
     },
   };
 }
 
 export async function showDeliveryRecovery(store: EvolutionStore, cycleId: string) {
-  let value: RecoverySidecar;
+  let value: unknown;
   try {
-    value = JSON.parse(await readFile(recoveryPath(store, cycleId), "utf8")) as RecoverySidecar;
+    value = JSON.parse(await readFile(recoveryPath(store, cycleId), "utf8"));
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
       return { recovery: null, recoveryEvidenceRef: null };
@@ -627,14 +726,19 @@ export async function showDeliveryRecovery(store: EvolutionStore, cycleId: strin
       `cannot read delivery recovery record for ${cycleId}: ${error instanceof Error ? error.message : String(error)}`
     );
   }
-  const { integrityDigest, ...payload } = value;
+  if (!isRecord(value)) {
+    throw new DeliveryRecoveryError("delivery recovery sidecar must be a JSON object");
+  }
+  const sidecar = value as RecoverySidecar;
+  const { integrityDigest, ...payload } = sidecar;
   if (
-    value.schemaVersion !== 1 ||
-    value.cycleId !== cycleId ||
+    sidecar.schemaVersion !== 1 ||
+    sidecar.cycleId !== cycleId ||
+    typeof integrityDigest !== "string" ||
     !/^[a-f0-9]{64}$/i.test(integrityDigest) ||
     integrityDigest !== digestJson(payload)
   ) {
     throw new DeliveryRecoveryError("delivery recovery sidecar integrity mismatch");
   }
-  return { recovery: value.latest, recoveryEvidenceRef: value.evidenceRef };
+  return { recovery: sidecar.latest, recoveryEvidenceRef: sidecar.evidenceRef };
 }
