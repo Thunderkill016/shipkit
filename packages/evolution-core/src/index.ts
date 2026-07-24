@@ -15,8 +15,26 @@ export * from "./evidence.js";
 export * from "./execution-backend.js";
 export * from "./check-runner.js";
 export * from "./scorecard.js";
-export * from "./delivery.js";
-export * from "./delivery-publish.js";
+export {
+  DeliveryError,
+  loadDeliveryManifest,
+  showDelivery,
+  type DeliveryCommandSpec,
+  type DeliveryExecutionRecord,
+  type DeliveryExecutionStatus,
+  type DeliveryManifest,
+  type DeliveryVerificationCheck,
+  type DeliveryVerificationRecord,
+  type ExecuteDeliveryInput,
+  type VerifyDeliveryInput,
+} from "./delivery.js";
+export {
+  DeliveryPublishError,
+  showDeliveryPublication,
+  type DeliveryPublicationRecord,
+  type PublishDeliveryInput,
+} from "./delivery-publish.js";
+export { executeDelivery, publishDelivery, verifyDelivery } from "./delivery-api.js";
 export * from "./delivery-recovery.js";
 export * from "./delivery-operation.js";
 export * from "./delivery-cli.js";
