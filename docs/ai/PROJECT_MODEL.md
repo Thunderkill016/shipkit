@@ -1,7 +1,7 @@
 # Project model — Shipkit
 
 Status: active verified snapshot  
-Last verified: 2026-07-23  
+Last verified: 2026-07-24<br>
 Product: Shipkit — one integrated AI-native product development system  
 Current safe autonomy ceiling: A2 for arbitrary repositories; A3 remains experimental and trusted-only
 
@@ -139,6 +139,8 @@ Partially implemented:
 - deterministic repository research and readiness gates;
 - bounded public-source capture with SSRF controls, exact citation spans,
   hostile-source quarantine and independent review;
+- provider-neutral ranked public repository discovery with one built-in GitHub
+  adapter, persisted query/rank/digest provenance and fail-closed outcomes;
 - named-candidate comparison against current capabilities and protected
   experiment parameters;
 - typed execution handoff;
@@ -152,6 +154,35 @@ Remaining:
 - consented user-research ingestion and external user decision-value proof;
 - calibrated decision weights and outcome evaluation;
 - execution-handoff consumption by a coding-agent adapter.
+
+### External Decision-Value Validation
+
+Operationally ready:
+
+- the fixed issue #14 protocol is machine-readable and merged on `main`;
+- exactly six pseudonymous participant/repository slots are precommitted;
+- the technical gate is ready after PR #31 merged;
+- eligibility, consent, pre-audit decision, product/technical outcome
+  separation, redaction and aggregate classification are checked in CI;
+- schema drift, early session start, timebox violations, record-path mismatch,
+  common sensitive-content patterns and unsupported decision-value claims fail
+  closed.
+
+Current evidence boundary:
+
+- external completed audits are `0/6`;
+- the 14-day clock has not started;
+- no participant or external repository has been contacted or accessed;
+- operational readiness does not establish decision value, user demand or
+  repeat use.
+
+Remaining human gates:
+
+- choose an authorized recruitment channel;
+- recruit eligible developers or maintainers and obtain explicit consent;
+- run exactly six primary audits within the original timebox;
+- apply the locked success, inconclusive, failure or protocol-gap rule without
+  changing thresholds after observing results.
 
 ### Execution and Sandbox
 
@@ -246,13 +277,16 @@ This is the next slice of the complete Shipkit lifecycle, not a separate final p
 
 ## Verification baseline
 
-Latest verified PR #10 checks before this model update:
+Latest verified merged state through PR #33:
 
 - Test & Build;
+- Evolution Core standalone on Node.js 20 and 22;
 - Evolution Engine Proof;
+- hostile Docker sandbox proof;
 - demo-mode browser E2E;
 - portable PostgreSQL auth and user-isolation E2E;
-- AI workflow and capability registry checks.
+- AI workflow, capability registry, external-system registry and A2 pilot
+  protocol checks.
 
 Passing CI proves compatibility with the tested repository state, not complete integration or product usefulness.
 
@@ -265,6 +299,7 @@ Passing CI proves compatibility with the tested repository state, not complete i
 - no deployment governed by the durable cycle;
 - no product-outcome measurement linked to a released experiment;
 - no causally evaluated learning from a later comparable cycle;
+- the external decision-value pilot is operational but remains `0/6`;
 - no external user has yet demonstrated repeat complete-cycle use.
 
 ## Priority order
@@ -285,7 +320,8 @@ This order expresses dependency and safety. It does not remove any module from t
 - #11 — persistence crash, migration and multi-process proof;
 - #12 — fail-closed sandbox execution backends;
 - #13 — research-to-decision integrated milestone;
-- #14 — real-user decision-value validation;
+- #14 — real-user decision-value validation; operations are merged and the
+  technical gate is ready, but external evidence remains `0/6`;
 - #15 — independent/versioned Evolution Core package.
 
 These issues are modules and prerequisites of the single Shipkit product, not separate product directions.

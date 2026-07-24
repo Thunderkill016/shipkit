@@ -1,6 +1,6 @@
 # Implementation plan: A2 Research Audit pilot operations
 
-- Status: implemented in draft PR #33; pilot not started
+- Status: merged in PR #33 (`a4d2ac1`); pilot not started
 - Date: 2026-07-24
 - Issue: #14
 - Autonomy: A2 research and planning
