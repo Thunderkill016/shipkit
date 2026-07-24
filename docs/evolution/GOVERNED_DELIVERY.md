@@ -17,7 +17,7 @@ planned ExecutionHandoff
 → local verified commit
 ```
 
-The implementation actor cannot be the verifier actor. An accepted verification creates a commit on the isolated branch but does not push, open a PR, merge, deploy, read production secrets, or spend money.
+The implementation actor cannot be the verifier actor. CycleWarden orchestration creates a local commit only after independent verification and does not itself push, open a PR, merge, deploy, read production secrets, or spend money. The trusted implementation command still runs with the current operating-system user's privileges, so CycleWarden cannot technically prevent that command from invoking other installed tools or accessing resources available to that user.
 
 ## Manifest
 
@@ -93,6 +93,6 @@ Only `directory/**`, exact files and directory-prefix rules are enforced. Descri
 
 ## Security truth
 
-The first beta uses the existing `trusted-local` backend because the Docker check backend mounts a read-only workspace and is not a mutation environment. Trusted-local execution is **not a security sandbox**. The selected repository and command must be trusted, and the process can access files available to the current operating-system user.
+The first beta uses the existing `trusted-local` backend because the current Docker baseline denies network access and therefore cannot run an authenticated online Codex workflow. Although its bind-mounted workspace can be writable, it was verified as a bounded check backend rather than as a complete agent-mutation environment. Trusted-local execution is **not a security sandbox**. The selected repository, command and command arguments must be trusted, and the process can access files, credentials and network resources available to the current operating-system user.
 
-A later slice may add a writable remote or microVM backend. This document must not be used to claim such isolation today.
+The first slice also has no crash-safe delivery resume: an unexpected process termination after the cycle enters `executing` may require manual recovery. A later slice may add a writable remote or microVM backend, explicit egress policy and recovery records. This document must not be used to claim such isolation or resilience today.

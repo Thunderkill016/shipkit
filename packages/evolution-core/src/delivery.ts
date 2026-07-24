@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { execFile } from "node:child_process";
-import { mkdir, mkdtemp, readFile, realpath, rename, writeFile } from "node:fs/promises";
+import { lstat, mkdir, mkdtemp, readFile, readlink, realpath, rename, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { promisify } from "node:util";
@@ -74,6 +74,7 @@ export type DeliveryExecutionRecord = {
   baseCommit: string;
   branchName: string;
   worktreeId: string;
+  patchDigest: string;
   executable: string;
   argumentsDigest: string;
   commandStatus: ExecutionBackendResult["status"];
@@ -367,6 +368,51 @@ async function listChangedFiles(worktreePath: string): Promise<string[]> {
     .sort();
 }
 
+async function patchDigest(worktreePath: string, changedFiles: string[]): Promise<string> {
+  const worktreeRoot = resolve(worktreePath);
+  const digest = createHash("sha256");
+  for (const changedFile of changedFiles) {
+    const path = normalizeRepositoryPath(changedFile);
+    const absolutePath = resolve(worktreeRoot, path);
+    const offset = relative(worktreeRoot, absolutePath);
+    if (offset === ".." || offset.startsWith(`..${sep}`) || isAbsolute(offset)) {
+      throw new DeliveryError(`changed path escapes the delivery worktree: ${path}`);
+    }
+    let info;
+    try {
+      info = await lstat(absolutePath);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+        digest.update(`deleted\0${path}\0`);
+        continue;
+      }
+      throw error;
+    }
+    if (info.isSymbolicLink()) {
+      const target = await readlink(absolutePath);
+      const resolvedTarget = resolve(dirname(absolutePath), target);
+      const targetOffset = relative(worktreeRoot, resolvedTarget);
+      if (
+        isAbsolute(target) ||
+        targetOffset === ".." ||
+        targetOffset.startsWith(`..${sep}`) ||
+        isAbsolute(targetOffset)
+      ) {
+        throw new DeliveryError(`changed symlink escapes the delivery worktree: ${path}`);
+      }
+      digest.update(`symlink\0${path}\0${target}\0`);
+      continue;
+    }
+    if (!info.isFile()) {
+      throw new DeliveryError(`changed path is not a regular file: ${path}`);
+    }
+    digest.update(`file\0${path}\0${info.mode}\0`);
+    digest.update(await readFile(absolutePath));
+    digest.update("\0");
+  }
+  return digest.digest("hex");
+}
+
 function sameStrings(left: string[], right: string[]): boolean {
   return left.length === right.length && left.every((value, index) => value === right[index]);
 }
@@ -494,10 +540,12 @@ export async function executeDelivery(input: ExecuteDeliveryInput) {
     };
   }
   let changedFiles: string[] = [];
+  let implementationPatchDigest = sha256("");
   let violations: string[] = [];
   try {
     changedFiles = await listChangedFiles(worktreePath);
     violations = scopeViolations(changedFiles, handoff.allowedScope, handoff.forbiddenScope);
+    implementationPatchDigest = await patchDigest(worktreePath, changedFiles);
   } catch (error) {
     violations = [error instanceof Error ? error.message : String(error)];
   }
@@ -518,6 +566,7 @@ export async function executeDelivery(input: ExecuteDeliveryInput) {
     baseCommit,
     branchName,
     worktreeId,
+    patchDigest: implementationPatchDigest,
     executable: basename(manifest.command.executable),
     argumentsDigest: digestJson(manifest.command.arguments),
     commandStatus: result.status,
@@ -531,7 +580,8 @@ export async function executeDelivery(input: ExecuteDeliveryInput) {
     status,
     limitations: [
       "trusted-local delivery is not a security sandbox and is only for an explicitly trusted repository",
-      "the implementation adapter cannot merge, deploy, write production, or accept its own output",
+      "CycleWarden orchestration does not invoke merge, deploy, or production writes, but the trusted command runs with the current operating-system user's privileges",
+      "only a distinct verifier can transition the CycleWarden cycle to verified; this does not constrain arbitrary side effects of the trusted command outside the worktree",
       "external product validation has not been established",
     ],
   };
@@ -598,8 +648,19 @@ export async function verifyDelivery(input: VerifyDeliveryInput) {
     throw new DeliveryError("verifier actor must differ from the implementation actor");
   }
   const startedAt = input.now ?? new Date().toISOString();
-  const beforeChecks = await listChangedFiles(control.worktreePath);
-  const changedBeforeVerification = sameStrings(beforeChecks, control.execution.changedFiles);
+  let beforeChecks: string[] = [];
+  let beforeDigest: string | null = null;
+  let beforeSnapshotError: string | null = null;
+  try {
+    beforeChecks = await listChangedFiles(control.worktreePath);
+    beforeDigest = await patchDigest(control.worktreePath, beforeChecks);
+  } catch (error) {
+    beforeSnapshotError = error instanceof Error ? error.message : String(error);
+  }
+  const changedBeforeVerification =
+    beforeSnapshotError === null &&
+    sameStrings(beforeChecks, control.execution.changedFiles) &&
+    beforeDigest === control.execution.patchDigest;
   const checks: DeliveryVerificationCheck[] = [];
   if (changedBeforeVerification) {
     for (const spec of control.manifest.verification) {
@@ -620,11 +681,34 @@ export async function verifyDelivery(input: VerifyDeliveryInput) {
       checks.push(checkRecord(spec, result));
     }
   }
-  const afterChecks = await listChangedFiles(control.worktreePath);
-  const patchUnchanged = sameStrings(afterChecks, control.execution.changedFiles);
+  let afterChecks: string[] = [];
+  let afterDigest: string | null = null;
+  let afterSnapshotError: string | null = null;
+  try {
+    afterChecks = await listChangedFiles(control.worktreePath);
+    afterDigest = await patchDigest(control.worktreePath, afterChecks);
+  } catch (error) {
+    afterSnapshotError = error instanceof Error ? error.message : String(error);
+  }
+  const patchUnchanged =
+    afterSnapshotError === null &&
+    sameStrings(afterChecks, control.execution.changedFiles) &&
+    afterDigest === control.execution.patchDigest;
   const unresolvedRisks: string[] = [];
-  if (!changedBeforeVerification) unresolvedRisks.push("worktree changed after implementation and before verification");
-  if (!patchUnchanged) unresolvedRisks.push("verification commands changed the implementation patch");
+  if (!changedBeforeVerification) {
+    unresolvedRisks.push(
+      beforeSnapshotError
+        ? `cannot verify the implementation patch: ${beforeSnapshotError}`
+        : "worktree content changed after implementation and before verification"
+    );
+  }
+  if (!patchUnchanged) {
+    unresolvedRisks.push(
+      afterSnapshotError
+        ? `cannot verify the post-check patch: ${afterSnapshotError}`
+        : "verification commands changed the implementation patch content"
+    );
+  }
   if (checks.length === 0) unresolvedRisks.push("no verification command was executed");
   for (const check of checks) {
     if (check.status !== "passed") unresolvedRisks.push(`${check.id} returned ${check.status}`);

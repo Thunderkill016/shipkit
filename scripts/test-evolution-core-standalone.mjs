@@ -187,6 +187,17 @@ try {
     );
   }
 
+  const deliveryBinary = join(
+    consumerRoot,
+    "node_modules",
+    ".bin",
+    process.platform === "win32" ? "cyclewarden-deliver.cmd" : "cyclewarden-deliver"
+  );
+  const deliveryHelp = await run(deliveryBinary, ["--help"], consumerRoot);
+  if (!deliveryHelp.stdout.includes("CycleWarden governed delivery")) {
+    throw new Error("installed cyclewarden-deliver binary did not return expected help output");
+  }
+
   await persistDiagnostics();
   process.stdout.write(
     `${JSON.stringify(
@@ -202,6 +213,7 @@ try {
         consumerCli: "passed",
         consumerCandidateCli: "passed",
         consumerSearchCli: "passed",
+        consumerDeliveryCli: "passed",
       },
       null,
       2
