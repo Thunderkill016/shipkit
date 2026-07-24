@@ -51,9 +51,9 @@ function modeledCycle(cycleId: string): EvolutionCycle {
 }
 
 async function registry() {
-  const root = await mkdtemp(join(tmpdir(), "shipkit-public-search-failure-"));
+  const root = await mkdtemp(join(tmpdir(), "cyclewarden-public-search-failure-"));
   temporaryRoots.push(root);
-  return new EvidenceRegistry(join(root, ".shipkit"), root);
+  return new EvidenceRegistry(join(root, ".cyclewarden"), root);
 }
 
 function manifest(): PublicSearchManifest {
@@ -63,10 +63,10 @@ function manifest(): PublicSearchManifest {
 const publicResolver = async () => ["140.82.114.5"];
 
 const result = {
-  full_name: "Thunderkill016/shipkit",
-  html_url: "https://github.com/Thunderkill016/shipkit",
-  url: "https://api.github.com/repos/Thunderkill016/shipkit",
-  description: "Shipkit uses bounded search and exact citations.",
+  full_name: "Thunderkill016/cyclewarden",
+  html_url: "https://github.com/Thunderkill016/cyclewarden",
+  url: "https://api.github.com/repos/Thunderkill016/cyclewarden",
+  description: "CycleWarden uses bounded search and exact citations.",
   updated_at: "2026-07-22T12:00:00.000Z",
   score: 8,
 };

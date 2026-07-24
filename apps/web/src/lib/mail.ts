@@ -1,4 +1,4 @@
-import { createConsoleMailer, createResendMailer, type MailPort } from "@shipkit/mail";
+import { createConsoleMailer, createResendMailer, type MailPort } from "@cyclewarden/mail";
 
 let cachedMailer: MailPort | null = null;
 

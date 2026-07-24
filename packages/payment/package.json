@@ -1,5 +1,5 @@
 {
-  "name": "@shipkit/payment",
+  "name": "@cyclewarden/payment",
   "version": "0.1.0",
   "private": true,
   "type": "module",

@@ -3,16 +3,16 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: shipkit
-      POSTGRES_PASSWORD: shipkit
-      POSTGRES_DB: shipkit
+      POSTGRES_USER: cyclewarden
+      POSTGRES_PASSWORD: cyclewarden
+      POSTGRES_DB: cyclewarden
     ports:
       - "5432:5432"
     volumes:
-      - shipkit_pg:/var/lib/postgresql/data
+      - cyclewarden_pg:/var/lib/postgresql/data
       - ./packages/db/sql/0001_init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
       - ./packages/db/sql/0003_better_auth.sql:/docker-entrypoint-initdb.d/03_better_auth.sql:ro
       - ./packages/db/sql/0004_notes.sql:/docker-entrypoint-initdb.d/04_notes.sql:ro
 
 volumes:
-  shipkit_pg:
+  cyclewarden_pg:

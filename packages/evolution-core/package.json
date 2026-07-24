@@ -1,8 +1,8 @@
 {
-  "name": "@shipkit/evolution-core",
+  "name": "@cyclewarden/evolution-core",
   "version": "0.1.0",
   "private": true,
-  "description": "Deterministic lifecycle, evidence, research and governed execution core for Shipkit.",
+  "description": "Deterministic lifecycle, evidence, research and governed execution core for CycleWarden.",
   "license": "MIT",
   "type": "module",
   "engines": {
@@ -14,11 +14,11 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "shipkit-evolve": "./dist/bin-evolve.js",
-    "shipkit-research-public": "./dist/bin-public-research.js",
-    "shipkit-sandbox-check": "./dist/bin-sandbox-check.js",
-    "shipkit-research-candidates": "./dist/bin-candidate-research.js",
-    "shipkit-research-search": "./dist/bin-public-search.js"
+    "cyclewarden-evolve": "./dist/bin-evolve.js",
+    "cyclewarden-research-public": "./dist/bin-public-research.js",
+    "cyclewarden-sandbox-check": "./dist/bin-sandbox-check.js",
+    "cyclewarden-research-candidates": "./dist/bin-candidate-research.js",
+    "cyclewarden-research-search": "./dist/bin-public-search.js"
   },
   "exports": {
     ".": {

@@ -12,7 +12,7 @@ export default function AppError({
 }) {
   useEffect(() => {
     // Log error for observability — replace with Sentry when ready
-    console.error("[shipkit/app-error]", error);
+    console.error("[cyclewarden/app-error]", error);
   }, [error]);
 
   return (

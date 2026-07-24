@@ -27,10 +27,10 @@ function collector() {
 }
 
 async function createProject() {
-  const root = await mkdtemp(join(tmpdir(), "shipkit-repository-research-cli-"));
+  const root = await mkdtemp(join(tmpdir(), "cyclewarden-repository-research-cli-"));
   temporaryRoots.push(root);
   const projectRoot = join(root, "research-product");
-  const storeRoot = join(root, ".shipkit");
+  const storeRoot = join(root, ".cyclewarden");
   await mkdir(join(projectRoot, "src"), { recursive: true });
   await mkdir(join(projectRoot, ".github", "workflows"), { recursive: true });
   await writeFile(join(projectRoot, "src", "index.js"), "export const ready = true;\n", "utf8");

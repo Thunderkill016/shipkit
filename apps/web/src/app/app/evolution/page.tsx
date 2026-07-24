@@ -1,4 +1,5 @@
 import { execFile } from "node:child_process";
+import { existsSync } from "node:fs";
 import { promisify } from "node:util";
 import Link from "next/link";
 import { basename, dirname, resolve } from "node:path";
@@ -115,12 +116,19 @@ function repositoryRoot(): string {
 }
 
 function stateRoot(): string {
-  return resolve(process.env.SHIPKIT_STATE_ROOT ?? resolve(repositoryRoot(), ".shipkit"));
+  const configuredRoot =
+    process.env.CYCLEWARDEN_STATE_ROOT ?? process.env.SHIPKIT_STATE_ROOT;
+  if (configuredRoot) return resolve(configuredRoot);
+
+  const canonicalRoot = resolve(repositoryRoot(), ".cyclewarden");
+  const legacyRoot = resolve(repositoryRoot(), ".shipkit");
+  return existsSync(canonicalRoot) || !existsSync(legacyRoot) ? canonicalRoot : legacyRoot;
 }
 
 function cliPath(): string {
   return resolve(
-    process.env.SHIPKIT_EVOLUTION_CLI ??
+    process.env.CYCLEWARDEN_EVOLUTION_CLI ??
+      process.env.SHIPKIT_EVOLUTION_CLI ??
       resolve(repositoryRoot(), "packages/evolution-core/dist/cli.js")
   );
 }
@@ -183,7 +191,7 @@ export default async function EvolutionWorkspacePage({ searchParams }: PageProps
       <header className="flex flex-wrap items-start justify-between gap-4 border-b border-border pb-6">
         <div>
           <p className="text-xs font-semibold uppercase tracking-widest text-accent">
-            Unified Shipkit workspace
+            Unified CycleWarden workspace
           </p>
           <h1 className="mt-2 text-2xl font-semibold text-foreground">Evolution cycles</h1>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
@@ -206,7 +214,7 @@ export default async function EvolutionWorkspacePage({ searchParams }: PageProps
 
       {workspace.error && (
         <div className="mt-6 rounded-xl border border-red-500/40 bg-red-500/5 p-4 text-sm text-red-300">
-          Could not load Shipkit state: {workspace.error}
+          Could not load CycleWarden state: {workspace.error}
         </div>
       )}
 
@@ -218,10 +226,10 @@ export default async function EvolutionWorkspacePage({ searchParams }: PageProps
           </p>
           <pre className="mt-4 overflow-x-auto rounded-xl bg-background p-4 text-xs text-muted">
             {`pnpm evolve -- init
-pnpm evolve -- start --id shipkit:cycle-001 --objective "Choose the next product experiment"
-pnpm evolve -- inspect shipkit:cycle-001 --project-root .
-pnpm evolve -- assess shipkit:cycle-001 --project-root .
-pnpm evolve -- research-repository shipkit:cycle-001 --project-root .`}
+pnpm evolve -- start --id cyclewarden:cycle-001 --objective "Choose the next product experiment"
+pnpm evolve -- inspect cyclewarden:cycle-001 --project-root .
+pnpm evolve -- assess cyclewarden:cycle-001 --project-root .
+pnpm evolve -- research-repository cyclewarden:cycle-001 --project-root .`}
           </pre>
         </section>
       ) : (

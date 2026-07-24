@@ -7,6 +7,7 @@ const execFileAsync = promisify(execFile);
 
 const IGNORED_DIRECTORIES = new Set([
   ".git",
+  ".cyclewarden",
   ".shipkit",
   ".next",
   ".turbo",

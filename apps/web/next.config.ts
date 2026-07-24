@@ -1,5 +1,5 @@
 import type { NextConfig } from "next";
-import { securityHeaders } from "@shipkit/security";
+import { securityHeaders } from "@cyclewarden/security";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -7,15 +7,15 @@ const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
   transpilePackages: [
-    "@shipkit/config",
-    "@shipkit/security",
-    "@shipkit/db",
-    "@shipkit/auth",
-    "@shipkit/storage",
-    "@shipkit/mail",
-    "@shipkit/logger",
-    "@shipkit/i18n",
-    "@shipkit/payment",
+    "@cyclewarden/config",
+    "@cyclewarden/security",
+    "@cyclewarden/db",
+    "@cyclewarden/auth",
+    "@cyclewarden/storage",
+    "@cyclewarden/mail",
+    "@cyclewarden/logger",
+    "@cyclewarden/i18n",
+    "@cyclewarden/payment",
   ],
   async headers() {
     return [

@@ -23,7 +23,7 @@ function collector() {
 }
 
 async function fixtureProject(): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), "shipkit-sandbox-cli-"));
+  const root = await mkdtemp(join(tmpdir(), "cyclewarden-sandbox-cli-"));
   temporaryRoots.push(root);
   await writeFile(
     join(root, "package.json"),
@@ -44,7 +44,7 @@ afterEach(async () => {
   await Promise.all(temporaryRoots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
 });
 
-describe("shipkit-sandbox-check CLI", () => {
+describe("cyclewarden-sandbox-check CLI", () => {
   it("requires an explicit backend", async () => {
     await expect(runSandboxCli(["--project-root", await fixtureProject()], collector().io)).rejects.toThrow(
       /--backend is required/

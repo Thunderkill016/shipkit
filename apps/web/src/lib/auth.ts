@@ -1,4 +1,4 @@
-import type { AuthPort } from "@shipkit/auth";
+import type { AuthPort } from "@cyclewarden/auth";
 import { createBetterAuthPort } from "./adapters/better-auth/port";
 import { createSupabaseAuthPort } from "./adapters/supabase/auth";
 import { resolveAuthAdapter } from "./auth-adapter";

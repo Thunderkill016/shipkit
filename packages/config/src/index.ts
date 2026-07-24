@@ -1,13 +1,13 @@
 import { z } from "zod";
 
 /** Supported presets — see /presets */
-export type ShipkitPreset = "supabase-full" | "portable-pg";
+export type CycleWardenPreset = "supabase-full" | "portable-pg";
 
 export type AuthAdapterId = "supabase" | "better-auth";
 export type DeployTarget = "vercel" | "docker";
 
 export interface KitConfig {
-  preset: ShipkitPreset;
+  preset: CycleWardenPreset;
   auth: AuthAdapterId;
   deploy: DeployTarget[];
 }
@@ -26,16 +26,16 @@ export const envSchema = z.object({
   UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
 });
 
-export type ShipkitEnv = z.infer<typeof envSchema>;
+export type CycleWardenEnv = z.infer<typeof envSchema>;
 
 export function parseEnv(raw: NodeJS.ProcessEnv = process.env): {
-  env: ShipkitEnv;
+  env: CycleWardenEnv;
   issues: string[];
 } {
   const result = envSchema.safeParse(raw);
   if (!result.success) {
     return {
-      env: {} as ShipkitEnv,
+      env: {} as CycleWardenEnv,
       issues: result.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`),
     };
   }

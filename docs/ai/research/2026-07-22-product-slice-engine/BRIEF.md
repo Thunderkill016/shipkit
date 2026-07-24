@@ -3,7 +3,7 @@
 Status: selected for delivery  
 Date: 2026-07-22  
 Autonomy: A3  
-Target: turn Shipkit from an AI-friendly boilerplate into an executable product-building system
+Target: turn CycleWarden from an AI-friendly boilerplate into an executable product-building system
 
 ## Decision
 
@@ -20,7 +20,7 @@ The unmet gap is the step after infrastructure: converting a product idea into a
 A declarative Product Slice Engine:
 
 - a project defines slices and fields in one JSON file;
-- Shipkit renders a working create/list/delete workflow;
+- CycleWarden renders a working create/list/delete workflow;
 - Zod validation is derived from the same definition;
 - records persist in Postgres and remain scoped by user ID;
 - demo mode remains explicit and in-memory;

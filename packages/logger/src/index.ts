@@ -1,5 +1,5 @@
 /**
- * @shipkit/logger — structured logging port.
+ * @cyclewarden/logger — structured logging port.
  */
 
 export type LogLevel = "debug" | "info" | "warn" | "error";

@@ -4,12 +4,12 @@ import { prepareCandidateResearch, type CapabilityRegistrySnapshot } from "./can
 import { createCycle, transitionCycle, type EvolutionCycle } from "./index.js";
 
 const fixture = JSON.parse(
-  readFileSync(new URL("./fixtures/shipkit-next-workstream.candidates.json", import.meta.url), "utf8")
+  readFileSync(new URL("./fixtures/cyclewarden-next-workstream.candidates.json", import.meta.url), "utf8")
 );
 
 const capabilities: CapabilityRegistrySnapshot = {
   schemaVersion: 1,
-  project: "shipkit",
+  project: "cyclewarden",
   lastVerified: "2026-07-23",
   capabilities: [
     {
@@ -53,8 +53,8 @@ const capabilities: CapabilityRegistrySnapshot = {
 
 function modeledCycle(): EvolutionCycle {
   let cycle = createCycle({
-    cycleId: "shipkit:candidate-research-001",
-    objective: "Choose Shipkit's next workstream",
+    cycleId: "cyclewarden:candidate-research-001",
+    objective: "Choose CycleWarden's next workstream",
     autonomy: "A2",
     risk: "R1",
     now: "2026-07-23T13:00:00.000Z",

@@ -1,10 +1,14 @@
-# ✦ Shipkit
+# ✦ CycleWarden
 
 **Unified AI-Native Product Evolution System & Deterministic Control Engine**
 
-Shipkit combines a product workspace, Next.js application foundation, deterministic evolution kernel, evidence-backed research intelligence, sandboxed agent execution, automated verification, and continuous measured learning into one governed product lifecycle.
+CycleWarden combines a product workspace, Next.js application foundation, deterministic evolution kernel, evidence-backed research intelligence, sandboxed agent execution, automated verification, and continuous measured learning into one governed product lifecycle.
 
-> **Core Philosophy:** Models and agents are *interchangeable workers*. They do not own Shipkit's state, permissions, evidence, deployment authority, or final verdicts. Shipkit wraps probabilistic AI in a deterministic control harness.
+> CycleWarden was formerly named Shipkit. Existing state and configuration
+> compatibility are documented in
+> [docs/RENAMING_FROM_SHIPKIT.md](docs/RENAMING_FROM_SHIPKIT.md).
+
+> **Core Philosophy:** Models and agents are *interchangeable workers*. They do not own CycleWarden's state, permissions, evidence, deployment authority, or final verdicts. CycleWarden wraps probabilistic AI in a deterministic control harness.
 
 [![Node.js](https://img.shields.io/badge/node-%E2%89%A520-brightgreen.svg)](https://nodejs.org)
 [![pnpm](https://img.shields.io/badge/pnpm-9.15.0-blue.svg)](https://pnpm.io)
@@ -68,7 +72,7 @@ Every product improvement cycle (`EvolutionCycle`) progresses through one durabl
 
 ---
 
-## 💡 Product Usability & Readiness (Is Shipkit Usable Today?)
+## 💡 Product Usability & Readiness (Is CycleWarden Usable Today?)
 
 ### 🟢 What is Ready to Use Now?
 - **Web App Foundation (`apps/web`):** Fully usable today as a modern production starter kit (Next.js 14, Supabase / Better-Auth, Drizzle/PostgreSQL, Tailwind CSS, Sentry, Vitest, Playwright, Vercel/Docker deployment recipes).
@@ -80,7 +84,7 @@ Every product improvement cycle (`EvolutionCycle`) progresses through one durabl
 - **Autonomous Deployment & Outcome Measurement:** Post-release outcome tracking and autonomous deployment execution remain manual or semi-automated steps.
 
 ### 📌 Recommended Usage Today
-- **For Web SaaS Builders:** Use `apps/web` & `pnpm create-shipkit` as your product application foundation.
+- **For Web SaaS Builders:** Use `apps/web` and `pnpm create -- my-product` as your product application foundation.
 - **For AI Systems Engineering:** Use `pnpm evolve` CLI to run evidence-backed project audits, research discovery, and decision-value pilots.
 
 ---
@@ -95,16 +99,16 @@ Every product improvement cycle (`EvolutionCycle`) progresses through one durabl
 
 ```bash
 # Clone repository
-git clone https://github.com/Thunderkill016/shipkit.git
-cd shipkit
+git clone https://github.com/Thunderkill016/cyclewarden.git
+cd cyclewarden
 
 # Install dependencies
 pnpm install
 
 # Build core evolution engine
-pnpm --filter @shipkit/evolution-core build
+pnpm --filter @cyclewarden/evolution-core build
 
-# Initialize durable local Shipkit store (.shipkit/)
+# Initialize durable local CycleWarden store (.cyclewarden/)
 pnpm evolve -- init
 ```
 
@@ -113,19 +117,19 @@ pnpm evolve -- init
 ```bash
 # Create a new product cycle
 pnpm evolve -- start \
-  --id shipkit:cycle-001 \
+  --id cyclewarden:cycle-001 \
   --objective "Identify and deliver the highest-value bounded improvement" \
   --autonomy A2 \
   --risk R1
 
 # Inspect repository baseline evidence
-pnpm evolve -- inspect shipkit:cycle-001 --project-root .
+pnpm evolve -- inspect cyclewarden:cycle-001 --project-root .
 
 # Assess readiness and run authorized checks
-pnpm evolve -- assess shipkit:cycle-001 --project-root . --check test
+pnpm evolve -- assess cyclewarden:cycle-001 --project-root . --check test
 
 # Show cycle state & evidence graph
-pnpm evolve -- show shipkit:cycle-001
+pnpm evolve -- show cyclewarden:cycle-001
 ```
 
 ### 3. Run Web Application Workspace
@@ -140,7 +144,7 @@ Navigate to `http://localhost:3000` to access the web foundation workspace.
 
 ## 🛡️ Security Boundary & Policy
 
-Shipkit enforces strict security boundaries:
+CycleWarden enforces strict security boundaries:
 
 - **Evidence-Gated Approvals:** No state transition occurs without explicit evidence matching requested action, cycle, and risk scope.
 - **Secret Redaction & Protection:** Active GitHub Secret Scanning and Push Protection prevent credential leaks.

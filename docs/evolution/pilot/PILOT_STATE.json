@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "protocolVersion": "2026-07-24-v1",
-  "issueUrl": "https://github.com/Thunderkill016/shipkit/issues/14",
+  "issueUrl": "https://github.com/Thunderkill016/cyclewarden/issues/14",
   "status": "not-started",
   "technicalGate": {
     "pullRequest": 31,

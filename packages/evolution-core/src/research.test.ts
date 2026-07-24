@@ -8,7 +8,7 @@ import {
 
 function modeledCycle(): EvolutionCycle {
   let cycle = createCycle({
-    cycleId: "shipkit:research-001",
+    cycleId: "cyclewarden:research-001",
     objective: "Choose the highest-value onboarding experiment",
     autonomy: "A2",
     risk: "R1",
@@ -31,7 +31,7 @@ function modeledCycle(): EvolutionCycle {
 function bundle() {
   return {
     brief: {
-      decisionQuestion: "Which onboarding experiment should Shipkit run first?",
+      decisionQuestion: "Which onboarding experiment should CycleWarden run first?",
       owner: "product-owner",
       assumptions: ["Developers can attach an existing repository"],
       constraints: ["No code mutation during research"],
@@ -54,8 +54,8 @@ function bundle() {
     sources: [
       {
         canonicalId: "repo:readme",
-        title: "Shipkit README",
-        publisher: "Shipkit",
+        title: "CycleWarden README",
+        publisher: "CycleWarden",
         sourceClass: "repository",
         authority: 1,
         directness: 1,
@@ -67,7 +67,7 @@ function bundle() {
       {
         canonicalId: "interview:developer-1",
         title: "Developer onboarding interview",
-        publisher: "Shipkit research",
+        publisher: "CycleWarden research",
         sourceClass: "user-research",
         authority: 0.8,
         directness: 1,
@@ -166,7 +166,7 @@ describe("research-to-execution handoff", () => {
   it("advances one durable cycle and preserves typed decision records", () => {
     const modeled = modeledCycle();
     const prepared = prepareResearchToExecution(modeled, bundle(), {
-      actor: "shipkit-researcher",
+      actor: "cyclewarden-researcher",
       now: "2026-07-23T01:00:00.000Z",
       evidenceRefs: ["evidence:research-bundle"],
     });
@@ -189,7 +189,7 @@ describe("research-to-execution handoff", () => {
     invalid.opportunities = invalid.opportunities.slice(0, 2);
     expect(() =>
       prepareResearchToExecution(modeledCycle(), invalid, {
-        actor: "shipkit-researcher",
+        actor: "cyclewarden-researcher",
         evidenceRefs: ["evidence:research-bundle"],
       })
     ).toThrow(/at least three opportunities/);
@@ -197,14 +197,14 @@ describe("research-to-execution handoff", () => {
 
   it("requires a modeled cycle", () => {
     const cycle = createCycle({
-      cycleId: "shipkit:research-002",
+      cycleId: "cyclewarden:research-002",
       objective: "Prepare an evidence-backed experiment",
       autonomy: "A2",
       risk: "R1",
     });
     expect(() =>
       prepareResearchToExecution(cycle, bundle(), {
-        actor: "shipkit-researcher",
+        actor: "cyclewarden-researcher",
         evidenceRefs: ["evidence:research-bundle"],
       })
     ).toThrow(/requires a modeled cycle/);

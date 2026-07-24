@@ -1,4 +1,4 @@
-# Shipkit Evolution Engine — comprehensive comparative analysis
+# CycleWarden Evolution Engine — comprehensive comparative analysis
 
 Status: active decision record  
 Issue: #9  
@@ -9,13 +9,13 @@ tests are enforced in
 [`EXTERNAL_SYSTEMS.json`](./EXTERNAL_SYSTEMS.json). The narrative below preserves
 the broader architecture baseline; the machine registry and
 [`../CAPABILITIES.json`](../CAPABILITIES.json) take precedence for current
-external revisions and implemented Shipkit status.
+external revisions and implemented CycleWarden status.
 
 ## Purpose
 
 This document prevents architecture-by-name-dropping. Every external system is evaluated
 against the same dimensions, produces an explicit `adopt`, `adapt`, `integrate`, `defer`, or
-`reject` decision, and names the evidence required to validate that decision in Shipkit.
+`reject` decision, and names the evidence required to validate that decision in CycleWarden.
 
 The comparison covers adjacent systems as well as direct coding-agent projects because
 Evolution Engine spans durable workflow, agent execution, sandboxing, policy, evidence,
@@ -29,8 +29,8 @@ For each system:
 2. record the source, license where applicable, and review date;
 3. compare the same architectural dimensions;
 4. separate useful mechanisms from product positioning;
-5. state what Shipkit adopts, adapts, integrates, defers, or rejects;
-6. define a test or benchmark that can falsify the Shipkit decision;
+5. state what CycleWarden adopts, adapts, integrates, defers, or rejects;
+6. define a test or benchmark that can falsify the CycleWarden decision;
 7. pin a release, tag, commit, or specification version before implementing an integration;
 8. revisit the decision when a source changes materially or evidence contradicts it.
 
@@ -52,11 +52,11 @@ specific source revision and ADR are pinned.
 - technical and product-outcome evaluation;
 - memory, learning, and meta-improvement;
 - operating model, deployment burden, and license;
-- fit, overlap, and unresolved gap relative to Shipkit.
+- fit, overlap, and unresolved gap relative to CycleWarden.
 
 ## Landscape summary
 
-| System | Primary scope | Strongest reusable mechanism | Missing relative to Shipkit | Decision |
+| System | Primary scope | Strongest reusable mechanism | Missing relative to CycleWarden | Decision |
 | --- | --- | --- | --- | --- |
 | Temporal | durable distributed execution | replayable event history and crash recovery | repository/product semantics, agent policy, outcome learning | Adapt |
 | LangGraph | stateful agent orchestration | checkpoints, interrupts, human-in-the-loop | independent evidence and product-governance lifecycle | Adapt |
@@ -66,7 +66,7 @@ specific source revision and ADR are pinned.
 | SWE-agent | issue-resolution agent research | agent-computer-interface and reproducible task framing | product discovery and long-lived project governance | Adapt for benchmarks |
 | mini-SWE-agent | minimal coding agent | small agent loop and multiple environment backends | durable state, policy, evidence, product outcomes | Integrate as minimal baseline |
 | OpenSandbox | general AI sandbox platform | lifecycle API, Docker/Kubernetes runtimes, egress controls | project decisions, evidence semantics, learning | Integrate rather than rebuild |
-| MCP | tools/resources protocol | standard client-to-tool interoperability | lifecycle truth, authorization policy, evaluation | Expose Shipkit through MCP |
+| MCP | tools/resources protocol | standard client-to-tool interoperability | lifecycle truth, authorization policy, evaluation | Expose CycleWarden through MCP |
 | A2A | agent-to-agent protocol | capability discovery and long-running task transport | project governance and evidence acceptance | Defer until adapters exist |
 | OPA | policy decision engine | policy-decision/enforcement separation | evolution-domain model and evidence gates | Adapt concepts; defer Rego dependency |
 | in-toto / SLSA | supply-chain provenance | attestations, subjects, materials, incremental assurance | correctness and product-value verdicts | Adapt attestation model |
@@ -86,7 +86,7 @@ specific source revision and ADR are pinned.
 **Adopt:** append-only history, deterministic transition logic, idempotent external activities,
 and explicit recovery semantics.
 
-**Adapt:** Shipkit starts local-first with inspectable JSONL and snapshots rather than requiring
+**Adapt:** CycleWarden starts local-first with inspectable JSONL and snapshots rather than requiring
 a Temporal service. A later distributed backend must preserve the same kernel contracts.
 
 **Reject for now:** embedding repository policy and product decisions inside a generic workflow
@@ -103,7 +103,7 @@ human-in-the-loop continuation.
 **Adopt:** resumable checkpoints, explicit interrupts, and separate short-term execution state
 from longer-lived memory.
 
-**Adapt:** Shipkit cycle state remains the authoritative product record. Agent graphs are
+**Adapt:** CycleWarden cycle state remains the authoritative product record. Agent graphs are
 activities or clients of the kernel, not the owner of truth, authorization, or accepted claims.
 
 **Reject:** assuming persisted graph state proves repository improvement.
@@ -118,7 +118,7 @@ across providers.
 
 **Adopt:** adapter contracts, executor boundaries, and workflow composition patterns.
 
-**Integrate later:** one Agent Framework client should consume Shipkit through stable APIs after
+**Integrate later:** one Agent Framework client should consume CycleWarden through stable APIs after
 the kernel and MCP boundary are complete.
 
 **Reject:** framework-specific provider objects in kernel state.
@@ -139,7 +139,7 @@ evaluation infrastructure.
 **Reject:** treating an agent finishing a task as sufficient evidence that a governed evolution
 cycle succeeded.
 
-**Falsification test:** execute one bounded implementation through OpenHands while Shipkit alone
+**Falsification test:** execute one bounded implementation through OpenHands while CycleWarden alone
 controls authorization, evidence acceptance, stage changes, and final verdict.
 
 ### Codex CLI — local coding-agent adapter reference
@@ -154,7 +154,7 @@ provenance, and branch-delivery contracts exist.
 
 **Reject:** making Codex-specific sessions the durable source of truth.
 
-**Falsification test:** interrupt Codex, resume the Shipkit cycle with another agent, and retain
+**Falsification test:** interrupt Codex, resume the CycleWarden cycle with another agent, and retain
 all accepted state without replaying unauthorized work.
 
 ### SWE-agent and mini-SWE-agent — coding-agent and minimal-baseline references
@@ -165,7 +165,7 @@ environments and benchmark-oriented agent interfaces.
 **Adopt:** pinned task/repository inputs, environment abstraction, trajectory retention, and a
 minimal baseline that challenges unnecessary orchestration complexity.
 
-**Adapt:** Shipkit evaluates issue repair as one opportunity class among product discovery,
+**Adapt:** CycleWarden evaluates issue repair as one opportunity class among product discovery,
 experiments, reliability, security, and optimization.
 
 **Reject:** adding specialized tools or multi-agent layers without measured improvement over the
@@ -183,7 +183,7 @@ backends, resource controls, endpoints, and egress policy.
 resource limits, network policy, diagnostics, pause/resume, and cleanup.
 
 **Integrate rather than rebuild:** prefer a dedicated sandbox backend when running untrusted
-repositories. Shipkit owns authorization and evidence; the sandbox owns containment.
+repositories. CycleWarden owns authorization and evidence; the sandbox owns containment.
 
 **Reject:** describing a temporary directory or copied workspace as a security sandbox.
 
@@ -230,7 +230,7 @@ provenance, and increasing assurance against tampering.
 **Adopt:** content-addressed subjects/materials, attributable activities, portable attestations,
 and incremental conformance levels.
 
-**Adapt:** Shipkit attestations cover evolution-cycle claims, not only builds.
+**Adapt:** CycleWarden attestations cover evolution-cycle claims, not only builds.
 
 **Reject:** equating provenance with correctness, user value, or safety.
 
@@ -257,7 +257,7 @@ in the Index, broader categories than issue resolution alone.
 **Adopt:** pinned repositories, versioned tasks, isolated environments, retained trajectories,
 independent harnesses, and reporting beyond one headline score.
 
-**Adapt:** Shipkit must also measure authorization correctness, recovery, explanation quality,
+**Adapt:** CycleWarden must also measure authorization correctness, recovery, explanation quality,
 product outcomes, cost, duration, regressions, and later-cycle learning.
 
 **Reject:** using public issue-resolution success as proof of general product evolution.
@@ -283,7 +283,7 @@ promote only when measured lift exceeds uncertainty and no protected metric regr
 
 ## Cross-system gap matrix
 
-| Capability | Best external reference | Shipkit status | Required proof |
+| Capability | Best external reference | CycleWarden status | Required proof |
 | --- | --- | --- | --- |
 | deterministic transitions | Temporal | implemented foundation | kill-boundary and migration tests |
 | agent checkpoints/HITL | LangGraph | cycle resume implemented; agent interrupts absent | two-client resume proof |
@@ -296,11 +296,11 @@ promote only when measured lift exceeds uncertainty and no protected metric regr
 | observability | OpenTelemetry | absent | exporter-independent correctness |
 | coding benchmarks | SWE-bench/OpenHands Index | repository proofs exist; no broad outcome suite | audited, versioned multi-dimensional evaluation |
 | durable learning | Reflexion/Voyager | absent | consumption records and paired evaluation |
-| positive recursion | no compared system proves Shipkit's full claim | absent by design | causal later-cycle improvement benchmark |
+| positive recursion | no compared system proves CycleWarden's full claim | absent by design | causal later-cycle improvement benchmark |
 
 ## Required benchmark program
 
-Before claiming the core is broadly competitive, Shipkit must run the following program:
+Before claiming the core is broadly competitive, CycleWarden must run the following program:
 
 1. **Durability:** process-kill tests at every journal/snapshot boundary and migration fixtures.
 2. **Portability:** at least three unrelated repositories spanning different package managers and
@@ -325,7 +325,7 @@ The research gate is complete for a decision only when:
 - the reviewed version, tag, commit, or access date is recorded;
 - license and integration implications are known where code reuse is possible;
 - strengths and failure boundaries are described separately;
-- an explicit Shipkit decision is recorded;
+- an explicit CycleWarden decision is recorded;
 - the decision has a falsifiable implementation or benchmark requirement;
 - contradictory evidence is retained rather than silently removed;
 - changes in the external system trigger review when they affect the decision.
@@ -334,7 +334,7 @@ The research gate is complete for a decision only when:
 
 The current source-level decisions live in
 [`EXTERNAL_SYSTEMS.json`](./EXTERNAL_SYSTEMS.json). The registry pins a version,
-commit, publication date or access date; records the Shipkit boundary,
+commit, publication date or access date; records the CycleWarden boundary,
 limitation and falsification test; preserves material contradictions; and
 expires on a declared review date.
 
@@ -345,7 +345,7 @@ true or useful to users.
 
 ## Current conclusion
 
-Shipkit should not compete by rebuilding every adjacent runtime. Its differentiated responsibility
+CycleWarden should not compete by rebuilding every adjacent runtime. Its differentiated responsibility
 is the deterministic, evidence-backed, policy-governed project-evolution lifecycle across agents,
 runtimes, repositories, and product outcomes.
 

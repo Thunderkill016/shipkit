@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import { mkdir, open, readFile, realpath, rename, rm, stat } from "node:fs/promises";
 import { basename, dirname, extname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { resolveDefaultStateRoot } from "./runtime-paths.js";
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
 
@@ -119,7 +120,7 @@ export class EvidenceRegistry {
   readonly evidenceRoot: string;
   readonly occurrenceRoot: string;
 
-  constructor(storeRoot = ".shipkit", projectRoot = process.cwd()) {
+  constructor(storeRoot = resolveDefaultStateRoot(), projectRoot = process.cwd()) {
     this.storeRoot = resolve(storeRoot);
     this.projectRoot = resolve(projectRoot);
     this.evidenceRoot = join(this.storeRoot, "evidence", "sha256");

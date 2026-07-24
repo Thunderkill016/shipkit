@@ -238,7 +238,7 @@ function createBundle(
     {
       canonicalId: `check-report:${scorecard.createdAt}`,
       title: `${snapshot.projectName} temporary-workspace check report`,
-      publisher: "Shipkit Evolution Core",
+      publisher: "CycleWarden Evolution Core",
       sourceClass: "repository",
       version: snapshot.git.commit,
       accessedAt: scorecard.createdAt,
@@ -248,13 +248,13 @@ function createBundle(
       freshness: 1,
       applicability: 0.9,
       independence: 0.4,
-      conflictOfInterest: "Checks are selected from repository scripts and run by Shipkit.",
+      conflictOfInterest: "Checks are selected from repository scripts and run by CycleWarden.",
       evidenceRefs: [evidenceRefs.checks],
     },
     {
       canonicalId: `project-scorecard:${scorecard.createdAt}`,
       title: `${snapshot.projectName} readiness scorecard`,
-      publisher: "Shipkit Evolution Core",
+      publisher: "CycleWarden Evolution Core",
       sourceClass: "repository",
       version: snapshot.git.commit,
       accessedAt: scorecard.createdAt,
@@ -349,7 +349,7 @@ function createBundle(
     },
     {
       statement:
-        "This repository assessment used the trusted-local path, which is not a security sandbox. Shipkit separately exposes a verified Docker sandbox baseline; its current capability limits must be read from the capability registry before any execution handoff.",
+        "This repository assessment used the trusted-local path, which is not a security sandbox. CycleWarden separately exposes a verified Docker sandbox baseline; its current capability limits must be read from the capability registry before any execution handoff.",
       claimType: "limitation",
       confidence: 0.98,
       uncertainty: "The selected assessment path and the available Docker backend provide different guarantees; neither establishes product value or authorizes agent execution.",
@@ -411,7 +411,7 @@ function createBundle(
   return {
     brief: {
       decisionQuestion: `Which repository-grounded experiment should ${snapshot.projectName} run next for: ${cycle.objective}?`,
-      owner: "shipkit-researcher",
+      owner: "cyclewarden-researcher",
       deadline: null,
       assumptions: [
         "The inspected checkout is the intended project scope.",

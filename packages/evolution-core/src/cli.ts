@@ -10,6 +10,7 @@ import { authorizeAction } from "./policy.js";
 import { prepareRepositoryResearch } from "./repository-research.js";
 import { prepareResearchToExecution } from "./research.js";
 import { inspectRepository } from "./repository.js";
+import { resolveDefaultStateRoot } from "./runtime-paths.js";
 import { createProjectScorecard } from "./scorecard.js";
 import { createCycle, transitionCycle } from "./state-machine.js";
 import {
@@ -37,24 +38,24 @@ type ParsedArgs = {
   options: Map<string, string[]>;
 };
 
-const HELP = `Shipkit Evolution Engine
+const HELP = `CycleWarden Evolution Engine
 
 Usage:
-  shipkit-evolve init [--root .shipkit]
-  shipkit-evolve start --objective "..." [--id repo:cycle] [--autonomy A2] [--risk R1]
-  shipkit-evolve inspect [cycle-id] [--project-root .] [--actor shipkit-inspector]
-  shipkit-evolve assess <cycle-id> [--project-root .] [--check test]...
-    [--timeout-ms 120000] [--max-output-bytes 65536] [--actor shipkit-assessor]
-  shipkit-evolve research-repository <cycle-id> [--project-root .] [--check test]...
+  cyclewarden-evolve init [--root .cyclewarden]
+  cyclewarden-evolve start --objective "..." [--id repo:cycle] [--autonomy A2] [--risk R1]
+  cyclewarden-evolve inspect [cycle-id] [--project-root .] [--actor cyclewarden-inspector]
+  cyclewarden-evolve assess <cycle-id> [--project-root .] [--check test]...
+    [--timeout-ms 120000] [--max-output-bytes 65536] [--actor cyclewarden-assessor]
+  cyclewarden-evolve research-repository <cycle-id> [--project-root .] [--check test]...
     [--max-queries 8] [--max-sources 8] [--max-minutes 15]
-    [--actor shipkit-repository-researcher] [--reviewer shipkit-research-reviewer]
-  shipkit-evolve prepare-handoff <cycle-id> --bundle research.json
-    [--project-root .] [--actor shipkit-researcher]
-  shipkit-evolve research-show <cycle-id> [--root .shipkit]
-  shipkit-evolve status [--root .shipkit]
-  shipkit-evolve show <cycle-id> [--root .shipkit]
-  shipkit-evolve resume <cycle-id> [--root .shipkit]
-  shipkit-evolve advance <cycle-id> --to <stage> --actor <name> --reason "..."
+    [--actor cyclewarden-repository-researcher] [--reviewer cyclewarden-research-reviewer]
+  cyclewarden-evolve prepare-handoff <cycle-id> --bundle research.json
+    [--project-root .] [--actor cyclewarden-researcher]
+  cyclewarden-evolve research-show <cycle-id> [--root .cyclewarden]
+  cyclewarden-evolve status [--root .cyclewarden]
+  cyclewarden-evolve show <cycle-id> [--root .cyclewarden]
+  cyclewarden-evolve resume <cycle-id> [--root .cyclewarden]
+  cyclewarden-evolve advance <cycle-id> --to <stage> --actor <name> --reason "..."
     [--artifact bucket=reference]...
     [--approval action|approved-by|exact-scope|expires-at]...
     [--verification-passed]
@@ -185,7 +186,8 @@ function parseApprovals(values: string[], cycleId: string): EvolutionApproval[] 
 }
 
 function rootFrom(args: ParsedArgs): string {
-  return resolve(one(args, "root") ?? ".shipkit");
+  const root = one(args, "root");
+  return root ? resolve(root) : resolveDefaultStateRoot();
 }
 
 function projectRootFrom(args: ParsedArgs): string {
@@ -248,7 +250,7 @@ export async function runEvolutionCli(
     if (cycleId) {
       const previous = await store.load(cycleId);
       const next = transitionCycle(previous, "observed", {
-        actor: one(parsed, "actor")?.trim() || "shipkit-inspector",
+        actor: one(parsed, "actor")?.trim() || "cyclewarden-inspector",
         reason: "Captured repository structure, checks, product signals, and trust boundaries",
         addArtifacts: { baseline: [`evidence:${evidence.occurrenceId}`] },
       });
@@ -289,7 +291,7 @@ export async function runEvolutionCli(
     const checkEvidence = await registry.registerJson("check-report", checkReport);
     const scorecardEvidence = await registry.registerJson("project-scorecard", scorecard);
     const next = transitionCycle(previous, "modeled", {
-      actor: one(parsed, "actor")?.trim() || "shipkit-assessor",
+      actor: one(parsed, "actor")?.trim() || "cyclewarden-assessor",
       reason: "Built a repository model from temporary-workspace checks and an evidence-backed scorecard",
       addArtifacts: {
         baseline: [
@@ -351,8 +353,8 @@ export async function runEvolutionCli(
       maxCostUsd: 0,
     };
     const prepared = prepareRepositoryResearch(previous, snapshot, scorecard, {
-      actor: one(parsed, "actor")?.trim() || "shipkit-repository-researcher",
-      reviewerActor: one(parsed, "reviewer")?.trim() || "shipkit-research-reviewer",
+      actor: one(parsed, "actor")?.trim() || "cyclewarden-repository-researcher",
+      reviewerActor: one(parsed, "reviewer")?.trim() || "cyclewarden-research-reviewer",
       startedAt,
       budget,
       evidenceRefs: {
@@ -427,7 +429,7 @@ export async function runEvolutionCli(
     );
     const evidenceRef = `evidence:${evidence.occurrenceId}`;
     const prepared = prepareResearchToExecution(previous, bundle, {
-      actor: one(parsed, "actor")?.trim() || "shipkit-researcher",
+      actor: one(parsed, "actor")?.trim() || "cyclewarden-researcher",
       evidenceRefs: [evidenceRef],
     });
 
@@ -497,7 +499,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       process.exitCode = code;
     },
     (error) => {
-      process.stderr.write(`shipkit-evolve: ${error instanceof Error ? error.message : String(error)}\n`);
+      process.stderr.write(`cyclewarden-evolve: ${error instanceof Error ? error.message : String(error)}\n`);
       process.exitCode = 1;
     }
   );

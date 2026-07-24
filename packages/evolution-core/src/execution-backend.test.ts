@@ -33,11 +33,11 @@ describe("execution backend contract", () => {
   });
 
   it("rejects mutable images even when building a Docker invocation directly", async () => {
-    const workspaceRoot = await mkdtemp(join(tmpdir(), "shipkit-docker-mutable-"));
+    const workspaceRoot = await mkdtemp(join(tmpdir(), "cyclewarden-docker-mutable-"));
     temporaryRoots.push(workspaceRoot);
     expect(() =>
       buildDockerRunArguments({
-        containerName: "shipkit-check-mutable",
+        containerName: "cyclewarden-check-mutable",
         image: "node:22-bookworm-slim",
         workspaceRoot,
         relativeWorkingDirectory: ".",
@@ -50,11 +50,11 @@ describe("execution backend contract", () => {
   });
 
   it("rejects a working directory that escapes the copied workspace", async () => {
-    const workspaceRoot = await mkdtemp(join(tmpdir(), "shipkit-docker-traversal-"));
+    const workspaceRoot = await mkdtemp(join(tmpdir(), "cyclewarden-docker-traversal-"));
     temporaryRoots.push(workspaceRoot);
     expect(() =>
       buildDockerRunArguments({
-        containerName: "shipkit-check-traversal",
+        containerName: "cyclewarden-check-traversal",
         image: IMMUTABLE_IMAGE,
         workspaceRoot,
         relativeWorkingDirectory: "../host",
@@ -76,10 +76,10 @@ describe("execution backend contract", () => {
   });
 
   it("builds a fail-closed Docker invocation without inheriting protected host variables", async () => {
-    const workspaceRoot = await mkdtemp(join(tmpdir(), "shipkit-docker-args-"));
+    const workspaceRoot = await mkdtemp(join(tmpdir(), "cyclewarden-docker-args-"));
     temporaryRoots.push(workspaceRoot);
     const args = buildDockerRunArguments({
-      containerName: "shipkit-check-test",
+      containerName: "cyclewarden-check-test",
       image: IMMUTABLE_IMAGE,
       workspaceRoot,
       relativeWorkingDirectory: ".",
@@ -114,10 +114,10 @@ describe("execution backend contract", () => {
   });
 
   it("runs trusted-local commands with an explicit environment instead of inheriting secrets", async () => {
-    const workspaceRoot = await mkdtemp(join(tmpdir(), "shipkit-local-backend-"));
+    const workspaceRoot = await mkdtemp(join(tmpdir(), "cyclewarden-local-backend-"));
     temporaryRoots.push(workspaceRoot);
-    const previous = process.env.SHIPKIT_BACKEND_TEST_SECRET;
-    process.env.SHIPKIT_BACKEND_TEST_SECRET = "do-not-inherit";
+    const previous = process.env.CYCLEWARDEN_BACKEND_TEST_SECRET;
+    process.env.CYCLEWARDEN_BACKEND_TEST_SECRET = "do-not-inherit";
     try {
       const result = await new TrustedLocalExecutionBackend().execute({
         workspaceRoot,
@@ -125,7 +125,7 @@ describe("execution backend contract", () => {
         executable: process.execPath,
         arguments: [
           "-e",
-          "process.stdout.write(String(process.env.SHIPKIT_BACKEND_TEST_SECRET))",
+          "process.stdout.write(String(process.env.CYCLEWARDEN_BACKEND_TEST_SECRET))",
         ],
         environment: { CI: "true" },
         limits: { timeoutMs: 5_000, maxOutputBytes: 4_096 },
@@ -133,8 +133,8 @@ describe("execution backend contract", () => {
       expect(result.status).toBe("passed");
       expect(result.stdout).toBe("undefined");
     } finally {
-      if (previous === undefined) delete process.env.SHIPKIT_BACKEND_TEST_SECRET;
-      else process.env.SHIPKIT_BACKEND_TEST_SECRET = previous;
+      if (previous === undefined) delete process.env.CYCLEWARDEN_BACKEND_TEST_SECRET;
+      else process.env.CYCLEWARDEN_BACKEND_TEST_SECRET = previous;
     }
   });
 });

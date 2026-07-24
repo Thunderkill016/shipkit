@@ -1,6 +1,6 @@
 # Adapter Contribution Guide
 
-Shipkit dùng mô hình **Ports & Adapters** (Hexagonal Architecture).
+CycleWarden dùng mô hình **Ports & Adapters** (Hexagonal Architecture).
 Mỗi Port là một interface TypeScript trong `packages/`.
 Mỗi Adapter là một implementation cụ thể dùng vendor SDK.
 
@@ -67,7 +67,7 @@ Dùng trong app:
 
 ```ts
 // apps/web/src/lib/mail.ts
-import { createConsoleMailer, createPostmarkMailer } from "@shipkit/mail";
+import { createConsoleMailer, createPostmarkMailer } from "@cyclewarden/mail";
 
 export function getMailer() {
   const token = process.env.POSTMARK_API_TOKEN;
@@ -83,7 +83,7 @@ export function getMailer() {
 Spaces tương thích S3 — chỉ cần set `endpoint`:
 
 ```ts
-import { createS3Storage } from "@shipkit/storage";
+import { createS3Storage } from "@cyclewarden/storage";
 
 const storage = createS3Storage({
   bucket: process.env.DO_SPACES_BUCKET!,

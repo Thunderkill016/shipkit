@@ -9,5 +9,5 @@
 pnpm install
 pnpm doctor
 pnpm dev
-pnpm --filter @shipkit/web build
+pnpm --filter @cyclewarden/web build
 ```

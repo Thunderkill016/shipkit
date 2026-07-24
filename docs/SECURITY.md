@@ -1,6 +1,6 @@
 # Security Guide
 
-Tài liệu này ghi lại các quyết định bảo mật, baseline đang được thực thi trong Shipkit, và hướng dẫn cho nhóm phát triển.
+Tài liệu này ghi lại các quyết định bảo mật, baseline đang được thực thi trong CycleWarden, và hướng dẫn cho nhóm phát triển.
 
 ---
 
@@ -46,7 +46,7 @@ if (!parsed.success) return { error: parsed.error.issues[0]?.message };
 const name = formData.get("name") as string; // ❌
 ```
 
-Package `@shipkit/security` cung cấp `validate()` helper có thể dùng ngoài Server Actions.
+Package `@cyclewarden/security` cung cấp `validate()` helper có thể dùng ngoài Server Actions.
 
 ---
 

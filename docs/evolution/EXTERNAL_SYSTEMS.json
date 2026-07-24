@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "decision": "Which current external mechanisms should Shipkit adopt, adapt, integrate, defer, or reject?",
+  "decision": "Which current external mechanisms should CycleWarden adopt, adapt, integrate, defer, or reject?",
   "reviewedAt": "2026-07-23",
   "reviewBy": "2026-10-23",
   "scope": "Primary-source review of adjacent coding-agent, durable-workflow, research, sandbox, interoperability, policy, provenance, telemetry, and evaluation systems. This is architecture evidence, not market or user validation.",
@@ -11,9 +11,9 @@
       "group": "durable-workflow",
       "decision": "adapt",
       "mechanism": "Crash-proof execution, replayable history, deterministic workflows, and idempotent activities.",
-      "shipkitBoundary": "Keep Shipkit's local inspectable cycle kernel; use Temporal only as a future optional distributed activity backend.",
-      "limitation": "Temporal proves workflow recovery, not repository correctness, product value, or Shipkit policy acceptance.",
-      "falsificationTest": "A future Temporal adapter must replay to the same legal Shipkit cycle state as the local backend without duplicate accepted actions.",
+      "cyclewardenBoundary": "Keep CycleWarden's local inspectable cycle kernel; use Temporal only as a future optional distributed activity backend.",
+      "limitation": "Temporal proves workflow recovery, not repository correctness, product value, or CycleWarden policy acceptance.",
+      "falsificationTest": "A future Temporal adapter must replay to the same legal CycleWarden cycle state as the local backend without duplicate accepted actions.",
       "sources": [
         {
           "kind": "official-doc",
@@ -35,9 +35,9 @@
       "group": "durable-workflow",
       "decision": "adapt",
       "mechanism": "Durable checkpointers, thread-addressed state, interrupts, and resumable human input.",
-      "shipkitBoundary": "Treat a graph as an execution client or activity; Shipkit remains authoritative for policy, evidence, and accepted stage changes.",
+      "cyclewardenBoundary": "Treat a graph as an execution client or activity; CycleWarden remains authoritative for policy, evidence, and accepted stage changes.",
       "limitation": "On resume, the interrupted node restarts from its beginning, so pre-interrupt side effects must be idempotent.",
-      "falsificationTest": "A graph client and plain CLI client must consume identical Shipkit state and produce equivalent policy decisions.",
+      "falsificationTest": "A graph client and plain CLI client must consume identical CycleWarden state and produce equivalent policy decisions.",
       "sources": [
         {
           "kind": "official-doc",
@@ -59,9 +59,9 @@
       "group": "durable-workflow",
       "decision": "integrate-later",
       "mechanism": "A provider-neutral durable execution layer with integrations for Temporal, DBOS, Prefect, and Restate.",
-      "shipkitBoundary": "Preserve portable Shipkit records and make any workflow-engine integration optional rather than growing a competing distributed runtime.",
-      "limitation": "Provider support does not define Shipkit's product-governance semantics or prove a backend is appropriate for local-first users.",
-      "falsificationTest": "Integrate only if a real multi-process use case cannot meet its recovery target with the local kernel and the adapter preserves all Shipkit invariants.",
+      "cyclewardenBoundary": "Preserve portable CycleWarden records and make any workflow-engine integration optional rather than growing a competing distributed runtime.",
+      "limitation": "Provider support does not define CycleWarden's product-governance semantics or prove a backend is appropriate for local-first users.",
+      "falsificationTest": "Integrate only if a real multi-process use case cannot meet its recovery target with the local kernel and the adapter preserves all CycleWarden invariants.",
       "sources": [
         {
           "kind": "official-doc",
@@ -77,9 +77,9 @@
       "group": "coding-agent",
       "decision": "integrate-later",
       "mechanism": "Model-neutral coding-agent runtime, client-server sandbox execution, reusable workflows, policy, cost, and audit controls.",
-      "shipkitBoundary": "Use OpenHands as a bounded execution adapter; differentiate Shipkit through decision-to-outcome evidence rather than the generic control-plane label.",
-      "limitation": "Control-plane, scale, safety, and outcome statements are first-party product claims; the enterprise control plane now overlaps Shipkit's earlier positioning.",
-      "falsificationTest": "One approved Shipkit handoff must execute through OpenHands while Shipkit alone authorizes scope and accepts evidence and final verdicts.",
+      "cyclewardenBoundary": "Use OpenHands as a bounded execution adapter; differentiate CycleWarden through decision-to-outcome evidence rather than the generic control-plane label.",
+      "limitation": "Control-plane, scale, safety, and outcome statements are first-party product claims; the enterprise control plane now overlaps CycleWarden's earlier positioning.",
+      "falsificationTest": "One approved CycleWarden handoff must execute through OpenHands while CycleWarden alone authorizes scope and accepts evidence and final verdicts.",
       "sources": [
         {
           "kind": "official-doc",
@@ -107,9 +107,9 @@
       "group": "coding-agent",
       "decision": "integrate-later",
       "mechanism": "Local coding-agent execution with sandbox permissions, repository instructions, skills, hooks, and context-isolated specialist agents.",
-      "shipkitBoundary": "Consume a parameter-bound execution handoff through a subprocess adapter; never store Codex sessions as authoritative cycle state.",
-      "limitation": "Parallel write-heavy agent work adds coordination risk, and agent permissions do not replace Shipkit's independent policy and evidence rules.",
-      "falsificationTest": "Interrupt Codex and resume the same Shipkit cycle with another agent without losing accepted state or widening action scope.",
+      "cyclewardenBoundary": "Consume a parameter-bound execution handoff through a subprocess adapter; never store Codex sessions as authoritative cycle state.",
+      "limitation": "Parallel write-heavy agent work adds coordination risk, and agent permissions do not replace CycleWarden's independent policy and evidence rules.",
+      "falsificationTest": "Interrupt Codex and resume the same CycleWarden cycle with another agent without losing accepted state or widening action scope.",
       "sources": [
         {
           "kind": "official-doc",
@@ -131,9 +131,9 @@
       "group": "coding-agent",
       "decision": "adapt",
       "mechanism": "Deterministic lifecycle hooks can inspect tool calls, deny or modify them, and emit auditable progress outside model reasoning.",
-      "shipkitBoundary": "Adapt the enforcement-point pattern while keeping Shipkit policy deterministic and independent of a particular agent runtime.",
+      "cyclewardenBoundary": "Adapt the enforcement-point pattern while keeping CycleWarden policy deterministic and independent of a particular agent runtime.",
       "limitation": "Command-hook crashes fail closed but hook timeouts fail open, so hooks alone are not a complete security boundary.",
-      "falsificationTest": "Policy fixtures must produce equivalent allow or deny results through a hook adapter and the local Shipkit enforcement path, including timeout cases.",
+      "falsificationTest": "Policy fixtures must produce equivalent allow or deny results through a hook adapter and the local CycleWarden enforcement path, including timeout cases.",
       "sources": [
         {
           "kind": "official-doc",
@@ -149,7 +149,7 @@
       "group": "coding-agent",
       "decision": "adapt",
       "mechanism": "A deliberately small agent loop and environment abstraction provide a baseline against unnecessary orchestration complexity.",
-      "shipkitBoundary": "Require new execution-layer complexity to beat a minimal command baseline on a defined protected metric.",
+      "cyclewardenBoundary": "Require new execution-layer complexity to beat a minimal command baseline on a defined protected metric.",
       "limitation": "Issue-resolution performance does not establish product discovery, governance, release safety, or user value.",
       "falsificationTest": "Reject an orchestration feature that does not improve success, cost, duration, safety, or portability over the minimal baseline.",
       "sources": [
@@ -173,7 +173,7 @@
       "group": "sandbox",
       "decision": "integrate-later",
       "mechanism": "Programmatic isolated computers with dedicated kernel, filesystem, network stack, resource limits, snapshots, pause, resume, and fork capabilities.",
-      "shipkitBoundary": "Keep authorization and evidence in Shipkit while a capability-negotiated provider owns remote containment and lifecycle.",
+      "cyclewardenBoundary": "Keep authorization and evidence in CycleWarden while a capability-negotiated provider owns remote containment and lifecycle.",
       "limitation": "The hosted API requires credentials and creates cost, data-location, availability, and provider-trust decisions that need explicit approval.",
       "falsificationTest": "Pilot only after hostile fixtures prove host isolation, secret denial, network policy, cleanup, and equivalent evidence capture.",
       "sources": [
@@ -197,7 +197,7 @@
       "group": "interoperability",
       "decision": "adapt",
       "mechanism": "Standard client-to-server transport for tools, resources, prompts, authorization, and reviewable elicitation.",
-      "shipkitBoundary": "Expose permitted Shipkit resources and operations through MCP without treating the protocol as lifecycle authority or a policy boundary.",
+      "cyclewardenBoundary": "Expose permitted CycleWarden resources and operations through MCP without treating the protocol as lifecycle authority or a policy boundary.",
       "limitation": "The reviewed elicitation page is a draft; MCP servers must not request secrets through form mode, and protocol compliance does not make a tool trustworthy.",
       "falsificationTest": "An MCP client must be unable to perform any action rejected by the local CLI for identical cycle, scope, risk, and approval inputs.",
       "sources": [
@@ -221,9 +221,9 @@
       "group": "interoperability",
       "decision": "defer",
       "mechanism": "Capability discovery and transport for opaque independent agents, long-running tasks, streaming, and resumable interactions.",
-      "shipkitBoundary": "Keep internal APIs transport-neutral and add A2A only after at least one real execution adapter and an interoperability use case exist.",
-      "limitation": "A2A transports agent work but does not define Shipkit authorization, evidence acceptance, repository truth, or outcome evaluation.",
-      "falsificationTest": "Adopt only if two independent agent clients need the protocol and both preserve identical Shipkit policy and cycle semantics.",
+      "cyclewardenBoundary": "Keep internal APIs transport-neutral and add A2A only after at least one real execution adapter and an interoperability use case exist.",
+      "limitation": "A2A transports agent work but does not define CycleWarden authorization, evidence acceptance, repository truth, or outcome evaluation.",
+      "falsificationTest": "Adopt only if two independent agent clients need the protocol and both preserve identical CycleWarden policy and cycle semantics.",
       "sources": [
         {
           "kind": "official-spec",
@@ -245,8 +245,8 @@
       "group": "policy-provenance",
       "decision": "adapt",
       "mechanism": "Policy decision and enforcement separation, versioned bundles, decision identifiers, trace correlation, and sensitive-field masking.",
-      "shipkitBoundary": "Keep the dependency-free local policy engine and copy the decision-record shape; add Rego only when shared external policy packs show value.",
-      "limitation": "OPA supplies a general policy engine, not Shipkit's domain model, action enforcement, or product-outcome judgment.",
+      "cyclewardenBoundary": "Keep the dependency-free local policy engine and copy the decision-record shape; add Rego only when shared external policy packs show value.",
+      "limitation": "OPA supplies a general policy engine, not CycleWarden's domain model, action enforcement, or product-outcome judgment.",
       "falsificationTest": "A future OPA adapter must match every local policy fixture and remain optional when the external service is unavailable.",
       "sources": [
         {
@@ -269,7 +269,7 @@
       "group": "policy-provenance",
       "decision": "adapt",
       "mechanism": "Versioned provenance and verification-summary formats with incremental build and source assurance tracks.",
-      "shipkitBoundary": "Adapt subjects, materials, provenance, and verification statements to evolution-cycle claims without claiming formal SLSA conformance.",
+      "cyclewardenBoundary": "Adapt subjects, materials, provenance, and verification statements to evolution-cycle claims without claiming formal SLSA conformance.",
       "limitation": "Supply-chain provenance can prove lineage and controls but cannot prove correctness, safety, or user value.",
       "falsificationTest": "An independent verifier must reject changed subjects, missing materials, and unsupported assurance elevation.",
       "sources": [
@@ -287,7 +287,7 @@
       "group": "telemetry",
       "decision": "integrate-later",
       "mechanism": "Vendor-neutral traces, metrics, logs, and semantic conventions for correlation across runtimes.",
-      "shipkitBoundary": "Export optional telemetry from authoritative Shipkit records; telemetry must never become the cycle journal.",
+      "cyclewardenBoundary": "Export optional telemetry from authoritative CycleWarden records; telemetry must never become the cycle journal.",
       "limitation": "Generative-AI semantic conventions have moved repositories and include development-status fields, so pinning and compatibility tests are required.",
       "falsificationTest": "Disabling every telemetry exporter must leave cycle correctness, recovery, and evidence verification unchanged.",
       "sources": [
@@ -305,8 +305,8 @@
       "group": "research",
       "decision": "adapt",
       "mechanism": "Agentic search exposes search actions, inline URL annotations, a complete source list, domain controls, live-access controls, and token budgets.",
-      "shipkitBoundary": "Adapt these provider-neutral record fields before choosing a paid search provider; preserve complete sources and query trajectory in Shipkit evidence.",
-      "limitation": "The API requires credentials and incurs provider cost; first-party benchmark claims are not independent evidence of Shipkit user value.",
+      "cyclewardenBoundary": "Adapt these provider-neutral record fields before choosing a paid search provider; preserve complete sources and query trajectory in CycleWarden evidence.",
+      "limitation": "The API requires credentials and incurs provider cost; first-party benchmark claims are not independent evidence of CycleWarden user value.",
       "falsificationTest": "A provider-neutral fixture must preserve queries, actions, complete sources, exact citations, budget, and stop reason without importing provider objects into kernel state.",
       "sources": [
         {
@@ -323,9 +323,9 @@
       "group": "evaluation",
       "decision": "adapt",
       "mechanism": "Hard-to-find but easy-to-verify questions test persistent, strategic browsing with inexpensive short-answer grading.",
-      "shipkitBoundary": "Adapt verification asymmetry, trajectory retention, and budget reporting for research tests rather than copying the task distribution.",
+      "cyclewardenBoundary": "Adapt verification asymmetry, trajectory retention, and budget reporting for research tests rather than copying the task distribution.",
       "limitation": "Short stable answers do not represent open-ended user research, and the published deep-research model was trained for BrowseComp-like tasks.",
-      "falsificationTest": "A Shipkit research fixture must measure retrieval, citation support, contradiction handling, cost, and decision usefulness separately.",
+      "falsificationTest": "A CycleWarden research fixture must measure retrieval, citation support, contradiction handling, cost, and decision usefulness separately.",
       "sources": [
         {
           "kind": "primary-paper",
@@ -341,9 +341,9 @@
       "group": "evaluation",
       "decision": "reject-as-single-gate",
       "mechanism": "Containerized repository tasks and hidden regression tests provide useful but narrow coding-agent evaluation.",
-      "shipkitBoundary": "Use curated repository tasks only as one technical slice alongside policy, recovery, cost, product outcome, and learning measures.",
+      "cyclewardenBoundary": "Use curated repository tasks only as one technical slice alongside policy, recovery, cost, product outcome, and learning measures.",
       "limitation": "Audits reported material task-design problems and contamination in SWE-bench Verified, then estimated roughly thirty percent broken tasks in SWE-Bench Pro.",
-      "falsificationTest": "No aggregate score may gate Shipkit promotion until sampled tasks pass independent prompt, test, environment, and contamination review.",
+      "falsificationTest": "No aggregate score may gate CycleWarden promotion until sampled tasks pass independent prompt, test, environment, and contamination review.",
       "sources": [
         {
           "kind": "primary-audit",
@@ -369,7 +369,7 @@
   "contradictions": [
     {
       "id": "control-plane-is-not-unique",
-      "claim": "Shipkit can differentiate primarily as an agent control plane.",
+      "claim": "CycleWarden can differentiate primarily as an agent control plane.",
       "evidence": [
         "openhands",
         "open-policy-agent",
@@ -398,7 +398,7 @@
         "mini-swe-agent"
       ],
       "impact": "Task flaws, contamination, narrow distributions, and setup sensitivity can dominate aggregate scores.",
-      "resolution": "Use multi-dimensional, versioned, sampled, independently reviewed evaluations tied to Shipkit user outcomes."
+      "resolution": "Use multi-dimensional, versioned, sampled, independently reviewed evaluations tied to CycleWarden user outcomes."
     },
     {
       "id": "protocol-is-not-authority",
@@ -409,7 +409,7 @@
         "github-copilot-hooks"
       ],
       "impact": "Protocols transport requests and context; enforcement behavior, timeouts, secret handling, and trust remain implementation responsibilities.",
-      "resolution": "Keep Shipkit policy and evidence acceptance transport-neutral and test protocol adapters for parity."
+      "resolution": "Keep CycleWarden policy and evidence acceptance transport-neutral and test protocol adapters for parity."
     }
   ]
 }

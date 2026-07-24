@@ -28,7 +28,7 @@ export function createStripePaymentPort(secretKey: string): PaymentPort {
         },
       });
       if (!session.url) {
-        throw new Error("[shipkit/payment] Stripe session missing url");
+        throw new Error("[cyclewarden/payment] Stripe session missing url");
       }
       return { url: session.url, sessionId: session.id };
     },

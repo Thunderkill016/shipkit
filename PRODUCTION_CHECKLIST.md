@@ -4,7 +4,7 @@
 
 - [ ] Secrets only in env / host secret store  
 - [ ] `NEXT_PUBLIC_*` has no private keys  
-- [ ] Security headers enabled (`next.config` → `@shipkit/security`)  
+- [ ] Security headers enabled (`next.config` → `@cyclewarden/security`)
 - [ ] Zod (or equivalent) on all write actions  
 - [ ] Rate limit on auth / sensitive writes  
 - [ ] Error pages do not leak stacks  
@@ -23,7 +23,7 @@
 
 - [ ] Project linked to GitHub  
 - [ ] Env vars set for Production + Preview  
-- [ ] Build: `pnpm --filter @shipkit/web build` (or root install + filter)
+- [ ] Build: `pnpm --filter @cyclewarden/web build` (or root install + filter)
 
 ### Docker
 

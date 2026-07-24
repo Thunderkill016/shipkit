@@ -6,18 +6,18 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 
-const shipkitRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const cli = join(shipkitRoot, "packages/evolution-core/dist/cli.js");
-const temporary = await mkdtemp(join(tmpdir(), "shipkit-external-proof-"));
+const cyclewardenRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const cli = join(cyclewardenRoot, "packages/evolution-core/dist/cli.js");
+const temporary = await mkdtemp(join(tmpdir(), "cyclewarden-external-proof-"));
 const projectRoot = join(temporary, "is-plain-obj");
-const store = join(temporary, ".shipkit");
+const store = join(temporary, ".cyclewarden");
 const cycleId = "is-plain-obj:external-proof-001";
 const repository = "https://github.com/sindresorhus/is-plain-obj.git";
 const revision = "97f38e8836f86a642cce98fc6ab3058bc36df181";
 
 function command(executable, args, options = {}) {
   const result = spawnSync(executable, args, {
-    cwd: options.cwd ?? shipkitRoot,
+    cwd: options.cwd ?? cyclewardenRoot,
     encoding: "utf8",
     env: process.env,
     timeout: options.timeout ?? 180_000,
@@ -31,7 +31,7 @@ function command(executable, args, options = {}) {
 }
 
 function runCli(args) {
-  const output = command(process.execPath, [cli, ...args], { cwd: shipkitRoot, timeout: 240_000 });
+  const output = command(process.execPath, [cli, ...args], { cwd: cyclewardenRoot, timeout: 240_000 });
   try {
     return JSON.parse(output);
   } catch {

@@ -2,9 +2,9 @@
 
 ## Package boundary
 
-`@shipkit/evolution-core` is the standalone deterministic core used by the Shipkit workspace, CLIs and future integrations. It owns its TypeScript, Node type and Vitest toolchain and must build and test without `apps/web` or the web dependency tree.
+`@cyclewarden/evolution-core` is the standalone deterministic core used by the CycleWarden workspace, CLIs and future integrations. It owns its TypeScript, Node type and Vitest toolchain and must build and test without `apps/web` or the web dependency tree.
 
-The current package name is `@shipkit/evolution-core`. During the decision-value pilot it remains marked `private` to prevent accidental registry publication. Supported distribution is:
+The current package name is `@cyclewarden/evolution-core`. During the decision-value pilot it remains marked `private` to prevent accidental registry publication. Supported distribution is:
 
 - workspace consumption;
 - a locally produced npm tarball;
@@ -55,6 +55,6 @@ The current persistence support boundary remains the one declared in `PERSISTENC
 4. runs typecheck, tests and build;
 5. packs the package to a tarball;
 6. installs the tarball into an empty consumer;
-7. imports the public module and invokes the installed `shipkit-evolve --help` binary.
+7. imports the public module and invokes the installed `cyclewarden-evolve --help` binary.
 
 This proves package/toolchain independence. It does not prove public registry ownership, external adoption or product value; those remain separate gates.

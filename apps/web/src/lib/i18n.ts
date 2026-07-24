@@ -4,11 +4,11 @@ import {
   detectLocale,
   type Locale,
   DEFAULT_LOCALE,
-} from "@shipkit/i18n";
-import en from "@shipkit/i18n/locales/en.json";
-import vi from "@shipkit/i18n/locales/vi.json";
+} from "@cyclewarden/i18n";
+import en from "@cyclewarden/i18n/locales/en.json";
+import vi from "@cyclewarden/i18n/locales/vi.json";
 
-export const LOCALE_COOKIE = "shipkit_locale";
+export const LOCALE_COOKIE = "cyclewarden_locale";
 
 const dictionaries = { en, vi } as const;
 

@@ -1,31 +1,31 @@
-# Shipkit
+# CycleWarden
 
 > Open product foundation kit for vibe coding — idea to shipped web product.
 
 ## Start here
 
-- [VISION](https://github.com/Thunderkill016/shipkit/blob/main/VISION.md): why Shipkit exists
-- [AGENTS](https://github.com/Thunderkill016/shipkit/blob/main/AGENTS.md): rules for coding agents
-- [IDEA](https://github.com/Thunderkill016/shipkit/blob/main/IDEA.md): current product brief (edit per project)
-- [Vibe guide](https://github.com/Thunderkill016/shipkit/blob/main/docs/VIBE.md): human+agent workflow
-- [Architecture](https://github.com/Thunderkill016/shipkit/blob/main/ARCHITECTURE.md): packages and ports
-- [Standards](https://github.com/Thunderkill016/shipkit/blob/main/STANDARDS.md): 12-factor, ASVS, agents.md
-- [Decisions](https://github.com/Thunderkill016/shipkit/blob/main/DECISIONS.md): locked product choices
-- [Production checklist](https://github.com/Thunderkill016/shipkit/blob/main/PRODUCTION_CHECKLIST.md)
-- [Deployment guide](https://github.com/Thunderkill016/shipkit/blob/main/docs/DEPLOY.md): production Vercel + Docker deployment
-- [Security guide](https://github.com/Thunderkill016/shipkit/blob/main/docs/SECURITY.md): CSRF, headers, secrets, upload
-- [API key rotation](https://github.com/Thunderkill016/shipkit/blob/main/docs/API_KEY_ROTATION.md): rotate secrets safely
-- [Multi-framework guide](https://github.com/Thunderkill016/shipkit/blob/main/docs/MULTI_FRAMEWORK.md): integrate Nuxt, SvelteKit, etc.
+- [VISION](https://github.com/Thunderkill016/cyclewarden/blob/main/VISION.md): why CycleWarden exists
+- [AGENTS](https://github.com/Thunderkill016/cyclewarden/blob/main/AGENTS.md): rules for coding agents
+- [IDEA](https://github.com/Thunderkill016/cyclewarden/blob/main/IDEA.md): current product brief (edit per project)
+- [Vibe guide](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/VIBE.md): human+agent workflow
+- [Architecture](https://github.com/Thunderkill016/cyclewarden/blob/main/ARCHITECTURE.md): packages and ports
+- [Standards](https://github.com/Thunderkill016/cyclewarden/blob/main/STANDARDS.md): 12-factor, ASVS, agents.md
+- [Decisions](https://github.com/Thunderkill016/cyclewarden/blob/main/DECISIONS.md): locked product choices
+- [Production checklist](https://github.com/Thunderkill016/cyclewarden/blob/main/PRODUCTION_CHECKLIST.md)
+- [Deployment guide](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/DEPLOY.md): production Vercel + Docker deployment
+- [Security guide](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/SECURITY.md): CSRF, headers, secrets, upload
+- [API key rotation](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/API_KEY_ROTATION.md): rotate secrets safely
+- [Multi-framework guide](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/MULTI_FRAMEWORK.md): integrate Nuxt, SvelteKit, etc.
 
 ## Presets & research
 
-- [supabase-full](https://github.com/Thunderkill016/shipkit/blob/main/presets/supabase-full.md)
-- [portable-pg](https://github.com/Thunderkill016/shipkit/blob/main/presets/portable-pg.md) (Better Auth)
-- [Research notes](https://github.com/Thunderkill016/shipkit/blob/main/docs/RESEARCH_NOTES.md)
-- [Roadmap](https://github.com/Thunderkill016/shipkit/blob/main/ROADMAP.md)
-- [Development plan / audit](https://github.com/Thunderkill016/shipkit/blob/main/docs/DEVELOPMENT_PLAN.md)
-- [Competitive benchmark](https://github.com/Thunderkill016/shipkit/blob/main/docs/COMPETITIVE_BENCHMARK.md)
-- [Quickstart (usable)](https://github.com/Thunderkill016/shipkit/blob/main/docs/QUICKSTART.md)
+- [supabase-full](https://github.com/Thunderkill016/cyclewarden/blob/main/presets/supabase-full.md)
+- [portable-pg](https://github.com/Thunderkill016/cyclewarden/blob/main/presets/portable-pg.md) (Better Auth)
+- [Research notes](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/RESEARCH_NOTES.md)
+- [Roadmap](https://github.com/Thunderkill016/cyclewarden/blob/main/ROADMAP.md)
+- [Development plan / audit](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/DEVELOPMENT_PLAN.md)
+- [Competitive benchmark](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/COMPETITIVE_BENCHMARK.md)
+- [Quickstart (usable)](https://github.com/Thunderkill016/cyclewarden/blob/main/docs/QUICKSTART.md)
 - Skills: .agents/skills/ship-feature, add-entity, security-pass, vibe-setup
 
 ## Code map

@@ -5,6 +5,7 @@ import { isAbsolute, relative, resolve, sep } from "node:path";
 import { EvidenceRegistry } from "./evidence.js";
 import { EvolutionStore } from "./persistence.js";
 import { authorizeAction } from "./policy.js";
+import { resolveDefaultStateRoot } from "./runtime-paths.js";
 import {
   preparePublicSearchResearch,
   type PublicSearchRuntime,
@@ -20,14 +21,14 @@ type ParsedArgs = {
   options: Map<string, string[]>;
 };
 
-const HELP = `Shipkit reproducible public search research
+const HELP = `CycleWarden reproducible public search research
 
 Usage:
-  shipkit-research-search <cycle-id> --manifest public-search.json
-    [--root .shipkit] [--project-root .]
+  cyclewarden-research-search <cycle-id> --manifest public-search.json
+    [--root .cyclewarden] [--project-root .]
     [--search-timeout-ms 15000] [--max-search-bytes 524288]
     [--source-timeout-ms 15000] [--max-source-bytes 524288]
-    [--actor shipkit-search-researcher] [--reviewer shipkit-search-reviewer]
+    [--actor cyclewarden-search-researcher] [--reviewer cyclewarden-search-reviewer]
 
 The command requires a modeled A1+ cycle. It executes the explicit support and falsification
 queries in the manifest through one declared public provider, persists ranked result digests and
@@ -133,7 +134,8 @@ export async function runPublicSearchCli(
 
   const cycleId = parsed.positionals[0];
   if (!cycleId) throw new Error("public search research requires a cycle ID");
-  const root = resolve(one(parsed, "root") ?? ".shipkit");
+  const explicitRoot = one(parsed, "root");
+  const root = explicitRoot ? resolve(explicitRoot) : resolveDefaultStateRoot();
   const projectRoot = resolve(one(parsed, "project-root") ?? process.cwd());
   const store = new EvolutionStore(root);
   const previous = await store.load(cycleId);
@@ -159,8 +161,8 @@ export async function runPublicSearchCli(
   const registry = new EvidenceRegistry(root, projectRoot);
   const manifestEvidence = await registry.registerJson("public-search-manifest", manifest);
   const prepared = await preparePublicSearchResearch(previous, manifest, {
-    actor: one(parsed, "actor")?.trim() || "shipkit-search-researcher",
-    reviewerActor: one(parsed, "reviewer")?.trim() || "shipkit-search-reviewer",
+    actor: one(parsed, "actor")?.trim() || "cyclewarden-search-researcher",
+    reviewerActor: one(parsed, "reviewer")?.trim() || "cyclewarden-search-reviewer",
     registry,
     manifestEvidenceRef: `evidence:${manifestEvidence.occurrenceId}`,
     startedAt: new Date().toISOString(),
@@ -216,7 +218,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     },
     (error) => {
       process.stderr.write(
-        `shipkit-research-search: ${error instanceof Error ? error.message : String(error)}\n`
+        `cyclewarden-research-search: ${error instanceof Error ? error.message : String(error)}\n`
       );
       process.exitCode = 1;
     }

@@ -1,4 +1,4 @@
-import { createLocalStorage, createS3Storage, type StoragePort } from "@shipkit/storage";
+import { createLocalStorage, createS3Storage, type StoragePort } from "@cyclewarden/storage";
 import { join } from "node:path";
 
 let cachedStorage: StoragePort | null = null;

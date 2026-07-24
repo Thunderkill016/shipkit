@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * create-shipkit <name>
+ * create-cyclewarden <name>
  * Usage: pnpm create -- my-product
  */
 import fs from "node:fs";
@@ -12,7 +12,7 @@ const name = process.argv[2];
 
 if (!name || name.startsWith("-")) {
   console.log(`
-✦ create-shipkit
+✦ create-cyclewarden
 
 Usage:
   pnpm create -- <name>
@@ -39,6 +39,7 @@ const skip = new Set([
   "node_modules",
   ".next",
   ".git",
+  ".cyclewarden",
   ".shipkit",
   "dist",
   "coverage",
@@ -53,7 +54,7 @@ function copyDirSync(src, out) {
     if (skip.has(entry)) continue;
     const from = join(src, entry);
 
-    // `pnpm create -- my-app` is commonly run from the Shipkit root. The
+    // `pnpm create -- my-app` is commonly run from the CycleWarden root. The
     // destination then becomes a child of the source repository and must not
     // be copied into itself recursively.
     if (resolve(from) === dest) continue;
@@ -73,12 +74,12 @@ const idea = starterTemplate
 
 const readme = `# ${name}
 
-A product project generated from Shipkit's Starter Kit foundation.
+A product project generated from CycleWarden's Starter Kit foundation.
 
 ## Define the product first
 
 Edit [IDEA.md](./IDEA.md) before asking an agent to build broad features. The generated
-project owns its product direction; Shipkit Evolution Engine is included as optional local
+project owns its product direction; CycleWarden Evolution Engine is included as optional local
 audit tooling and is not the product being built.
 
 ## Run locally
@@ -114,7 +115,7 @@ Open http://localhost:3000.
 - security, mail, storage and optional billing adapters;
 - Vitest and Playwright checks;
 - repository-first AI workflow;
-- embedded Shipkit Evolution Engine CLI for local inspection and governed audits.
+- embedded CycleWarden Evolution Engine CLI for local inspection and governed audits.
 
 Passing checks proves technical compatibility, not product value. Validate the user problem
 and measure the intended outcome.
@@ -152,7 +153,7 @@ const roadmap = `# ${name} roadmap
 2. One complete path before several partial paths.
 3. Passing tests is not proof of demand.
 4. Agents may propose work but do not own product truth or production authority.
-5. Use Shipkit Evolution Engine in A0-A2 mode for read-only inspection and research until higher autonomy is explicitly justified.
+5. Use CycleWarden Evolution Engine in A0-A2 mode for read-only inspection and research until higher autonomy is explicitly justified.
 `;
 
 const projectModel = `# Project model — ${name}
@@ -171,7 +172,7 @@ See \`IDEA.md\`. Product claims are not yet verified against user evidence or im
 
 ## Repository foundation
 
-The repository was generated from Shipkit and contains a Next.js Starter Kit plus embedded
+The repository was generated from CycleWarden and contains a Next.js Starter Kit plus embedded
 Evolution Engine audit tooling. Inherited code presence is not verification of this product.
 
 ## Unknowns
@@ -197,7 +198,7 @@ try {
   const pkgPath = join(dest, "package.json");
   const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
   pkg.name = name;
-  pkg.description = `${name} — generated product project with Shipkit Starter Kit and Evolution Engine audit tooling.`;
+  pkg.description = `${name} — generated product project with CycleWarden Starter Kit and Evolution Engine audit tooling.`;
   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
 } catch (error) {
   console.error(
@@ -212,10 +213,10 @@ try {
     schemaVersion: 1,
     project: name,
     primaryProduct: name,
-    inheritedFrom: "shipkit",
+    inheritedFrom: "cyclewarden",
     lastVerified: new Date().toISOString().slice(0, 10),
     verificationScope:
-      "Foundation files were copied from Shipkit. Generated-product behavior, configuration, user value and production operation have not been verified.",
+      "Foundation files were copied from CycleWarden. Generated-product behavior, configuration, user value and production operation have not been verified.",
     capabilities: [
       {
         id: "starter-foundation",
@@ -243,7 +244,7 @@ try {
         status: "partial",
         verificationStatus: "not-run",
         summary:
-          "Embedded Shipkit Evolution Engine tooling is available for local read-only repository inspection and governed audit cycles.",
+          "Embedded CycleWarden Evolution Engine tooling is available for local read-only repository inspection and governed audit cycles.",
         evidence: [
           "packages/evolution-core",
           "docs/evolution/ARCHITECTURE.md",

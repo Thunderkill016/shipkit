@@ -8,7 +8,7 @@ runEvolutionCli(process.argv.slice(2)).then(
   },
   (error) => {
     process.stderr.write(
-      `shipkit-evolve: ${error instanceof Error ? error.message : String(error)}\n`
+      `cyclewarden-evolve: ${error instanceof Error ? error.message : String(error)}\n`
     );
     process.exitCode = 1;
   }

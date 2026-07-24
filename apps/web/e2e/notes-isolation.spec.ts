@@ -25,8 +25,8 @@ test.describe("Notes isolation", () => {
 
   test("user B cannot see user A notes", async ({ browser }) => {
     const password = "password12345";
-    const emailA = `iso_a_${Date.now()}@shipkit.test`;
-    const emailB = `iso_b_${Date.now()}@shipkit.test`;
+    const emailA = `iso_a_${Date.now()}@cyclewarden.test`;
+    const emailB = `iso_b_${Date.now()}@cyclewarden.test`;
     const secretTitle = `SecretA-${Date.now()}`;
 
     const ctxA = await browser.newContext();

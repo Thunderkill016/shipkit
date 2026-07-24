@@ -1,5 +1,5 @@
 /**
- * @shipkit/i18n — lightweight i18n port.
+ * @cyclewarden/i18n — lightweight i18n port.
  *
  * Goals:
  * - Zero runtime dependency in production (just a lookup function).

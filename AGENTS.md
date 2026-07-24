@@ -1,6 +1,6 @@
-# AGENTS.md — Shipkit
+# AGENTS.md — CycleWarden
 
-You are building a product on Shipkit. Preserve the chosen stack and make the
+You are building a product on CycleWarden. Preserve the chosen stack and make the
 smallest verifiable change that satisfies the current task.
 
 ## Start here

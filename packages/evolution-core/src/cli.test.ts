@@ -26,11 +26,11 @@ function collector() {
   };
 }
 
-describe("shipkit-evolve CLI", () => {
+describe("cyclewarden-evolve CLI", () => {
   it("initializes a store, starts a cycle, and reports status", async () => {
-    const root = await mkdtemp(join(tmpdir(), "shipkit-cli-"));
+    const root = await mkdtemp(join(tmpdir(), "cyclewarden-cli-"));
     temporaryRoots.push(root);
-    const storeRoot = join(root, ".shipkit");
+    const storeRoot = join(root, ".cyclewarden");
 
     const init = collector();
     await expect(
@@ -72,9 +72,9 @@ describe("shipkit-evolve CLI", () => {
   });
 
   it("advances a persisted cycle only with the required evidence", async () => {
-    const root = await mkdtemp(join(tmpdir(), "shipkit-cli-"));
+    const root = await mkdtemp(join(tmpdir(), "cyclewarden-cli-"));
     temporaryRoots.push(root);
-    const storeRoot = join(root, ".shipkit");
+    const storeRoot = join(root, ".cyclewarden");
     const silent = collector();
 
     await runEvolutionCli(

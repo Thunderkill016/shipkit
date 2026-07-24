@@ -57,8 +57,8 @@ const required = [
   "scripts/a2-pilot-validation.mjs",
   "scripts/check-a2-pilot.mjs",
   "scripts/test-a2-pilot.mjs",
-  "scripts/create-shipkit.mjs",
-  "scripts/test-create-shipkit.mjs",
+  "scripts/create-cyclewarden.mjs",
+  "scripts/test-create-cyclewarden.mjs",
 ];
 
 const missing = [];

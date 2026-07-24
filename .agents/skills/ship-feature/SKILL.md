@@ -1,6 +1,6 @@
 ---
 name: ship-feature
-description: Implement the next MVP product feature from IDEA.md under /app using Shipkit ports and conventions.
+description: Implement the next MVP product feature from IDEA.md under /app using CycleWarden ports and conventions.
 ---
 
 # Skill: ship-feature
@@ -20,7 +20,7 @@ User wants a new product feature, screen, or MVP checklist item implemented.
 4. Do **not** add auth providers or new frameworks.  
 5. Wire navigation from `/app` if users need to reach it.  
 6. Update `IDEA.md` checklist when done.  
-7. Run `pnpm --filter @shipkit/web build` if types/routes changed.
+7. Run `pnpm --filter @cyclewarden/web build` if types/routes changed.
 
 ## Done
 

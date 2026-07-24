@@ -3,7 +3,7 @@
  * Isolation: always scoped by userId (never list all users' notes).
  */
 
-import { notes } from "@shipkit/db";
+import { notes } from "@cyclewarden/db";
 import { and, desc, eq } from "drizzle-orm";
 import { createDb } from "./db";
 
@@ -15,11 +15,11 @@ export type Note = {
   createdAt: string;
 };
 
-const g = globalThis as unknown as { __shipkitNotes?: Note[] };
+const g = globalThis as unknown as { __cyclewardenNotes?: Note[] };
 
 function bucket(): Note[] {
-  if (!g.__shipkitNotes) g.__shipkitNotes = [];
-  return g.__shipkitNotes;
+  if (!g.__cyclewardenNotes) g.__cyclewardenNotes = [];
+  return g.__cyclewardenNotes;
 }
 
 /** Demo / anonymous shell uses this owner id when no session. */

@@ -13,7 +13,7 @@ test.describe("Auth portable-pg", () => {
   test.skip(!portable, "Requires DATABASE_URL + BETTER_AUTH_SECRET");
 
   test("sign up then see session on /app", async ({ page }) => {
-    const email = `e2e_${Date.now()}@shipkit.test`;
+    const email = `e2e_${Date.now()}@cyclewarden.test`;
     const password = "password12345";
 
     await page.goto("/login");

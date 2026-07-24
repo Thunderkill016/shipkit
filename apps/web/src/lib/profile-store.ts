@@ -1,5 +1,5 @@
 import { createDb } from "./db";
-import { profiles } from "@shipkit/db";
+import { profiles } from "@cyclewarden/db";
 import { eq } from "drizzle-orm";
 
 export interface UserProfile {
@@ -9,11 +9,11 @@ export interface UserProfile {
   avatarUrl: string | null;
 }
 
-const g = globalThis as unknown as { __shipkitProfiles?: Map<string, UserProfile> };
+const g = globalThis as unknown as { __cyclewardenProfiles?: Map<string, UserProfile> };
 
 function getDemoMap(): Map<string, UserProfile> {
-  if (!g.__shipkitProfiles) g.__shipkitProfiles = new Map();
-  return g.__shipkitProfiles;
+  if (!g.__cyclewardenProfiles) g.__cyclewardenProfiles = new Map();
+  return g.__cyclewardenProfiles;
 }
 
 /**

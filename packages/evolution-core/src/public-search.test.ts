@@ -83,13 +83,13 @@ function searchFetcher(options: { duplicate?: boolean } = {}): PublicFetch {
     const query = parsed.searchParams.get("q") ?? "";
     const item = query.includes("limitations")
       ? repositoryItem({
-          fullName: "example/shipkit-limitations",
+          fullName: "example/cyclewarden-limitations",
           description: "Repository search alone is not a general web index.",
           score: 4,
         })
       : repositoryItem({
-          fullName: "Thunderkill016/shipkit",
-          description: "Shipkit uses bounded search and exact citations.",
+          fullName: "Thunderkill016/cyclewarden",
+          description: "CycleWarden uses bounded search and exact citations.",
           score: 8,
         });
     const items = options.duplicate ? [item, item] : [item];
@@ -101,18 +101,18 @@ function searchFetcher(options: { duplicate?: boolean } = {}): PublicFetch {
 
 function sourceFetcher(): PublicFetch {
   return async (url) => {
-    if (url.includes("shipkit-limitations")) {
+    if (url.includes("cyclewarden-limitations")) {
       return response(
         JSON.stringify({
-          full_name: "example/shipkit-limitations",
+          full_name: "example/cyclewarden-limitations",
           description: "Repository search alone is not a general web index.",
         })
       );
     }
     return response(
       JSON.stringify({
-        full_name: "Thunderkill016/shipkit",
-        description: "Shipkit uses bounded search and exact citations.",
+        full_name: "Thunderkill016/cyclewarden",
+        description: "CycleWarden uses bounded search and exact citations.",
       })
     );
   };
@@ -123,7 +123,7 @@ function manifest(): PublicSearchManifest {
     provider: "github-repository-search",
     maxResultAgeMinutes: 60,
     brief: {
-      decisionQuestion: "Should Shipkit add a reproducible public search baseline before the external pilot?",
+      decisionQuestion: "Should CycleWarden add a reproducible public search baseline before the external pilot?",
       owner: "search-researcher",
       deadline: null,
       assumptions: ["GitHub repository search is a bounded first discovery provider."],
@@ -142,13 +142,13 @@ function manifest(): PublicSearchManifest {
     },
     queries: [
       {
-        query: "shipkit evidence research in:name,description",
-        rationale: "Find the primary Shipkit repository result.",
+        query: "cyclewarden evidence research in:name,description",
+        rationale: "Find the primary CycleWarden repository result.",
         intent: "support",
         maxResults: 3,
       },
       {
-        query: "shipkit limitations archived in:name,description",
+        query: "cyclewarden limitations archived in:name,description",
         rationale: "Search explicitly for a limitation or contrary implementation.",
         intent: "falsification",
         maxResults: 3,
@@ -186,14 +186,14 @@ function manifest(): PublicSearchManifest {
     ],
     claims: [
       {
-        statement: "Shipkit has a bounded search and exact-citation implementation path.",
+        statement: "CycleWarden has a bounded search and exact-citation implementation path.",
         claimType: "fact",
         confidence: 0.9,
         uncertainty: "The fixture proves the baseline contract, not external product value.",
         supportingCitations: [
           {
             sourceIndex: 0,
-            quote: '"description":"Shipkit uses bounded search and exact citations."',
+            quote: '"description":"CycleWarden uses bounded search and exact citations."',
           },
         ],
         contradictingCitations: [],
@@ -276,9 +276,9 @@ function manifest(): PublicSearchManifest {
 }
 
 async function registry() {
-  const root = await mkdtemp(join(tmpdir(), "shipkit-public-search-"));
+  const root = await mkdtemp(join(tmpdir(), "cyclewarden-public-search-"));
   temporaryRoots.push(root);
-  return new EvidenceRegistry(join(root, ".shipkit"), root);
+  return new EvidenceRegistry(join(root, ".cyclewarden"), root);
 }
 
 describe("reproducible public search research", () => {

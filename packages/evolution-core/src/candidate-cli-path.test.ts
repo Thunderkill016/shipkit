@@ -12,7 +12,7 @@ afterEach(async () => {
 
 describe("candidate research input path confinement", () => {
   it("accepts a real JSON file inside project-root", async () => {
-    const root = await mkdtemp(join(tmpdir(), "shipkit-candidate-path-"));
+    const root = await mkdtemp(join(tmpdir(), "cyclewarden-candidate-path-"));
     temporaryRoots.push(root);
     const project = join(root, "project");
     await mkdir(project);
@@ -25,7 +25,7 @@ describe("candidate research input path confinement", () => {
   });
 
   it("rejects traversal outside project-root", async () => {
-    const root = await mkdtemp(join(tmpdir(), "shipkit-candidate-path-"));
+    const root = await mkdtemp(join(tmpdir(), "cyclewarden-candidate-path-"));
     temporaryRoots.push(root);
     const project = join(root, "project");
     await mkdir(project);
@@ -37,7 +37,7 @@ describe("candidate research input path confinement", () => {
   });
 
   it("rejects a symlink inside project-root that resolves outside", async () => {
-    const root = await mkdtemp(join(tmpdir(), "shipkit-candidate-path-"));
+    const root = await mkdtemp(join(tmpdir(), "cyclewarden-candidate-path-"));
     temporaryRoots.push(root);
     const project = join(root, "project");
     await mkdir(project);

@@ -152,9 +152,9 @@ function manifest() {
 
 describe("public research CLI", () => {
   it("persists a reviewed planned cycle and reloads exact citation spans", async () => {
-    const root = await mkdtemp(join(tmpdir(), "shipkit-public-cli-"));
+    const root = await mkdtemp(join(tmpdir(), "cyclewarden-public-cli-"));
     temporaryRoots.push(root);
-    const storeRoot = join(root, ".shipkit");
+    const storeRoot = join(root, ".cyclewarden");
     const manifestPath = join(root, "public-research.json");
     await writeFile(manifestPath, `${JSON.stringify(manifest(), null, 2)}\n`, "utf8");
 

@@ -15,17 +15,17 @@ SENTRY_TRACES_SAMPLE_RATE=0.1
 3. Install Node SDK (optional peer):
 
 ```bash
-pnpm --filter @shipkit/web add @sentry/node
+pnpm --filter @cyclewarden/web add @sentry/node
 ```
 
 4. Restart `pnpm dev` / redeploy.
 
-## What Shipkit wires
+## What CycleWarden wires
 
 | Piece | Behavior |
 |-------|----------|
 | `apps/web/src/instrumentation.ts` | `Sentry.init` when DSN + package present |
-| `@shipkit/logger` `error()` | Forwards to Sentry via dynamic import |
+| `@cyclewarden/logger` `error()` | Forwards to Sentry via dynamic import |
 | No DSN | Zero overhead, no errors |
 
 ## Full Next wizard (optional)

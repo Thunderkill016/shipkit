@@ -47,7 +47,7 @@ Extract:
 - agent runtime and project-improvement governance are different layers;
 - broad benchmark coverage is more useful than one headline score.
 
-Evolution Engine implication: bring your own agent and dedicated sandbox; Shipkit owns the
+Evolution Engine implication: bring your own agent and dedicated sandbox; CycleWarden owns the
 lifecycle, authorization, evidence, and verdict rather than the code-generation model or
 sandbox runtime.
 

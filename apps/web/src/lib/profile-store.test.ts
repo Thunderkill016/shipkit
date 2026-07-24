@@ -3,9 +3,9 @@ import { getProfile, updateProfile } from "./profile-store";
 
 describe("profile-store (demo mode)", () => {
   beforeEach(() => {
-    const g = globalThis as unknown as { __shipkitProfiles?: Map<string, unknown> };
-    if (g.__shipkitProfiles) {
-      g.__shipkitProfiles.clear();
+    const g = globalThis as unknown as { __cyclewardenProfiles?: Map<string, unknown> };
+    if (g.__cyclewardenProfiles) {
+      g.__cyclewardenProfiles.clear();
     }
   });
 

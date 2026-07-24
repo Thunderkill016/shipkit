@@ -309,7 +309,7 @@ export async function capturePublicSource(
         signal: controller.signal,
         headers: {
           accept: "text/html,text/plain,text/markdown,application/json;q=0.9",
-          "user-agent": "Shipkit-Research/0.1",
+          "user-agent": "CycleWarden-Research/0.1",
         },
       });
     } catch (error) {

@@ -1,6 +1,6 @@
 # Public source research baseline
 
-Shipkit's first external-source adapter is a bounded, manifest-driven HTTP retriever. It extends the repository research baseline with real public-source capture and exact citation verification while deliberately stopping short of unrestricted web search.
+CycleWarden's first external-source adapter is a bounded, manifest-driven HTTP retriever. It extends the repository research baseline with real public-source capture and exact citation verification while deliberately stopping short of unrestricted web search.
 
 ## Flow
 
@@ -23,10 +23,10 @@ The adapter never executes text found in a source. Retrieved content is evidence
 ```bash
 pnpm research:public -- <cycle-id> \
   --manifest public-research.json \
-  --root .shipkit \
+  --root .cyclewarden \
   --project-root . \
-  --actor shipkit-public-researcher \
-  --reviewer shipkit-citation-reviewer
+  --actor cyclewarden-public-researcher \
+  --reviewer cyclewarden-citation-reviewer
 ```
 
 The cycle must already be at `modeled` and must permit the `research` action. The manifest's `ResearchBudget` controls source count, retrieval-query count, elapsed minutes and cost. The current adapter has zero provider cost and does not call a model.
@@ -78,7 +78,7 @@ The manifest contains the same brief, plan, contradictions, opportunities, decis
 
 ## Retrieval controls
 
-For every initial URL and redirect destination, Shipkit:
+For every initial URL and redirect destination, CycleWarden:
 
 - permits only HTTP or HTTPS;
 - rejects embedded credentials;
@@ -94,7 +94,7 @@ These controls materially reduce SSRF exposure. They do not yet provide a networ
 
 ## Source capture
 
-HTML executable and non-content elements are removed before text normalization. Plain text, Markdown and JSON are normalized directly. Shipkit stores:
+HTML executable and non-content elements are removed before text normalization. Plain text, Markdown and JSON are normalized directly. CycleWarden stores:
 
 - normalized source text as a content-addressed evidence blob;
 - capture metadata as a separate contextual occurrence;

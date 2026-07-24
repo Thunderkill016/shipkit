@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "protocolVersion": "2026-07-24-v1",
-  "issueUrl": "https://github.com/Thunderkill016/shipkit/issues/14",
-  "decision": "Determine whether one Shipkit A2 Research Audit creates inspectable decision value for solo developers and open-source maintainers already using coding agents.",
+  "issueUrl": "https://github.com/Thunderkill016/cyclewarden/issues/14",
+  "decision": "Determine whether one CycleWarden A2 Research Audit creates inspectable decision value for solo developers and open-source maintainers already using coding agents.",
   "sample": {
     "participants": 6,
     "repositories": 6,
@@ -19,7 +19,7 @@
     "agrees-to-recent-behavior-not-hypothetical-preference"
   ],
   "exclusions": [
-    "shipkit-audit-designer",
+    "cyclewarden-audit-designer",
     "unscopable-secret-regulated-or-private-data",
     "enthusiasm-only-recruitment",
     "no-real-decision-due-during-pilot"
@@ -39,7 +39,7 @@
     "alternatives-currently-considered",
     "preferred-decision-and-confidence",
     "evidence-already-used",
-    "likely-action-without-shipkit",
+    "likely-action-without-cyclewarden",
     "estimated-cost-of-wrong-decision",
     "evidence-that-could-change-the-decision"
   ],

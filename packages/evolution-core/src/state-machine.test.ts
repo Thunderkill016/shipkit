@@ -48,7 +48,7 @@ function approval(input: {
 describe("Evolution Engine kernel", () => {
   it("runs a complete evidence-backed cycle without mutating prior states", () => {
     const created = createCycle({
-      cycleId: "shipkit:cycle-001",
+      cycleId: "cyclewarden:cycle-001",
       objective: "Improve repository onboarding reliability",
       autonomy: "A3",
       risk: "R1",

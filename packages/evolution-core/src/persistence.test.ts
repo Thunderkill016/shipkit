@@ -24,9 +24,9 @@ import { createCycle, transitionCycle } from "./state-machine.js";
 const temporaryRoots: string[] = [];
 
 async function temporaryStore(options: EvolutionStoreOptions = {}): Promise<EvolutionStore> {
-  const root = await mkdtemp(join(tmpdir(), "shipkit-evolution-"));
+  const root = await mkdtemp(join(tmpdir(), "cyclewarden-evolution-"));
   temporaryRoots.push(root);
-  return new EvolutionStore(join(root, ".shipkit"), options);
+  return new EvolutionStore(join(root, ".cyclewarden"), options);
 }
 
 function cyclePaths(store: EvolutionStore, cycleId: string) {

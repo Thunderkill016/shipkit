@@ -1,4 +1,4 @@
-# Shipkit Evolution Engine — modern research capability
+# CycleWarden Evolution Engine — modern research capability
 
 Status: required product capability  
 Issue: #9  
@@ -7,12 +7,12 @@ Reviewed: 2026-07-23
 ## Why this is core technology
 
 Research is not a preliminary documentation task and not a single web-search tool call. It is a
-competitive capability that determines whether Shipkit discovers the right problem, rejects weak
+competitive capability that determines whether CycleWarden discovers the right problem, rejects weak
 ideas early, selects the smallest useful experiment, and learns faster than projects that only
 execute code well.
 
 A strong execution engine pointed at a weak research process will build the wrong product faster.
-Shipkit therefore treats research quality as a first-class, versioned and benchmarked capability.
+CycleWarden therefore treats research quality as a first-class, versioned and benchmarked capability.
 
 The research system must combine two disciplines:
 
@@ -403,7 +403,7 @@ Every major research architecture must be compared against:
 2. a deterministic search-and-extract workflow;
 3. a bounded parallel-worker configuration;
 4. a human-assisted configuration;
-5. the previous promoted Shipkit research skill set.
+5. the previous promoted CycleWarden research skill set.
 
 Results must include correctness, coverage, source quality, contradiction recall, cost, duration,
 tool calls, human interventions and failure modes. Aggregate scores may not hide per-task results.
@@ -451,4 +451,4 @@ No research-supported product decision is accepted unless:
 - https://www.atlassian.com/team-playbook/plays/customer-interview
 
 These links are the current baseline only. The source ledger must pin a revision or access date and
-retain changes that materially affect Shipkit's research architecture.
+retain changes that materially affect CycleWarden's research architecture.

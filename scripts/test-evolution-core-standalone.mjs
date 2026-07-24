@@ -10,7 +10,7 @@ import { promisify } from "node:util";
 const execFileAsync = promisify(execFile);
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const sourcePackageRoot = join(repositoryRoot, "packages", "evolution-core");
-const temporaryRoot = await mkdtemp(join(tmpdir(), "shipkit-evolution-core-standalone-"));
+const temporaryRoot = await mkdtemp(join(tmpdir(), "cyclewarden-evolution-core-standalone-"));
 const isolatedPackageRoot = join(temporaryRoot, "package");
 const tarballDirectory = join(temporaryRoot, "tarballs");
 const consumerRoot = join(temporaryRoot, "consumer");
@@ -127,7 +127,7 @@ try {
   await mkdir(consumerRoot, { recursive: true });
   await writeFile(
     join(consumerRoot, "package.json"),
-    `${JSON.stringify({ name: "shipkit-evolution-core-consumer", private: true, type: "module" }, null, 2)}\n`,
+    `${JSON.stringify({ name: "cyclewarden-evolution-core-consumer", private: true, type: "module" }, null, 2)}\n`,
     "utf8"
   );
   await run(
@@ -141,7 +141,7 @@ try {
     [
       "--input-type=module",
       "--eval",
-      'const core = await import("@shipkit/evolution-core"); if (typeof core.createCycle !== "function") throw new Error("createCycle export missing");',
+      'const core = await import("@cyclewarden/evolution-core"); if (typeof core.createCycle !== "function") throw new Error("createCycle export missing");',
     ],
     consumerRoot
   );
@@ -150,11 +150,11 @@ try {
     consumerRoot,
     "node_modules",
     ".bin",
-    process.platform === "win32" ? "shipkit-evolve.cmd" : "shipkit-evolve"
+    process.platform === "win32" ? "cyclewarden-evolve.cmd" : "cyclewarden-evolve"
   );
   const help = await run(binary, ["--help"], consumerRoot);
-  if (!help.stdout.includes("Shipkit Evolution Engine")) {
-    throw new Error("installed shipkit-evolve binary did not return expected help output");
+  if (!help.stdout.includes("CycleWarden Evolution Engine")) {
+    throw new Error("installed cyclewarden-evolve binary did not return expected help output");
   }
 
   const candidateBinary = join(
@@ -162,13 +162,13 @@ try {
     "node_modules",
     ".bin",
     process.platform === "win32"
-      ? "shipkit-research-candidates.cmd"
-      : "shipkit-research-candidates"
+      ? "cyclewarden-research-candidates.cmd"
+      : "cyclewarden-research-candidates"
   );
   const candidateHelp = await run(candidateBinary, ["--help"], consumerRoot);
-  if (!candidateHelp.stdout.includes("Shipkit named-candidate research")) {
+  if (!candidateHelp.stdout.includes("CycleWarden named-candidate research")) {
     throw new Error(
-      "installed shipkit-research-candidates binary did not return expected help output"
+      "installed cyclewarden-research-candidates binary did not return expected help output"
     );
   }
 
@@ -177,13 +177,13 @@ try {
     "node_modules",
     ".bin",
     process.platform === "win32"
-      ? "shipkit-research-search.cmd"
-      : "shipkit-research-search"
+      ? "cyclewarden-research-search.cmd"
+      : "cyclewarden-research-search"
   );
   const searchHelp = await run(searchBinary, ["--help"], consumerRoot);
-  if (!searchHelp.stdout.includes("Shipkit reproducible public search research")) {
+  if (!searchHelp.stdout.includes("CycleWarden reproducible public search research")) {
     throw new Error(
-      "installed shipkit-research-search binary did not return expected help output"
+      "installed cyclewarden-research-search binary did not return expected help output"
     );
   }
 

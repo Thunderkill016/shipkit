@@ -1,4 +1,4 @@
-# Shipkit — Vision
+# CycleWarden — Vision
 
 ## One-liner
 
@@ -17,7 +17,7 @@ Most tools either lock you into one cloud chat UI, or dump a huge paid boilerpla
 
 ## Solution
 
-Shipkit is a **research-backed product foundation**:
+CycleWarden is a **research-backed product foundation**:
 
 | Principle | Source |
 |-----------|--------|

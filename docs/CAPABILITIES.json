@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "project": "shipkit",
-  "primaryProduct": "Shipkit",
+  "project": "cyclewarden",
+  "primaryProduct": "CycleWarden",
   "lastVerified": "2026-07-24",
-  "verificationScope": "Repository evidence and GitHub Actions through merged pull request #33. Shipkit supports a standalone Evolution Core package, durable repository and explicit-source research, manifest-grounded named-candidate decisions, bounded GitHub public repository discovery, and a fail-closed six-session external decision-value pilot protocol whose technical gate is ready. The pilot remains 0/6 with its clock not started; general web discovery, direct user decision-value proof, coding-agent delivery, release and measured learning are not claimed.",
+  "verificationScope": "Repository evidence and GitHub Actions through merged pull request #33. CycleWarden supports a standalone Evolution Core package, durable repository and explicit-source research, manifest-grounded named-candidate decisions, bounded GitHub public repository discovery, and a fail-closed six-session external decision-value pilot protocol whose technical gate is ready. The pilot remains 0/6 with its clock not started; general web discovery, direct user decision-value proof, coding-agent delivery, release and measured learning are not claimed.",
   "capabilities": [
     {
       "id": "integrated-product-workspace",
@@ -37,10 +37,10 @@
       "category": "product",
       "status": "implemented",
       "verificationStatus": "passing",
-      "summary": "The generator creates a product workspace with independent identity, application foundation and AI workflow while retaining connection to Shipkit tooling.",
+      "summary": "The generator creates a product workspace with independent identity, application foundation and AI workflow while retaining connection to CycleWarden tooling.",
       "evidence": [
-        "scripts/create-shipkit.mjs",
-        "scripts/test-create-shipkit.mjs",
+        "scripts/create-cyclewarden.mjs",
+        "scripts/test-create-cyclewarden.mjs",
         "templates/STARTER_IDEA.md"
       ],
       "checks": [
@@ -83,8 +83,10 @@
       "category": "persistence",
       "status": "implemented",
       "verificationStatus": "passing",
-      "summary": "Versioned envelopes, deterministic v1-to-v2 migration, checksum-chained synchronized journals, atomic snapshots, corruption recovery and serialized multi-process writers preserve the shared Shipkit lifecycle on the declared Linux filesystem contract.",
+      "summary": "Versioned envelopes, deterministic v1-to-v2 migration, checksum-chained synchronized journals, atomic snapshots, corruption recovery and serialized multi-process writers preserve the shared CycleWarden lifecycle on the declared Linux filesystem contract. New state defaults to .cyclewarden while an existing .shipkit store remains readable when no canonical store exists.",
       "evidence": [
+        "packages/evolution-core/src/runtime-paths.ts",
+        "packages/evolution-core/src/runtime-paths.test.ts",
         "packages/evolution-core/src/persistence.ts",
         "packages/evolution-core/src/persistence.test.ts",
         "packages/evolution-core/src/persistence-process.test.ts",
@@ -92,6 +94,7 @@
         "docs/evolution/PERSISTENCE_REVIEW.md"
       ],
       "checks": [
+        "Canonical state root, legacy fallback and canonical-precedence tests",
         "Migration fixture and unsupported-schema rejection",
         "Process SIGKILL recovery at journal and snapshot boundaries",
         "Eight-process next-sequence contention",
@@ -125,7 +128,7 @@
       "category": "perception",
       "status": "partial",
       "verificationStatus": "passing",
-      "summary": "Shipkit models repository structure, checks, CI, product signals, Git state and structural trust boundaries and consumes that model in a bounded repository-research decision flow; deeper user and operational understanding remains planned.",
+      "summary": "CycleWarden models repository structure, checks, CI, product signals, Git state and structural trust boundaries and consumes that model in a bounded repository-research decision flow; deeper user and operational understanding remains planned.",
       "evidence": [
         "packages/evolution-core/src/repository.ts",
         "packages/evolution-core/src/repository-evidence.test.ts",
@@ -136,7 +139,7 @@
       "checks": [
         "Synthetic unrelated repository tests",
         "Pinned external repository assessment proof",
-        "CI: Shipkit repository-research dogfood"
+        "CI: CycleWarden repository-research dogfood"
       ],
       "limitations": [
         "User journeys, analytics, support, deployment state and product outcomes are not yet integrated",
@@ -177,7 +180,7 @@
       "category": "research",
       "status": "partial",
       "verificationStatus": "passing",
-      "summary": "Shipkit supports manual typed bundles, deterministic repository research, manifest-driven public-source capture, named-candidate comparison and bounded ranked GitHub repository search. Search decisions persist explicit support and falsification queries, provider ranks, result and response digests, selected sources, exact citations, rejected alternatives and fail-closed inconclusive outcomes before independent review.",
+      "summary": "CycleWarden supports manual typed bundles, deterministic repository research, manifest-driven public-source capture, named-candidate comparison and bounded ranked GitHub repository search. Search decisions persist explicit support and falsification queries, provider ranks, result and response digests, selected sources, exact citations, rejected alternatives and fail-closed inconclusive outcomes before independent review.",
       "evidence": [
         "packages/evolution-core/src/research-records.ts",
         "packages/evolution-core/src/research.ts",
@@ -198,7 +201,7 @@
         "packages/evolution-core/src/candidate-cli.ts",
         "packages/evolution-core/src/candidate-research.test.ts",
         "packages/evolution-core/src/candidate-cli.test.ts",
-        "packages/evolution-core/src/fixtures/shipkit-next-workstream.candidates.json",
+        "packages/evolution-core/src/fixtures/cyclewarden-next-workstream.candidates.json",
         "scripts/test-candidate-research.mjs",
         "docs/evolution/CANDIDATE_RESEARCH.md",
         "packages/evolution-core/src/public-search.ts",
@@ -222,7 +225,7 @@
         "Public-source tests: SSRF and unsafe redirect blocking",
         "Public-source tests: exact citations, hostile quarantine and missing quote",
         "Public CLI test: persist and reload citation spans",
-        "CI dogfood: autonomous repository research on Shipkit",
+        "CI dogfood: autonomous repository research on CycleWarden",
         "CI: production build",
         "CI: Evolution Engine Proof",
         "Unit tests: named candidates, stale capability rejection, missing evidence and tied ranking",
@@ -232,7 +235,7 @@
         "Public-search failure tests: duplicate, stale, incomplete, malformed, unsupported and time-budget rejection",
         "Public-search CLI test: persist, reload and project-root symlink confinement",
         "CI proof: deterministic public-search cycle with independent review",
-        "One-time live proof: expected Shipkit and Vitest repositories returned from GitHub repository search",
+        "One-time live proof: expected CycleWarden and Vitest repositories returned from GitHub repository search",
         "External-system registry: revisions, review expiry, coverage, limitations, contradictions and falsification tests",
         "External-system negative fixtures: floating revision, expiry, narrow coverage and missing contradictions",
         "GitHub Actions: external-system registry and validator changes trigger and run the focused checks"
@@ -243,11 +246,11 @@
         "Hostile-source screening is pattern-based and not a complete prompt-injection defense",
         "No real-user decision-value proof exists yet",
         "The execution handoff is not yet consumed by a coding-agent adapter",
-        "Named-candidate evidence is supplied through an explicit manifest; Shipkit does not fetch GitHub issues or independently verify external URLs in this adapter",
+        "Named-candidate evidence is supplied through an explicit manifest; CycleWarden does not fetch GitHub issues or independently verify external URLs in this adapter",
         "Deterministic priority weights are inspectable project judgments, not statistical estimates of market demand",
         "No adaptive query reformulation or citation chasing exists yet",
         "The only built-in search provider discovers public GitHub repositories; it is not a general web index",
-        "Live provider rankings can change; Shipkit persists timestamps and digests rather than promising identical future results",
+        "Live provider rankings can change; CycleWarden persists timestamps and digests rather than promising identical future results",
         "The external-system registry validates structure and freshness metadata but does not fetch URLs, prove source claims or establish user value"
       ]
     },
@@ -260,7 +263,7 @@
       "evidence": [
         "packages/evolution-core/src/candidate-research.ts",
         "packages/evolution-core/src/candidate-cli.ts",
-        "packages/evolution-core/src/fixtures/shipkit-next-workstream.candidates.json",
+        "packages/evolution-core/src/fixtures/cyclewarden-next-workstream.candidates.json",
         "scripts/test-candidate-research.mjs",
         "docs/evolution/CANDIDATE_RESEARCH.md"
       ],
@@ -298,7 +301,7 @@
         "Unit tests: duplicate, stale, incomplete, malformed, unsupported and time-budget fail-closed outcomes",
         "CLI test: planned-cycle persistence, replay and manifest symlink confinement",
         "CI: deterministic public-search proof",
-        "One-time live provider proof against Shipkit and an unrelated Vitest repository query"
+        "One-time live provider proof against CycleWarden and an unrelated Vitest repository query"
       ],
       "limitations": [
         "The built-in provider searches public GitHub repositories only and is not a general web index",
@@ -375,7 +378,7 @@
       "category": "product",
       "status": "partial",
       "verificationStatus": "passing",
-      "summary": "Shipkit now has capability-negotiated trusted-local and Docker execution backends plus an explicit sandbox-check CLI. The Docker baseline uses immutable local images, denied network, read-only root, reduced environment, no host dependencies, resource bounds and forced cleanup, but no coding-agent adapter consumes ExecutionHandoff yet.",
+      "summary": "CycleWarden now has capability-negotiated trusted-local and Docker execution backends plus an explicit sandbox-check CLI. The Docker baseline uses immutable local images, denied network, read-only root, reduced environment, no host dependencies, resource bounds and forced cleanup, but no coding-agent adapter consumes ExecutionHandoff yet.",
       "evidence": [
         "packages/evolution-core/src/execution-backend.ts",
         "packages/evolution-core/src/check-runner.ts",
@@ -408,7 +411,7 @@
       "category": "product",
       "status": "planned",
       "verificationStatus": "not-run",
-      "summary": "Independent verification, provenance, explicit release approval, deployment adapters and rollback will extend the same Shipkit cycle into operations.",
+      "summary": "Independent verification, provenance, explicit release approval, deployment adapters and rollback will extend the same CycleWarden cycle into operations.",
       "evidence": [
         "IDEA.md",
         "docs/evolution/ARCHITECTURE.md",

@@ -10,7 +10,7 @@ IDEA.md / GitHub Issue
           ↓
 apps/web product routes and server actions
           ↓
-@shipkit/* ports and shared packages
+@cyclewarden/* ports and shared packages
           ↓
 apps/web/src/lib/adapters/*
           ↓

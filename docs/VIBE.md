@@ -1,6 +1,6 @@
 # Vibe coding with engineering controls
 
-Shipkit keeps the speed of AI-assisted building while adding explicit scope,
+CycleWarden keeps the speed of AI-assisted building while adding explicit scope,
 verification, and review.
 
 ## Default loop

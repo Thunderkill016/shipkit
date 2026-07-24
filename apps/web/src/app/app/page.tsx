@@ -88,7 +88,7 @@ export default async function AppHomePage() {
           </div>
           <p className="mt-3 text-sm text-muted">{t("app.session")}</p>
           <p className="mt-1 font-medium">
-            {user?.email ?? (configured ? "—" : "demo@shipkit.local")}
+            {user?.email ?? (configured ? "—" : "demo@cyclewarden.local")}
           </p>
           {user?.id && (
             <p className="mt-1 break-all font-mono text-xs text-muted">{user.id}</p>

@@ -22,7 +22,7 @@ const files = readdirSync(dir)
 
 const sql = postgres(url, { max: 1 });
 
-console.log("✦ shipkit db:migrate\n");
+console.log("✦ cyclewarden db:migrate\n");
 for (const f of files) {
   const body = readFileSync(join(dir, f), "utf8");
   process.stdout.write(`  → ${f} ... `);

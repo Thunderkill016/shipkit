@@ -45,30 +45,30 @@ const searchFetcher: PublicFetch = async (url) => {
   const query = parsed.searchParams.get("q") ?? "";
   const item = query.includes("limitations")
     ? repositoryItem(
-        "example/shipkit-limitations",
+        "example/cyclewarden-limitations",
         "Repository search alone is not a general web index.",
         4
       )
     : repositoryItem(
-        "Thunderkill016/shipkit",
-        "Shipkit uses bounded search and exact citations.",
+        "Thunderkill016/cyclewarden",
+        "CycleWarden uses bounded search and exact citations.",
         8
       );
   return response(JSON.stringify({ total_count: 1, incomplete_results: false, items: [item] }));
 };
 
 const sourceFetcher: PublicFetch = async (url) =>
-  url.includes("shipkit-limitations")
+  url.includes("cyclewarden-limitations")
     ? response(
         JSON.stringify({
-          full_name: "example/shipkit-limitations",
+          full_name: "example/cyclewarden-limitations",
           description: "Repository search alone is not a general web index.",
         })
       )
     : response(
         JSON.stringify({
-          full_name: "Thunderkill016/shipkit",
-          description: "Shipkit uses bounded search and exact citations.",
+          full_name: "Thunderkill016/cyclewarden",
+          description: "CycleWarden uses bounded search and exact citations.",
         })
       );
 
@@ -118,9 +118,9 @@ afterEach(async () => {
 
 describe("public search CLI", () => {
   it("persists and reloads a reviewed support and falsification search cycle", async () => {
-    const root = await mkdtemp(join(tmpdir(), "shipkit-public-search-cli-"));
+    const root = await mkdtemp(join(tmpdir(), "cyclewarden-public-search-cli-"));
     temporaryRoots.push(root);
-    const storeRoot = join(root, ".shipkit");
+    const storeRoot = join(root, ".cyclewarden");
     const manifestPath = join(root, "public-search.json");
     await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
 
@@ -173,8 +173,8 @@ describe("public search CLI", () => {
   });
 
   it("rejects a manifest symlink that escapes project-root", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "shipkit-public-search-project-"));
-    const outsideRoot = await mkdtemp(join(tmpdir(), "shipkit-public-search-outside-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "cyclewarden-public-search-project-"));
+    const outsideRoot = await mkdtemp(join(tmpdir(), "cyclewarden-public-search-outside-"));
     temporaryRoots.push(projectRoot, outsideRoot);
     const outsideManifest = join(outsideRoot, "outside.json");
     const escapedLink = join(projectRoot, "escaped.json");

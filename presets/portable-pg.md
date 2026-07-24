@@ -18,7 +18,7 @@ pnpm db:up
 `apps/web/.env.local`:
 
 ```bash
-DATABASE_URL=postgresql://shipkit:shipkit@localhost:5432/shipkit
+DATABASE_URL=postgresql://cyclewarden:cyclewarden@localhost:5432/cyclewarden
 BETTER_AUTH_SECRET=replace-with-32-plus-char-random-secret!!
 BETTER_AUTH_URL=http://localhost:3000
 NEXT_PUBLIC_APP_URL=http://localhost:3000

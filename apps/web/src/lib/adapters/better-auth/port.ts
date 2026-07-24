@@ -1,4 +1,4 @@
-import type { AuthPort, AuthUser } from "@shipkit/auth";
+import type { AuthPort, AuthUser } from "@cyclewarden/auth";
 import { headers } from "next/headers";
 import { getBetterAuth } from "./auth-instance";
 

@@ -13,12 +13,12 @@ import {
 const temporaryRoots: string[] = [];
 
 const manifest = JSON.parse(
-  readFileSync(new URL("./fixtures/shipkit-next-workstream.candidates.json", import.meta.url), "utf8")
+  readFileSync(new URL("./fixtures/cyclewarden-next-workstream.candidates.json", import.meta.url), "utf8")
 );
 
 const capabilities = {
   schemaVersion: 1,
-  project: "shipkit",
+  project: "cyclewarden",
   lastVerified: "2026-07-23",
   capabilities: [
     {
@@ -82,9 +82,9 @@ function collector() {
 
 describe("candidate research CLI", () => {
   it("persists and reloads a reviewed named-candidate decision", async () => {
-    const root = await mkdtemp(join(tmpdir(), "shipkit-candidate-cli-"));
+    const root = await mkdtemp(join(tmpdir(), "cyclewarden-candidate-cli-"));
     temporaryRoots.push(root);
-    const storeRoot = join(root, ".shipkit");
+    const storeRoot = join(root, ".cyclewarden");
     const manifestPath = join(root, "candidate-decision.json");
     const capabilitiesPath = join(root, "capabilities.json");
     await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
@@ -93,7 +93,7 @@ describe("candidate research CLI", () => {
     const store = new EvolutionStore(storeRoot);
     const created = createCycle({
       cycleId: "candidate-cli:cycle-001",
-      objective: "Choose Shipkit's next named workstream",
+      objective: "Choose CycleWarden's next named workstream",
       autonomy: "A2",
       risk: "R1",
     });

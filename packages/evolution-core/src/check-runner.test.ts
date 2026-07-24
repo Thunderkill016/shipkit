@@ -16,7 +16,7 @@ const temporaryRoots: string[] = [];
 const IMMUTABLE_IMAGE = `sha256:${"a".repeat(64)}`;
 
 async function projectWithScript(script: string): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), "shipkit-check-project-"));
+  const root = await mkdtemp(join(tmpdir(), "cyclewarden-check-project-"));
   temporaryRoots.push(root);
   await mkdir(join(root, "src"), { recursive: true });
   await writeFile(join(root, "src", "index.js"), "export const value = 1;\n", "utf8");

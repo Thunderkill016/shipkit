@@ -8,12 +8,12 @@ import { fileURLToPath } from "node:url";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const cli = join(repositoryRoot, "packages", "evolution-core", "dist", "cli.js");
-const temporaryRoot = await mkdtemp(join(tmpdir(), "shipkit-decision-calibration-"));
-const storeRoot = join(temporaryRoot, ".shipkit");
-const cycleId = "shipkit:next-workstream-calibration-001";
+const temporaryRoot = await mkdtemp(join(tmpdir(), "cyclewarden-decision-calibration-"));
+const storeRoot = join(temporaryRoot, ".cyclewarden");
+const cycleId = "cyclewarden:next-workstream-calibration-001";
 const reportPath = join(repositoryRoot, "artifacts", "decision-calibration-report.json");
 const objective =
-  "Choose which Shipkit workstream should be prioritized for the next 4 to 6 weeks among standalone core, minimal search discovery, remaining sandbox hardening, and governed agent execution";
+  "Choose which CycleWarden workstream should be prioritized for the next 4 to 6 weeks among standalone core, minimal search discovery, remaining sandbox hardening, and governed agent execution";
 
 const preAuditDecision = {
   selected: "#15 standalone core",

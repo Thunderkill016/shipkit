@@ -6,7 +6,7 @@ Opportunity: `OPPORTUNITY.md`
 ## Assumption
 
 A dependency-free registry checker can catch structural/evidence drift and work
-inside both Shipkit and a newly generated project.
+inside both CycleWarden and a newly generated project.
 
 ## Method
 

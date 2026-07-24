@@ -1,6 +1,6 @@
 # AI Engineering Workflow
 
-Shipkit uses a repository-first workflow: important context, decisions, plans,
+CycleWarden uses a repository-first workflow: important context, decisions, plans,
 research, and verification live in Git instead of being trapped in chat history.
 
 ## Delivery loop

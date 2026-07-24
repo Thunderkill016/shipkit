@@ -21,8 +21,8 @@
 ### Checklist nhanh
 
 ```bash
-git clone https://github.com/Thunderkill016/shipkit.git
-cd shipkit && pnpm install
+git clone https://github.com/Thunderkill016/cyclewarden.git
+cd cyclewarden && pnpm install
 cp .env.example apps/web/.env.local
 # Điền NEXT_PUBLIC_SUPABASE_URL và NEXT_PUBLIC_SUPABASE_ANON_KEY
 pnpm doctor
@@ -46,11 +46,11 @@ pnpm dev
 ### Checklist nhanh
 
 ```bash
-git clone https://github.com/Thunderkill016/shipkit.git
-cd shipkit && pnpm install
+git clone https://github.com/Thunderkill016/cyclewarden.git
+cd cyclewarden && pnpm install
 pnpm db:up
 cp .env.example apps/web/.env.local
-# Điền DATABASE_URL=postgresql://shipkit:shipkit@localhost:5432/shipkit
+# Điền DATABASE_URL=postgresql://cyclewarden:cyclewarden@localhost:5432/cyclewarden
 # Điền BETTER_AUTH_SECRET=<32+ ký tự ngẫu nhiên>
 # Điền BETTER_AUTH_URL=http://localhost:3000
 # Điền AUTH_ADAPTER=better-auth

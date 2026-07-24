@@ -32,7 +32,7 @@ Classification: product integration defect, exposed by CI; not a flaky assertion
 ## Fix
 
 - define and export the Better Auth `user`, `session`, `account`, and
-  `verification` Drizzle tables in `@shipkit/db`;
+  `verification` Drizzle tables in `@cyclewarden/db`;
 - pass those table objects explicitly to `drizzleAdapter`;
 - preserve Playwright failure artifacts for future portable-path incidents;
 - update the capability registry only after clean verification.

@@ -2,7 +2,7 @@ import {
   createNoopPaymentPort,
   createStripePaymentPort,
   type PaymentPort,
-} from "@shipkit/payment";
+} from "@cyclewarden/payment";
 
 let cached: PaymentPort | null = null;
 

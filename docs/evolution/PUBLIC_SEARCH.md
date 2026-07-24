@@ -1,6 +1,6 @@
 # Minimal public search discovery
 
-Shipkit's first reproducible search provider is `github-repository-search`, backed by the public GitHub Repository Search API.
+CycleWarden's first reproducible search provider is `github-repository-search`, backed by the public GitHub Repository Search API.
 
 This is deliberately narrower than general web search. It exists to prove the discovery contract before adding more providers.
 
@@ -52,5 +52,5 @@ The cycle becomes `inconclusive` when:
 - Only public GitHub repository search is implemented.
 - No general web index, paper/PDF search, browser rendering, private source or paid provider is included.
 - No adaptive query reformulation or citation chasing is included.
-- Provider ranking may change between runs. Shipkit preserves what was observed; it does not claim future runs will return the same order.
+- Provider ranking may change between runs. CycleWarden preserves what was observed; it does not claim future runs will return the same order.
 - Search evidence does not establish user demand. External decision value remains governed by the fixed six-participant pilot in issue #14.

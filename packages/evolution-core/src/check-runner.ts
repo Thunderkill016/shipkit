@@ -13,6 +13,7 @@ import type { ProjectSnapshot, RepositoryCheck } from "./repository.js";
 
 const COPY_EXCLUDES = new Set([
   ".git",
+  ".cyclewarden",
   ".shipkit",
   ".next",
   ".turbo",
@@ -229,7 +230,7 @@ async function createWorkspace(
   dependencyAccess: CheckResult["isolation"]["dependencyAccess"];
 }> {
   const root = resolve(projectRoot);
-  const temporaryRoot = await mkdtemp(join(tmpdir(), "shipkit-check-"));
+  const temporaryRoot = await mkdtemp(join(tmpdir(), "cyclewarden-check-"));
   const workspaceRoot = join(temporaryRoot, "workspace");
 
   await cp(root, workspaceRoot, {

@@ -6,7 +6,7 @@ export async function GET() {
   const adapter = resolveAuthAdapter();
   return NextResponse.json({
     ok: true,
-    service: "shipkit",
+    service: "cyclewarden",
     auth: adapter,
     time: new Date().toISOString(),
   });

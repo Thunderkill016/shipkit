@@ -5,7 +5,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const sandbox = await mkdtemp(join(tmpdir(), "shipkit-capabilities-"));
+const sandbox = await mkdtemp(join(tmpdir(), "cyclewarden-capabilities-"));
 
 function runCheck(expectSuccess, expectedText = "") {
   const result = spawnSync(process.execPath, ["scripts/check-capabilities.mjs"], {

@@ -18,31 +18,31 @@ importers:
 
   apps/web:
     dependencies:
-      '@shipkit/auth':
+      '@cyclewarden/auth':
         specifier: workspace:*
         version: link:../../packages/auth
-      '@shipkit/config':
+      '@cyclewarden/config':
         specifier: workspace:*
         version: link:../../packages/config
-      '@shipkit/db':
+      '@cyclewarden/db':
         specifier: workspace:*
         version: link:../../packages/db
-      '@shipkit/i18n':
+      '@cyclewarden/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
-      '@shipkit/logger':
+      '@cyclewarden/logger':
         specifier: workspace:*
         version: link:../../packages/logger
-      '@shipkit/mail':
+      '@cyclewarden/mail':
         specifier: workspace:*
         version: link:../../packages/mail
-      '@shipkit/payment':
+      '@cyclewarden/payment':
         specifier: workspace:^
         version: link:../../packages/payment
-      '@shipkit/security':
+      '@cyclewarden/security':
         specifier: workspace:*
         version: link:../../packages/security
-      '@shipkit/storage':
+      '@cyclewarden/storage':
         specifier: workspace:*
         version: link:../../packages/storage
       '@supabase/ssr':

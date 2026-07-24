@@ -48,9 +48,9 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Workspace package typecheck
-        run: pnpm --filter @shipkit/evolution-core typecheck
+        run: pnpm --filter @cyclewarden/evolution-core typecheck
       - name: Workspace package tests
-        run: pnpm --filter @shipkit/evolution-core test
+        run: pnpm --filter @cyclewarden/evolution-core test
       - name: Clean standalone install, pack and consumer proof
         run: node scripts/test-evolution-core-standalone.mjs
 
@@ -68,8 +68,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Build Evolution Engine
-        run: pnpm --filter @shipkit/evolution-core build
-      - name: Dogfood Shipkit assessment
+        run: pnpm --filter @cyclewarden/evolution-core build
+      - name: Dogfood CycleWarden assessment
         run: node scripts/test-evolution-cli.mjs
       - name: Upload Evolution dogfood diagnostics
         if: ${{ always() }}
@@ -116,7 +116,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Build Evolution Engine
-        run: pnpm --filter @shipkit/evolution-core build
+        run: pnpm --filter @cyclewarden/evolution-core build
       - name: Explicitly provision local sandbox image
         shell: bash
         run: |
@@ -124,7 +124,7 @@ jobs:
           docker pull node:22-bookworm-slim
           image_id="$(docker image inspect node:22-bookworm-slim --format '{{.Id}}')"
           [[ "$image_id" =~ ^sha256:[a-f0-9]{64}$ ]]
-          echo "SHIPKIT_SANDBOX_IMAGE=$image_id" >> "$GITHUB_ENV"
+          echo "CYCLEWARDEN_SANDBOX_IMAGE=$image_id" >> "$GITHUB_ENV"
       - name: Run hostile sandbox fixture
         shell: bash
         run: |
@@ -132,7 +132,7 @@ jobs:
           mkdir -p artifacts
           node scripts/test-sandbox-docker.mjs 2>&1 | tee artifacts/sandbox-docker-proof.log
         env:
-          SHIPKIT_HOST_SECRET: ci-secret-must-not-enter-sandbox
+          CYCLEWARDEN_HOST_SECRET: ci-secret-must-not-enter-sandbox
       - name: Upload hostile sandbox diagnostics
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
@@ -157,7 +157,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Install Playwright Chromium
-        run: pnpm --filter @shipkit/web exec playwright install chromium --with-deps
+        run: pnpm --filter @cyclewarden/web exec playwright install chromium --with-deps
       - name: E2E smoke (demo)
         run: pnpm test:e2e
         env:
@@ -174,9 +174,9 @@ jobs:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_USER: shipkit
-          POSTGRES_PASSWORD: shipkit
-          POSTGRES_DB: shipkit
+          POSTGRES_USER: cyclewarden
+          POSTGRES_PASSWORD: cyclewarden
+          POSTGRES_DB: cyclewarden
         ports:
           - 5432:5432
         options: >-
@@ -197,9 +197,9 @@ jobs:
       - name: Migrate database
         run: pnpm db:migrate
         env:
-          DATABASE_URL: postgresql://shipkit:shipkit@localhost:5432/shipkit
+          DATABASE_URL: postgresql://cyclewarden:cyclewarden@localhost:5432/cyclewarden
       - name: Install Playwright Chromium
-        run: pnpm --filter @shipkit/web exec playwright install chromium --with-deps
+        run: pnpm --filter @cyclewarden/web exec playwright install chromium --with-deps
       - name: E2E auth + isolation
         run: pnpm test:e2e
         env:
@@ -207,7 +207,7 @@ jobs:
           NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
           BETTER_AUTH_URL: http://127.0.0.1:3000
-          DATABASE_URL: postgresql://shipkit:shipkit@localhost:5432/shipkit
+          DATABASE_URL: postgresql://cyclewarden:cyclewarden@localhost:5432/cyclewarden
           BETTER_AUTH_SECRET: ci-test-secret-at-least-32-characters-long!!
           AUTH_ADAPTER: better-auth
       - name: Upload portable-pg Playwright evidence
