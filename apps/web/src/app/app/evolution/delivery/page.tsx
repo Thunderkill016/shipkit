@@ -43,8 +43,8 @@ export default async function DeliveryWorkspacePage({ searchParams }: PageProps)
           </p>
           <h1 className="mt-2 text-2xl font-semibold text-foreground">Delivery operations</h1>
           <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted">
-            Follow live heartbeat and phase, inspect durable delivery evidence, request graceful
-            cancellation and reconcile interrupted work through the same CLI boundary.
+            Follow an integrity-chained command timeline, inspect durable delivery evidence, request
+            graceful cancellation and reconcile interrupted work through the same CLI boundary.
           </p>
         </div>
         <Link
@@ -82,6 +82,7 @@ export default async function DeliveryWorkspacePage({ searchParams }: PageProps)
                 <Badge>cycle: {selected.stage}</Badge>
                 <Badge>lease: {state?.operation.disposition ?? "unavailable"}</Badge>
                 <Badge>control: {state?.operation.controlStatus ?? "unavailable"}</Badge>
+                <Badge>progress: {state?.progress.controlStatus ?? "unavailable"}</Badge>
                 <Badge>
                   cancel: {state?.operation.cancellable ? "available" : "unavailable"}
                 </Badge>
@@ -132,10 +133,12 @@ export default async function DeliveryWorkspacePage({ searchParams }: PageProps)
                 <div className="rounded-xl border border-border bg-card p-5">
                   <p className="text-xs uppercase tracking-wider text-muted">Live operation</p>
                   <p className="mt-2 text-lg font-semibold text-foreground">
-                    {state.operation.record?.phase ?? state.operation.disposition}
+                    {state.progress.activeStep?.stepId ??
+                      state.operation.record?.phase ??
+                      state.operation.disposition}
                   </p>
                   <p className="mt-2 text-xs text-muted">
-                    owner {state.operation.ownerState} · child {state.operation.childState}
+                    {state.progress.events.length} durable progress event(s)
                   </p>
                 </div>
               </section>
@@ -277,6 +280,65 @@ export default async function DeliveryWorkspacePage({ searchParams }: PageProps)
                 </div>
               </section>
 
+              <section className="rounded-2xl border border-border bg-card p-6">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-accent">
+                      Durable progress
+                    </p>
+                    <h3 className="mt-2 text-lg font-semibold text-foreground">
+                      Append-only command timeline
+                    </h3>
+                    <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted">
+                      Each event is stored atomically with a sequence number, previous-event digest and
+                      integrity digest. The timeline is observability evidence only and cannot advance
+                      the cycle lifecycle.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge>{state.progress.controlStatus}</Badge>
+                    {state.progress.truncated && <Badge>latest events only</Badge>}
+                  </div>
+                </div>
+
+                {state.progress.events.length > 0 ? (
+                  <ol className="mt-5 space-y-3">
+                    {state.progress.events.map((event) => (
+                      <li
+                        key={event.eventId}
+                        className="grid gap-2 rounded-xl border border-border bg-background p-4 sm:grid-cols-[5rem_1fr_auto]"
+                      >
+                        <p className="text-xs font-mono text-muted">#{event.sequence}</p>
+                        <div>
+                          <p className="text-sm font-medium text-foreground">
+                            {event.stepId ?? event.phase}
+                          </p>
+                          <p className="mt-1 text-xs leading-relaxed text-muted">
+                            {event.operation} · {event.phase}
+                            {event.executable ? ` · ${event.executable}` : ""}
+                            {event.childPid ? ` · pid ${event.childPid}` : ""}
+                            {event.exitCode !== null ? ` · exit ${event.exitCode}` : ""}
+                            {event.signal ? ` · ${event.signal}` : ""}
+                          </p>
+                          <p className="mt-1 text-xs text-muted">{event.occurredAt}</p>
+                        </div>
+                        <Badge>{event.status}</Badge>
+                      </li>
+                    ))}
+                  </ol>
+                ) : (
+                  <EmptyState>No durable progress event has been recorded for this cycle.</EmptyState>
+                )}
+
+                {state.progress.findings.length > 0 && (
+                  <ul className="mt-4 space-y-1 text-sm text-amber-200">
+                    {state.progress.findings.map((finding) => (
+                      <li key={finding}>• {finding}</li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+
               <DeliveryOperatorControls
                 cycleId={selected.cycleId}
                 enabled={mutationAccess.allowed}
@@ -288,10 +350,10 @@ export default async function DeliveryWorkspacePage({ searchParams }: PageProps)
               <section className="rounded-2xl border border-border bg-background p-5 text-sm leading-relaxed text-muted">
                 <p className="font-medium text-foreground">Boundary</p>
                 <p className="mt-2">
-                  This console exposes inspection, graceful cancellation and recovery only. It cannot
-                  upload a delivery manifest, run an implementation command, accept verification,
-                  push a branch, merge, deploy or write production. Cancellation is SIGTERM-only and
-                  remains subject to normal fail-closed reconciliation.
+                  This console exposes inspection, progress evidence, graceful cancellation and recovery
+                  only. It cannot upload a delivery manifest, run an implementation command, accept
+                  verification, push a branch, merge, deploy or write production. Progress events never
+                  substitute for execution, verification or publication evidence.
                 </p>
               </section>
             </>
