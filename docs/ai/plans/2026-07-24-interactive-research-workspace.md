@@ -1,7 +1,7 @@
 # Interactive research workspace
 
 Status: complete, ready for review
-Autonomy: A3 bounded delivery
+Autonomy: A2 bounded operator workflow
 Issue alignment: #16, with existing #13 research contracts
 
 ## Objective
@@ -47,6 +47,8 @@ isolation and manual decision editing remain blind spots.
    - accept no user-controlled filesystem path, executable or arbitrary CLI
      option;
    - operate only on `CYCLEWARDEN_PROJECT_ROOT` (or the current repository);
+   - canonicalize the configured repository before enforcing the filesystem-root boundary;
+   - do not disclose the configured repository path to unauthorized viewers;
    - require `CYCLEWARDEN_WORKSPACE_ACTIONS=enabled`;
    - re-check auth and an operator allowlist when auth is configured;
    - reject production demo mode and Vercel filesystem mutation;
