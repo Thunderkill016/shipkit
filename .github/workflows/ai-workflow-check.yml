@@ -23,7 +23,6 @@ on:
       - "scripts/test-a2-pilot.mjs"
       - "scripts/create-cyclewarden.mjs"
       - "scripts/test-create-cyclewarden.mjs"
-      - "scripts/apply-delivery-cwd-hardening.mjs"
       - "package.json"
   workflow_dispatch:
 
@@ -45,29 +44,3 @@ jobs:
       - run: node scripts/check-a2-pilot.mjs
       - run: node scripts/test-a2-pilot.mjs
       - run: node scripts/test-create-cyclewarden.mjs
-
-  apply-delivery-cwd-hardening:
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'agent/owner-beta-execution-vertical-slice'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: node scripts/apply-delivery-cwd-hardening.mjs
-      - name: Commit cwd and failure-status hardening
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add packages/evolution-core/src/delivery.ts packages/evolution-core/src/delivery-hardening.test.ts
-          if git diff --cached --quiet; then
-            echo "No cwd hardening changes to commit."
-            exit 0
-          fi
-          git commit -m "Harden delivery working-directory and failure boundaries"
-          git push origin HEAD:${{ github.event.pull_request.head.ref }}
