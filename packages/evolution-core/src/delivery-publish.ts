@@ -224,6 +224,7 @@ export async function publishDelivery(input: PublishDeliveryInput) {
   }
 
   const remoteUrl = await runGit(projectRoot, ["remote", "get-url", remoteName]);
+  const pushUrl = await runGit(projectRoot, ["remote", "get-url", "--push", remoteName]);
   const repository = parseGitHubRepository(remoteUrl);
   const authorization = authorizeAction({
     autonomy: cycle.autonomy,
@@ -241,7 +242,7 @@ export async function publishDelivery(input: PublishDeliveryInput) {
   const existingRemote = await runGit(projectRoot, [
     "ls-remote",
     "--heads",
-    remoteName,
+    pushUrl,
     `refs/heads/${branchName}`,
   ]);
   if (existingRemote) {
@@ -257,7 +258,7 @@ export async function publishDelivery(input: PublishDeliveryInput) {
   const remoteLine = await runGit(projectRoot, [
     "ls-remote",
     "--heads",
-    remoteName,
+    pushUrl,
     `refs/heads/${branchName}`,
   ]);
   const remoteCommit = remoteLine.split(/\s+/)[0] ?? "";
@@ -315,12 +316,13 @@ export async function publishDelivery(input: PublishDeliveryInput) {
       if (
         !Number.isInteger(view.number) ||
         typeof view.url !== "string" ||
+        !view.url.startsWith(`https://github.com/${repository}/pull/`) ||
         view.state !== "OPEN" ||
         view.isDraft !== true ||
         view.headRefName !== branchName ||
         view.baseRefName !== baseBranch
       ) {
-        throw new DeliveryError("created pull request does not match the expected open draft head/base");
+        throw new DeliveryError("created pull request does not match the expected repository, open draft head/base");
       }
       const publication: DeliveryPublicationRecord = {
         schemaVersion: 1,
