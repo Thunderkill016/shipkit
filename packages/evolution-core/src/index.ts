@@ -15,6 +15,8 @@ export * from "./evidence.js";
 export * from "./execution-backend.js";
 export * from "./check-runner.js";
 export * from "./scorecard.js";
+export * from "./delivery.js";
+export * from "./delivery-cli.js";
 
 export * from "./candidate-research.js";
 export * from "./candidate-cli.js";
