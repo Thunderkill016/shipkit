@@ -3,7 +3,8 @@
 ## Goal
 
 Let builders delegate product slices to AI while the foundation remains
-predictable, testable, and replaceable at explicit boundaries.
+predictable, testable, and replaceable at explicit boundaries. Wrap AI agent
+autonomy in a deterministic governance engine with audit-grade evidence.
 
 ```text
 IDEA.md / GitHub Issue
@@ -22,6 +23,7 @@ Postgres / Supabase / Better Auth / S3 / Resend / Stripe
 | Area | Responsibility |
 |---|---|
 | `apps/web` | Next.js App Router application, product UI, server actions, adapter selection |
+| `packages/evolution-core` | Deterministic lifecycle engine: state machine, policy, evidence registry, research, CLI |
 | `packages/auth` | AuthPort contract |
 | `packages/config` | Environment schema and preset identifiers |
 | `packages/db` | Drizzle schemas and SQL migrations |
@@ -33,6 +35,7 @@ Postgres / Supabase / Better Auth / S3 / Resend / Stripe
 | `packages/logger` | Logger abstraction |
 | `scripts` | Setup, diagnostics, migration, verification, and project generation |
 | `docs/ai` | Repository memory for agents: project model, plans, research, and improvements |
+| `docs/evolution` | Evolution engine specs: architecture, research capability, data governance |
 
 ## Application surface
 
@@ -41,6 +44,7 @@ Current routes include:
 - `/` — localized public landing;
 - `/login` — email/password and env-gated OAuth entry;
 - `/app` — authenticated or demo shell;
+- `/app/evolution` — evolution cycle dashboard: inspect, track, and advance cycles;
 - `/app/notes` — Postgres notes with memory fallback;
 - `/app/profile` — profile and storage pattern;
 - `/app/billing` — env-gated Stripe/noop pattern;
