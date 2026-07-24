@@ -1,0 +1,258 @@
+import { createHash } from "node:crypto";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
+import { afterEach, describe, expect, it } from "vitest";
+import {
+  inspectDeliveryOperation,
+  reconcileDeliveryOperation,
+  showDeliveryOperation,
+  withDeliveryOperation,
+  type DeliveryOperationRecord,
+} from "./delivery-operation.js";
+import { TrustedLocalExecutionBackend } from "./execution-backend.js";
+import { EvolutionStore, cycleStorageDirectoryName } from "./persistence.js";
+
+const temporaryRoots: string[] = [];
+
+function digestJson(value: unknown): string {
+  return createHash("sha256").update(JSON.stringify(value)).digest("hex");
+}
+
+function operationPath(store: EvolutionStore, cycleId: string): string {
+  return join(store.rootDir, "delivery", cycleStorageDirectoryName(cycleId), "operation.json");
+}
+
+function lockPath(store: EvolutionStore, cycleId: string): string {
+  return join(store.rootDir, "delivery", cycleStorageDirectoryName(cycleId), "operation.lock");
+}
+
+async function fixture(name: string) {
+  const root = await mkdtemp(join(tmpdir(), `cyclewarden-operation-${name}-`));
+  temporaryRoots.push(root);
+  const projectRoot = join(root, "project");
+  await mkdir(projectRoot, { recursive: true });
+  return {
+    root,
+    projectRoot,
+    store: new EvolutionStore(join(root, ".cyclewarden")),
+    cycleId: `operation:${name}`,
+  };
+}
+
+async function waitFor<T>(read: () => T | null, timeoutMs = 3_000): Promise<T> {
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < timeoutMs) {
+    const value = read();
+    if (value !== null) return value;
+    await new Promise((resolvePromise) => setTimeout(resolvePromise, 10));
+  }
+  throw new Error("timed out waiting for delivery operation state");
+}
+
+async function replaceRecord(
+  store: EvolutionStore,
+  cycleId: string,
+  mutate: (record: DeliveryOperationRecord) => DeliveryOperationRecord
+): Promise<void> {
+  const path = operationPath(store, cycleId);
+  const current = JSON.parse(await readFile(path, "utf8")) as DeliveryOperationRecord;
+  const mutated = mutate(current);
+  const { integrityDigest: _discarded, ...payload } = mutated;
+  await writeFile(
+    path,
+    `${JSON.stringify({ ...payload, integrityDigest: digestJson(payload) }, null, 2)}\n`,
+    "utf8"
+  );
+}
+
+afterEach(async () => {
+  await Promise.all(
+    temporaryRoots.splice(0).map((root) => rm(root, { recursive: true, force: true }))
+  );
+});
+
+describe("delivery operation checkpoints and process leases", () => {
+  it("writes a running checkpoint before callback work and completes it durably", async () => {
+    const current = await fixture("write-ahead");
+    const result = await withDeliveryOperation(
+      {
+        store: current.store,
+        cycleId: current.cycleId,
+        projectRoot: current.projectRoot,
+        actor: "fixture-operator",
+        operation: "execute",
+        heartbeatIntervalMs: 25,
+      },
+      async () => {
+        const inspection = inspectDeliveryOperation(current.store, current.cycleId);
+        expect(inspection.disposition).toBe("active");
+        expect(inspection.record?.status).toBe("running");
+        expect(inspection.record?.ownerPid).toBe(process.pid);
+        return "completed-value";
+      }
+    );
+
+    expect(result.value).toBe("completed-value");
+    expect(result.operation.status).toBe("completed");
+    expect(result.operation.completedAt).not.toBeNull();
+    const inspection = showDeliveryOperation(current.store, current.cycleId).deliveryOperation;
+    expect(inspection.disposition).toBe("healthy");
+    expect(inspection.lockPresent).toBe(false);
+  });
+
+  it("blocks a second operation while the first owner lease is active", async () => {
+    const current = await fixture("overlap");
+    let release!: () => void;
+    const gate = new Promise<void>((resolvePromise) => {
+      release = resolvePromise;
+    });
+    const first = withDeliveryOperation(
+      {
+        store: current.store,
+        cycleId: current.cycleId,
+        projectRoot: current.projectRoot,
+        actor: "first-operator",
+        operation: "execute",
+      },
+      async () => {
+        await gate;
+        return "done";
+      }
+    );
+
+    await waitFor(() =>
+      inspectDeliveryOperation(current.store, current.cycleId).disposition === "active"
+        ? true
+        : null
+    );
+    await expect(
+      withDeliveryOperation(
+        {
+          store: current.store,
+          cycleId: current.cycleId,
+          projectRoot: current.projectRoot,
+          actor: "second-operator",
+          operation: "verify",
+        },
+        async () => "should-not-run"
+      )
+    ).rejects.toThrow(/cannot start verify|operation lease is active/);
+
+    release();
+    await first;
+  });
+
+  it("records the spawned trusted-local child PID inside the active lease", async () => {
+    const current = await fixture("child-pid");
+    await withDeliveryOperation(
+      {
+        store: current.store,
+        cycleId: current.cycleId,
+        projectRoot: current.projectRoot,
+        actor: "fixture-operator",
+        operation: "verify",
+      },
+      async () => {
+        const backend = new TrustedLocalExecutionBackend();
+        const run = backend.execute({
+          workspaceRoot: current.projectRoot,
+          relativeWorkingDirectory: ".",
+          executable: process.execPath,
+          arguments: ["-e", "setTimeout(() => process.exit(0), 250)"],
+          environment: { PATH: process.env.PATH, CI: "true" },
+          limits: { timeoutMs: 2_000, maxOutputBytes: 4_096 },
+        });
+        const childPid = await waitFor(() => {
+          const pid = inspectDeliveryOperation(current.store, current.cycleId).record?.childPid;
+          return pid ? pid : null;
+        });
+        expect(childPid).not.toBe(process.pid);
+        expect(inspectDeliveryOperation(current.store, current.cycleId).childState).toBe("alive");
+        expect((await run).status).toBe("passed");
+        return childPid;
+      }
+    );
+  });
+
+  it("clears a dead stale lease only after explicit apply and records evidence", async () => {
+    const current = await fixture("stale");
+    await withDeliveryOperation(
+      {
+        store: current.store,
+        cycleId: current.cycleId,
+        projectRoot: current.projectRoot,
+        actor: "fixture-operator",
+        operation: "execute",
+      },
+      async () => "done"
+    );
+    await replaceRecord(current.store, current.cycleId, (record) => ({
+      ...record,
+      ownerPid: 999_999_999,
+      childPid: null,
+      completedAt: null,
+      status: "running",
+      recoveryEvidenceRef: null,
+    }));
+    await mkdir(lockPath(current.store, current.cycleId), { recursive: true });
+
+    const inspected = await reconcileDeliveryOperation({
+      store: current.store,
+      cycleId: current.cycleId,
+      projectRoot: current.projectRoot,
+      actor: "recovery-operator",
+      apply: false,
+    });
+    expect(inspected.decision).toBe("clear-stale");
+    expect(inspected.applied).toBe(false);
+    expect(inspected.inspection.ownerState).toBe("dead");
+
+    const applied = await reconcileDeliveryOperation({
+      store: current.store,
+      cycleId: current.cycleId,
+      projectRoot: current.projectRoot,
+      actor: "recovery-operator",
+      apply: true,
+    });
+    expect(applied.applied).toBe(true);
+    expect(applied.record?.status).toBe("abandoned");
+    expect(applied.recoveryEvidenceRef).toMatch(/^evidence:/);
+    expect(inspectDeliveryOperation(current.store, current.cycleId).lockPresent).toBe(false);
+  });
+
+  it("refuses to clear a lease while a recorded child process is alive", async () => {
+    const current = await fixture("live-child");
+    await withDeliveryOperation(
+      {
+        store: current.store,
+        cycleId: current.cycleId,
+        projectRoot: current.projectRoot,
+        actor: "fixture-operator",
+        operation: "execute",
+      },
+      async () => "done"
+    );
+    await replaceRecord(current.store, current.cycleId, (record) => ({
+      ...record,
+      ownerPid: 999_999_999,
+      childPid: process.pid,
+      completedAt: null,
+      status: "running",
+    }));
+    await mkdir(dirname(lockPath(current.store, current.cycleId)), { recursive: true });
+    await mkdir(lockPath(current.store, current.cycleId), { recursive: true });
+
+    const result = await reconcileDeliveryOperation({
+      store: current.store,
+      cycleId: current.cycleId,
+      projectRoot: current.projectRoot,
+      actor: "recovery-operator",
+      apply: true,
+    });
+    expect(result.decision).toBe("blocked");
+    expect(result.applied).toBe(false);
+    expect(result.inspection.childState).toBe("alive");
+    expect(result.record?.status).toBe("running");
+  });
+});
