@@ -49,6 +49,7 @@ Usage:
   cyclewarden-deliver cancel <cycle-id> --operation-id <exact-operation-id>
     [--root .cyclewarden] [--project-root .] [--actor cyclewarden-cancellation-operator]
     [--apply]
+  cyclewarden-deliver progress <cycle-id> [--root .cyclewarden]
   cyclewarden-deliver show <cycle-id> [--root .cyclewarden]
 
 execute requires a planned A3/A4 cycle and a manifest whose expectedParameterDigest matches the
@@ -78,6 +79,8 @@ cancel is read-only by default. With --apply it records a durable cancellation i
 SIGTERM only to the exact integrity-valid active child process group on the current host. The
 operation ID, heartbeat and process start identity are rechecked immediately before signalling.
 Cancellation never escalates to SIGKILL, merges, deploys or writes production.
+
+progress reads the integrity-chained append-only timeline without requiring delivery control state.
 `;
 
 function parseArgs(argv: string[]): ParsedArgs {
@@ -228,6 +231,11 @@ export async function runDeliveryCli(
       apply: one(parsed, "apply") === "true",
     });
     printJson(io, result);
+    return 0;
+  }
+
+  if (command === "progress") {
+    printJson(io, showDeliveryProgress(store, cycleId));
     return 0;
   }
 
