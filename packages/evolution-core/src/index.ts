@@ -17,6 +17,7 @@ export * from "./check-runner.js";
 export * from "./scorecard.js";
 export * from "./delivery.js";
 export * from "./delivery-cli.js";
+export * from "./delivery-publish.js";
 
 export * from "./candidate-research.js";
 export * from "./candidate-cli.js";
