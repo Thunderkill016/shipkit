@@ -35,6 +35,16 @@ function progressDirectory(store: EvolutionStore, cycleId: string): string {
   );
 }
 
+async function waitFor<T>(read: () => T | null, timeoutMs = 3_000): Promise<T> {
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < timeoutMs) {
+    const value = read();
+    if (value !== null) return value;
+    await new Promise((resolvePromise) => setTimeout(resolvePromise, 10));
+  }
+  throw new Error("timed out waiting for durable delivery progress");
+}
+
 async function runObservedCommand(current: Awaited<ReturnType<typeof fixture>>) {
   return await withDeliveryOperation(
     {
@@ -56,14 +66,45 @@ async function runObservedCommand(current: Awaited<ReturnType<typeof fixture>>) 
         },
         async () => {
           const backend = new TrustedLocalExecutionBackend();
-          return await backend.execute({
+          const releasePath = join(current.projectRoot, `release-${Date.now()}`);
+          const run = backend.execute({
             workspaceRoot: current.projectRoot,
             relativeWorkingDirectory: ".",
             executable: process.execPath,
-            arguments: ["-e", "setTimeout(() => process.exit(0), 120)"],
+            arguments: [
+              "-e",
+              [
+                "const fs = require('node:fs');",
+                "const marker = process.argv[1];",
+                "const deadline = Date.now() + 5000;",
+                "const tick = () => {",
+                "  if (fs.existsSync(marker)) process.exit(0);",
+                "  if (Date.now() > deadline) process.exit(2);",
+                "  setTimeout(tick, 10);",
+                "};",
+                "tick();",
+              ].join("\n"),
+              releasePath,
+            ],
             environment: { PATH: process.env.PATH, CI: "true" },
-            limits: { timeoutMs: 2_000, maxOutputBytes: 4_096 },
+            limits: { timeoutMs: 7_000, maxOutputBytes: 4_096 },
           });
+
+          let observationError: unknown;
+          try {
+            await waitFor(() =>
+              inspectDeliveryProgress(current.store, current.cycleId).activeStep
+                ? true
+                : null
+            );
+          } catch (error) {
+            observationError = error;
+          } finally {
+            await writeFile(releasePath, "release\n", "utf8");
+          }
+          const result = await run;
+          if (observationError) throw observationError;
+          return result;
         },
         (result) => [
           {
