@@ -227,58 +227,58 @@ describe("delivery operation checkpoints and process leases", () => {
   });
 
   it("prefers a different active acquisition lock over an older terminal checkpoint", async () => {
-  const current = await fixture("newer-acquisition");
-  await withDeliveryOperation(
-    {
+    const current = await fixture("newer-acquisition");
+    await withDeliveryOperation(
+      {
+        store: current.store,
+        cycleId: current.cycleId,
+        projectRoot: current.projectRoot,
+        actor: "previous-operator",
+        operation: "execute",
+      },
+      async () => "done"
+    );
+    const previous = JSON.parse(
+      await readFile(operationPath(current.store, current.cycleId), "utf8")
+    ) as DeliveryOperationRecord;
+    const acquisition = {
+      ...previous,
+      operationId: "operation:newer-acquisition",
+      actor: "active-operator",
+      ownerPid: process.pid,
+      childPid: null,
+      startedAt: new Date().toISOString(),
+      heartbeatAt: new Date().toISOString(),
+      completedAt: null,
+      status: "running" as const,
+      errorDigest: null,
+      recoveryEvidenceRef: null,
+    };
+    const { integrityDigest: _discarded, ...payload } = acquisition;
+    await writeFile(
+      lockPath(current.store, current.cycleId),
+      `${JSON.stringify({ ...payload, integrityDigest: digestJson(payload) }, null, 2)}\n`,
+      "utf8"
+    );
+
+    const inspection = inspectDeliveryOperation(current.store, current.cycleId);
+    expect(inspection.disposition).toBe("active");
+    expect(inspection.record?.operationId).toBe(acquisition.operationId);
+    expect(inspection.findings.join(" ")).toMatch(/different operation.*authoritative/);
+
+    const recovery = await reconcileDeliveryOperation({
       store: current.store,
       cycleId: current.cycleId,
       projectRoot: current.projectRoot,
-      actor: "previous-operator",
-      operation: "execute",
-    },
-    async () => "done"
-  );
-  const previous = JSON.parse(
-    await readFile(operationPath(current.store, current.cycleId), "utf8")
-  ) as DeliveryOperationRecord;
-  const acquisition = {
-    ...previous,
-    operationId: "operation:newer-acquisition",
-    actor: "active-operator",
-    ownerPid: process.pid,
-    childPid: null,
-    startedAt: new Date().toISOString(),
-    heartbeatAt: new Date().toISOString(),
-    completedAt: null,
-    status: "running" as const,
-    errorDigest: null,
-    recoveryEvidenceRef: null,
-  };
-  const { integrityDigest: _discarded, ...payload } = acquisition;
-  await writeFile(
-    lockPath(current.store, current.cycleId),
-    `${JSON.stringify({ ...payload, integrityDigest: digestJson(payload) }, null, 2)}\n`,
-    "utf8"
-  );
-
-  const inspection = inspectDeliveryOperation(current.store, current.cycleId);
-  expect(inspection.disposition).toBe("active");
-  expect(inspection.record?.operationId).toBe(acquisition.operationId);
-  expect(inspection.findings.join(" ")).toMatch(/different operation.*authoritative/);
-
-  const recovery = await reconcileDeliveryOperation({
-    store: current.store,
-    cycleId: current.cycleId,
-    projectRoot: current.projectRoot,
-    actor: "recovery-operator",
-    apply: true,
+      actor: "recovery-operator",
+      apply: true,
+    });
+    expect(recovery.decision).toBe("blocked");
+    expect(recovery.applied).toBe(false);
+    expect(recovery.record?.operationId).toBe(acquisition.operationId);
   });
-  expect(recovery.decision).toBe("blocked");
-  expect(recovery.applied).toBe(false);
-  expect(recovery.record?.operationId).toBe(acquisition.operationId);
-});
 
-it("recovers an acquisition lock when the primary checkpoint was never renamed", async () => {
+  it("recovers an acquisition lock when the primary checkpoint was never renamed", async () => {
     const current = await fixture("acquisition-only");
     await withDeliveryOperation(
       {
