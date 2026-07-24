@@ -325,16 +325,45 @@ export async function loadDeliveryWorkspace(cycleId: string) {
   const root = resolveEvolutionStateRoot();
   try {
     const projectRoot = await assertEvolutionProjectRoot();
-    const operation = await runDeliveryCoreCli<unknown>([
-      "operation",
-      cycleId,
-      "--root",
-      root,
-      "--project-root",
-      projectRoot,
-      "--actor",
-      "cyclewarden-web:delivery-observer",
+    const [operation, progress] = await Promise.all([
+      runDeliveryCoreCli<unknown>([
+        "operation",
+        cycleId,
+        "--root",
+        root,
+        "--project-root",
+        projectRoot,
+        "--actor",
+        "cyclewarden-web:delivery-observer",
+      ]),
+      runDeliveryCoreCli<unknown>(["progress", cycleId, "--root", root]),
     ]);
+
+    const operationOuter = record(operation);
+    const operationInspection = record(
+      operationOuter?.inspection ?? operationOuter?.deliveryOperation ?? operation
+    );
+    const exactOperationId = nullableText(record(operationInspection?.record)?.operationId);
+    let cancellation: unknown = {
+      deliveryCancellation: { cancellable: false, request: null },
+    };
+    if (exactOperationId) {
+      const cancellationPlan = await runDeliveryCoreCli<unknown>([
+        "cancel",
+        cycleId,
+        "--root",
+        root,
+        "--project-root",
+        projectRoot,
+        "--actor",
+        "cyclewarden-web:delivery-observer",
+        "--operation-id",
+        exactOperationId,
+      ]);
+      cancellation = {
+        deliveryCancellation: record(record(cancellationPlan)?.inspection) ?? {},
+      };
+    }
 
     let show: unknown = {};
     try {
@@ -344,7 +373,18 @@ export async function loadDeliveryWorkspace(cycleId: string) {
       if (!/cannot read delivery control|no such file|enoent/i.test(message)) throw error;
     }
 
-    return { state: normalizeDeliveryWorkspace(cycleId, show, operation), error: null };
+    return {
+      state: normalizeDeliveryWorkspace(
+        cycleId,
+        {
+          ...(record(show) ?? {}),
+          ...(record(progress) ?? {}),
+          ...(record(cancellation) ?? {}),
+        },
+        operation
+      ),
+      error: null,
+    };
   } catch (error) {
     return {
       state: null as DeliveryWorkspaceView | null,
