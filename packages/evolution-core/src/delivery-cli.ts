@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { executeDelivery, showDelivery, verifyDelivery } from "./delivery.js";
 import { publishDelivery, showDeliveryPublication } from "./delivery-publish.js";
+import { recoverDelivery, showDeliveryRecovery } from "./delivery-recovery.js";
 import { EvolutionStore } from "./persistence.js";
 import { resolveDefaultStateRoot } from "./runtime-paths.js";
 
@@ -29,6 +30,9 @@ Usage:
     [--root .cyclewarden] [--project-root .] [--actor cyclewarden-publisher]
     [--remote origin] [--hostname github.com] [--base main]
     [--title "Draft PR title"] [--body-file draft-pr.md]
+  cyclewarden-deliver recover <cycle-id>
+    [--root .cyclewarden] [--project-root .] [--actor cyclewarden-recovery-operator]
+    [--apply]
   cyclewarden-deliver show <cycle-id> [--root .cyclewarden]
 
 execute requires a planned A3/A4 cycle and a manifest whose expectedParameterDigest matches the
@@ -42,6 +46,10 @@ publish requires a verified cycle and the explicit --draft-pr opt-in. It checks 
 availability and authentication before pushing the exact verified commit, then opens a draft PR.
 It never merges, deploys, writes production, or accepts implementation output without an
 independent verifier.
+
+recover inspects cycle, control-sidecar, branch and worktree state. It is read-only by default.
+Use --apply only after reviewing the proposed transition. Recovery never treats an unrecorded
+commit as accepted verification and never reruns implementation, merges or deploys.
 `;
 
 function parseArgs(argv: string[]): ParsedArgs {
@@ -149,10 +157,23 @@ export async function runDeliveryCli(
     return 0;
   }
 
+  if (command === "recover") {
+    const result = await recoverDelivery({
+      store,
+      cycleId,
+      projectRoot: projectRootFrom(parsed),
+      actor: one(parsed, "actor")?.trim() || "cyclewarden-recovery-operator",
+      apply: one(parsed, "apply") === "true",
+    });
+    printJson(io, result);
+    return 0;
+  }
+
   if (command === "show") {
     printJson(io, {
       ...(await showDelivery(store, cycleId)),
       ...(await showDeliveryPublication(store, cycleId)),
+      ...(await showDeliveryRecovery(store, cycleId)),
     });
     return 0;
   }
