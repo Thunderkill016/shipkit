@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - agent/post-merge-truth-refresh
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write
