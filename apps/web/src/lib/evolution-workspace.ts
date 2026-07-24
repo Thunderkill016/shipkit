@@ -111,9 +111,14 @@ export function resolveCycleWardenRepositoryRoot(): string {
     : cwd;
 }
 
-export function resolveEvolutionProjectRoot(): string {
+function configuredEvolutionProjectRoot(): string {
   const repositoryRoot = resolveCycleWardenRepositoryRoot();
   return resolve(repositoryRoot, process.env.CYCLEWARDEN_PROJECT_ROOT ?? ".");
+}
+
+/** A display-safe label; the configured absolute path remains server-only. */
+export function resolveEvolutionProjectRoot(): string {
+  return "server-configured trusted repository";
 }
 
 export function resolveEvolutionStateRoot(): string {
@@ -128,7 +133,7 @@ export function resolveEvolutionStateRoot(): string {
 }
 
 export async function assertEvolutionProjectRoot(): Promise<string> {
-  const requestedRoot = resolveEvolutionProjectRoot();
+  const requestedRoot = configuredEvolutionProjectRoot();
   let projectRoot: string;
   try {
     projectRoot = await realpath(requestedRoot);
