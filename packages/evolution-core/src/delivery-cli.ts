@@ -2,13 +2,13 @@
 
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { executeDelivery, showDelivery, verifyDelivery } from "./delivery.js";
-import { publishDelivery, showDeliveryPublication } from "./delivery-publish.js";
+import { executeDelivery, publishDelivery, verifyDelivery } from "./delivery-api.js";
+import { showDelivery } from "./delivery.js";
+import { showDeliveryPublication } from "./delivery-publish.js";
 import { recoverDelivery, showDeliveryRecovery } from "./delivery-recovery.js";
 import {
   reconcileDeliveryOperation,
   showDeliveryOperation,
-  withDeliveryOperation,
 } from "./delivery-operation.js";
 import { EvolutionStore } from "./persistence.js";
 import { resolveDefaultStateRoot } from "./runtime-paths.js";
@@ -54,6 +54,10 @@ publish requires a verified cycle and the explicit --draft-pr opt-in. It checks 
 availability and authentication before pushing the exact verified commit, then opens a draft PR.
 It never merges, deploys, writes production, or accepts implementation output without an
 independent verifier.
+
+execute, verify and publish use the same lease-protected public API exported by the package. Direct
+library callers and the CLI therefore share write-ahead checkpoints, overlap prevention and stale
+operation recovery.
 
 recover inspects cycle, control-sidecar, branch and worktree state. It is read-only by default.
 Use --apply only after reviewing the proposed transition. Recovery never treats an unrecorded
@@ -109,6 +113,14 @@ function printJson(io: CliIo, value: unknown): void {
   io.stdout(`${JSON.stringify(value, null, 2)}\n`);
 }
 
+function terminalDeliveryOperation(store: EvolutionStore, cycleId: string) {
+  const inspection = showDeliveryOperation(store, cycleId).deliveryOperation;
+  if (!inspection.record || inspection.record.status === "running") {
+    throw new Error("delivery operation did not persist a terminal checkpoint");
+  }
+  return inspection.record;
+}
+
 export async function runDeliveryCli(
   argv: string[],
   io: CliIo = {
@@ -129,30 +141,23 @@ export async function runDeliveryCli(
   if (command === "execute") {
     const projectRoot = projectRootFrom(parsed);
     const actor = one(parsed, "actor")?.trim() || "cyclewarden-implementer";
-    const protectedResult = await withDeliveryOperation(
-      { store, cycleId, projectRoot, actor, operation: "execute" },
-      () =>
-        executeDelivery({
-          store,
-          cycleId,
-          projectRoot,
-          manifestPath: resolve(required(parsed, "manifest")),
-          actor,
-          trustedRepository: one(parsed, "trusted-repository") === "true",
-        })
-    );
-    printJson(io, { ...protectedResult.value, deliveryOperation: protectedResult.operation });
+    const result = await executeDelivery({
+      store,
+      cycleId,
+      projectRoot,
+      manifestPath: resolve(required(parsed, "manifest")),
+      actor,
+      trustedRepository: one(parsed, "trusted-repository") === "true",
+    });
+    printJson(io, { ...result, deliveryOperation: terminalDeliveryOperation(store, cycleId) });
     return 0;
   }
 
   if (command === "verify") {
     const projectRoot = projectRootFrom(parsed);
     const actor = one(parsed, "actor")?.trim() || "cyclewarden-independent-verifier";
-    const protectedResult = await withDeliveryOperation(
-      { store, cycleId, projectRoot, actor, operation: "verify" },
-      () => verifyDelivery({ store, cycleId, projectRoot, actor })
-    );
-    printJson(io, { ...protectedResult.value, deliveryOperation: protectedResult.operation });
+    const result = await verifyDelivery({ store, cycleId, projectRoot, actor });
+    printJson(io, { ...result, deliveryOperation: terminalDeliveryOperation(store, cycleId) });
     return 0;
   }
 
@@ -160,23 +165,19 @@ export async function runDeliveryCli(
     const bodyFile = one(parsed, "body-file")?.trim();
     const projectRoot = projectRootFrom(parsed);
     const actor = one(parsed, "actor")?.trim() || "cyclewarden-publisher";
-    const protectedResult = await withDeliveryOperation(
-      { store, cycleId, projectRoot, actor, operation: "publish" },
-      async () =>
-        publishDelivery({
-          store,
-          cycleId,
-          projectRoot,
-          actor,
-          draftPr: one(parsed, "draft-pr") === "true",
-          remote: one(parsed, "remote")?.trim() || "origin",
-          hostname: one(parsed, "hostname")?.trim(),
-          baseBranch: one(parsed, "base")?.trim(),
-          title: one(parsed, "title")?.trim(),
-          body: bodyFile ? await readFile(resolve(bodyFile), "utf8") : undefined,
-        })
-    );
-    printJson(io, { ...protectedResult.value, deliveryOperation: protectedResult.operation });
+    const result = await publishDelivery({
+      store,
+      cycleId,
+      projectRoot,
+      actor,
+      draftPr: one(parsed, "draft-pr") === "true",
+      remote: one(parsed, "remote")?.trim() || "origin",
+      hostname: one(parsed, "hostname")?.trim(),
+      baseBranch: one(parsed, "base")?.trim(),
+      title: one(parsed, "title")?.trim(),
+      body: bodyFile ? await readFile(resolve(bodyFile), "utf8") : undefined,
+    });
+    printJson(io, { ...result, deliveryOperation: terminalDeliveryOperation(store, cycleId) });
     return 0;
   }
 
