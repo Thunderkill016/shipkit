@@ -206,6 +206,7 @@ Remaining:
 
 - trusted-local execution is not a sandbox and can exercise the current user's
   filesystem, credentials and network privileges;
+- the integrity-checked delivery control sidecar is outside the synchronized cycle journal; loss blocks verification;
 - crash-safe resume or rollback for a cycle stranded at `executing`;
 - explicit push and draft-PR operation after verification;
 - workspace execution, pause/cancel, progress and intervention controls;

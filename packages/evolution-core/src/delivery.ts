@@ -120,6 +120,7 @@ export type DeliveryVerificationRecord = {
 
 type DeliveryControlFile = {
   schemaVersion: 1;
+  integrityDigest: string;
   cycleId: string;
   projectRoot: string;
   worktreePath: string;
@@ -452,11 +453,31 @@ async function atomicWriteJson(path: string, value: unknown): Promise<void> {
   await rename(temporary, path);
 }
 
+async function writeControl(
+  store: EvolutionStore,
+  control: Omit<DeliveryControlFile, "integrityDigest"> | DeliveryControlFile
+): Promise<DeliveryControlFile> {
+  const { integrityDigest: _discarded, ...payload } = control as DeliveryControlFile;
+  const value: DeliveryControlFile = {
+    ...payload,
+    integrityDigest: digestJson(payload),
+  };
+  await atomicWriteJson(controlPath(store, value.cycleId), value);
+  return value;
+}
+
 async function loadControl(store: EvolutionStore, cycleId: string): Promise<DeliveryControlFile> {
   try {
     const value = JSON.parse(await readFile(controlPath(store, cycleId), "utf8")) as DeliveryControlFile;
     if (value.schemaVersion !== 1 || value.cycleId !== cycleId) {
       throw new DeliveryError("delivery control file does not match the requested cycle");
+    }
+    const { integrityDigest, ...payload } = value;
+    if (!/^[a-f0-9]{64}$/i.test(integrityDigest) || integrityDigest !== digestJson(payload)) {
+      throw new DeliveryError("delivery control integrity digest mismatch");
+    }
+    if (value.execution.cycleId !== cycleId) {
+      throw new DeliveryError("delivery execution record does not match the requested cycle");
     }
     return value;
   } catch (error) {
@@ -645,7 +666,7 @@ export async function executeDelivery(input: ExecuteDeliveryInput) {
     execution
   );
   const evidenceRef = `evidence:${evidence.occurrenceId}`;
-  const control: DeliveryControlFile = {
+  const control: Omit<DeliveryControlFile, "integrityDigest"> = {
     schemaVersion: 1,
     cycleId: planned.cycleId,
     projectRoot,
@@ -656,7 +677,7 @@ export async function executeDelivery(input: ExecuteDeliveryInput) {
     verification: null,
     verificationEvidenceRef: null,
   };
-  await atomicWriteJson(controlPath(input.store, planned.cycleId), control);
+  await writeControl(input.store, control);
 
   const nextStage = status === "implemented" ? "implemented" : status === "failed" ? "rejected" : "inconclusive";
   const next = transitionCycle(executing, nextStage, {
@@ -696,6 +717,20 @@ export async function verifyDelivery(input: VerifyDeliveryInput) {
     throw new DeliveryError(`verify requires an implemented cycle; current stage is ${implemented.stage}`);
   }
   const control = await loadControl(input.store, input.cycleId);
+  if (!implemented.artifacts.changes.includes(control.executionEvidenceRef)) {
+    throw new DeliveryError("delivery execution evidence is not linked from the implemented cycle");
+  }
+  const handoff = latestHandoff(implemented);
+  if (
+    control.execution.handoffRecordId !== handoff.recordId ||
+    control.execution.handoffParameterDigest !== handoff.parameterDigest ||
+    control.manifest.expectedParameterDigest !== handoff.parameterDigest
+  ) {
+    throw new DeliveryError("delivery control no longer matches the persisted ExecutionHandoff");
+  }
+  if (control.execution.status !== "implemented") {
+    throw new DeliveryError("delivery control does not contain an implemented execution");
+  }
   if (control.projectRoot !== projectRoot) {
     throw new DeliveryError("delivery control project root does not match the requested repository");
   }
@@ -844,7 +879,7 @@ export async function verifyDelivery(input: VerifyDeliveryInput) {
   const evidenceRef = `evidence:${evidence.occurrenceId}`;
   control.verification = verification;
   control.verificationEvidenceRef = evidenceRef;
-  await atomicWriteJson(controlPath(input.store, implemented.cycleId), control);
+  await writeControl(input.store, control);
 
   const nextStage = verdict === "accepted" ? "verified" : verdict === "rejected" ? "rejected" : "inconclusive";
   const next = transitionCycle(implemented, nextStage, {

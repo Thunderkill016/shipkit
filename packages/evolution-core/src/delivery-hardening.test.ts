@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { promisify } from "node:util";
@@ -469,5 +469,34 @@ exit 91
     });
     expect(verified.verification.verdict).toBe("accepted");
     expect(verified.verification.commitSha).toMatch(/^[a-f0-9]{40}$/);
+  });
+
+  it("rejects a tampered delivery control manifest before verification", async () => {
+    const fixture = await setup("control-tamper");
+    const manifestPath = await writeManifest(fixture.root, {
+      commandSource:
+        "const fs=require('node:fs');fs.mkdirSync('docs',{recursive:true});fs.writeFileSync('docs/result.md','ok')",
+    });
+    const executed = await executeDelivery({
+      store: fixture.store,
+      cycleId: fixture.cycleId,
+      projectRoot: fixture.projectRoot,
+      manifestPath,
+      actor: "fixture-implementer",
+      trustedRepository: true,
+    });
+    temporaryRoots.push(dirname(executed.worktreePath));
+    const control = JSON.parse(await readFile(executed.controlPath, "utf8"));
+    control.manifest.verification[0].arguments = ["-e", "process.exit(0)"];
+    await writeFile(executed.controlPath, JSON.stringify(control, null, 2) + "\n", "utf8");
+    await expect(
+      verifyDelivery({
+        store: fixture.store,
+        cycleId: fixture.cycleId,
+        projectRoot: fixture.projectRoot,
+        actor: "fixture-independent-verifier",
+      })
+    ).rejects.toThrow(/integrity digest mismatch/);
+    expect((await fixture.store.load(fixture.cycleId)).stage).toBe("implemented");
   });
 });
