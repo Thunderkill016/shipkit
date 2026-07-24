@@ -46,7 +46,7 @@ Every product improvement cycle (`EvolutionCycle`) progresses through one durabl
 | **Research Intelligence** | Public repository search, claim extraction, citation integrity verification, deduplication, and contradiction analysis. |
 | **Execution & Sandbox** | Manifest-bound trusted-local delivery, isolated worktrees, and a separate hostile Docker check baseline. |
 | **Verification & Evidence** | SHA-256 content-addressed evidence, patch digests, independent verifier commands, and accepted/rejected/inconclusive verdicts. |
-| **Delivery & Operations** | Local verified branches today; explicit draft PR, deployment, rollback, and production operations remain later gates. |
+| **Delivery & Operations** | Verified local branches plus explicit opt-in push and draft PR publication; merge, deployment, rollback, and production operations remain later gates. |
 | **Learning & Improvement** | Durable memory records with expiry/scope, skill registry, paired cycle evaluations, and evidence-gated promotion. |
 | **Interoperability** | GitHub workflows and portable records today; broader MCP, tracing and trust attestations remain planned. |
 
@@ -54,23 +54,23 @@ Every product improvement cycle (`EvolutionCycle`) progresses through one durabl
 
 ## 🚦 Current Status & Autonomy Levels
 
-**Current autonomy:** A2 is operational for repository research. A3 is an experimental trusted-local CLI beta for explicitly trusted repositories and commands.
+**Current autonomy:** A2 is operational for repository research. A3 is an experimental trusted-local CLI beta for explicitly trusted repositories, commands, remotes, and GitHub accounts.
 
 ### Safe Autonomy Scale
 
 - **A0:** Inspect and display repository evidence.
 - **A1:** Bounded research, planning, static checks, and record creation.
 - **A2 (Operational):** Research and decision preparation within approved data scopes.
-- **A3 (Trusted-local beta):** Execute one exact `ExecutionHandoff` in an isolated branch/worktree, then require a different verifier before creating a local commit.
+- **A3 (Trusted-local beta):** Execute one exact `ExecutionHandoff` in an isolated branch/worktree, require a different verifier before creating a local commit, and optionally publish that exact commit as a draft PR.
 - **A4:** Production deployment, secret access, infrastructure spending, and other high-risk operations requiring explicit human approval.
 
 ### Implemented and Verified Capabilities
 
 - ✅ **Deterministic Evolution Engine:** Append-only transaction journal, atomic snapshots, write-lock serialization, and recovery.
-- ✅ **Evidence Registry:** SHA-256 content-addressed storage for evidence blobs, occurrences, citations, delivery records, and patch snapshots.
+- ✅ **Evidence Registry:** SHA-256 content-addressed storage for evidence blobs, occurrences, citations, delivery records, patch snapshots, and publication records.
 - ✅ **Research Intelligence:** Public GitHub search provider, repository research, named-candidate comparison, citation capture, and contradiction auditing.
 - ✅ **Bounded A2 Workspace:** Objective → inspect → assess → research → reviewed `ExecutionHandoff` against one server-configured trusted repository.
-- ✅ **Governed Local Delivery:** Generic command and optional Codex CLI profile, exact handoff digest binding, clean-base requirement, isolated worktree, changed-file scope checks, separate verifier, and local commit after accepted checks.
+- ✅ **Governed Local Delivery:** Generic command and optional Codex CLI profile, exact handoff digest binding, clean-base requirement, isolated worktree, changed-file scope checks, separate verifier, local commit after accepted checks, and explicit verified draft-PR publication.
 - ✅ **Application Foundation:** Next.js workspace, Supabase / Better Auth, PostgreSQL migrations, and Playwright E2E tests.
 - ✅ **Security Baselines:** Secret scanning, push protection, bounded execution interfaces, and hostile Docker check proof.
 
@@ -82,14 +82,15 @@ Every product improvement cycle (`EvolutionCycle`) progresses through one durabl
 
 - **Web application foundation (`apps/web`):** A modern product starter with auth, database, security, mail, storage, payment ports, tests, and deployment recipes.
 - **A2 workspace and CLI:** Create a cycle, inspect and assess a repository, run bounded research, inspect evidence, and persist a reviewed handoff.
-- **Trusted-local delivery CLI:** Run one exact approved implementation command in an isolated worktree and require independent verification before a local commit.
+- **Trusted-local delivery CLI:** Run one exact approved implementation command in an isolated worktree, require independent verification before a local commit, and explicitly publish that verified commit as a draft PR.
 
 ### 🟠 Important Beta Boundaries
 
 - Trusted-local delivery is **not a security sandbox**. The command runs with the current operating-system user's available filesystem, credential, tool, and network privileges.
-- The web workspace still ends at `ExecutionHandoff`; execute and verify are CLI-only.
-- CycleWarden does not yet push the verified branch or open a draft PR automatically.
-- A process crash after the cycle enters `executing` may require manual recovery.
+- The web workspace still ends at `ExecutionHandoff`; execute, verify, and publish are CLI-only.
+- Draft PR publication requires explicit `--draft-pr`, an installed and authenticated GitHub CLI, and a trusted Git remote/account.
+- Publication never merges or deploys. A branch push may succeed while later PR creation becomes inconclusive and requires operator attention.
+- A process crash after the cycle enters `executing` or during publication may require manual recovery.
 - Untrusted writable agent execution needs a remote or microVM backend with explicit egress, disk, credential, and lifecycle controls.
 - Release, deployment, rollback, outcome measurement, and learning are not yet complete.
 - The preserved six-session external protocol is deferred at `0/6`; external product value is not claimed.
@@ -98,7 +99,7 @@ Every product improvement cycle (`EvolutionCycle`) progresses through one durabl
 
 - **Product foundation:** use `apps/web` or `pnpm create -- my-product`.
 - **Repository decisions:** use the web workspace or `pnpm evolve` for evidence-backed audits and reviewed handoffs.
-- **Trusted local implementation:** use `pnpm deliver` only for a repository and implementation command you trust, then review the resulting branch before any push or PR.
+- **Trusted local implementation:** use `pnpm deliver` only for a repository and implementation command you trust, verify with a distinct actor, then explicitly open a draft PR for human review.
 
 ---
 
@@ -109,6 +110,7 @@ Every product improvement cycle (`EvolutionCycle`) progresses through one durabl
 - Node.js `≥ 20`
 - `pnpm` `≥ 9`
 - Git for governed delivery
+- GitHub CLI (`gh`) authenticated to the target hostname for draft PR publication
 
 ### 1. Install and Initialize
 
@@ -154,9 +156,17 @@ pnpm deliver -- verify <cycle-id> \
   --root .cyclewarden \
   --project-root /absolute/path/to/trusted/repository \
   --actor independent-verifier
+
+pnpm deliver -- publish <cycle-id> \
+  --root .cyclewarden \
+  --project-root /absolute/path/to/trusted/repository \
+  --actor owner-publisher \
+  --draft-pr \
+  --remote origin \
+  --base main
 ```
 
-An accepted verdict creates a commit on the isolated local branch. It does not push, open a PR, merge, or deploy.
+Verification creates a local commit on the isolated branch. Publication is a separate explicit command that pushes only that verified commit and opens a draft PR. Neither command merges or deploys.
 
 ### 4. Run the Web Workspace
 
@@ -176,8 +186,8 @@ CycleWarden enforces deterministic authorization and evidence boundaries, but ea
 - **Evidence-gated transitions:** lifecycle state changes require the correct stage, artifacts, autonomy, risk, and approval scope.
 - **Secret protection:** GitHub Secret Scanning and Push Protection reduce accidental committed credential exposure.
 - **Docker hostile-check baseline:** immutable image, denied network, read-only container root, reduced environment, resource bounds, and cleanup checks.
-- **Trusted-local delivery:** shell-free orchestration, isolated worktree, changed-file scope checks, patch digest, and separate verifier. This does not isolate the command from the current user account or prevent arbitrary side effects outside the worktree.
-- **No implicit release authority:** CycleWarden does not automatically merge or deploy in the current beta.
+- **Trusted-local delivery:** shell-free orchestration, isolated worktree, changed-file scope checks, patch digest, separate verifier, exact verified-commit publication, and durable partial-result evidence. This does not isolate the commands from the current user account or prevent arbitrary side effects outside the worktree.
+- **No implicit release authority:** CycleWarden may open a draft PR only after explicit opt-in; it does not automatically merge or deploy.
 
 ---
 
@@ -188,7 +198,7 @@ CycleWarden enforces deterministic authorization and evidence boundaries, but ea
 | [`IDEA.md`](./IDEA.md) | Single product source of truth and vision |
 | [`ROADMAP.md`](./ROADMAP.md) | Milestone roadmap and workstreams |
 | [`ARCHITECTURE.md`](./docs/evolution/ARCHITECTURE.md) | Unified product architecture and module contracts |
-| [`GOVERNED_DELIVERY.md`](./docs/evolution/GOVERNED_DELIVERY.md) | Trusted-local A3 delivery manifest, CLI, verifier, and boundaries |
+| [`GOVERNED_DELIVERY.md`](./docs/evolution/GOVERNED_DELIVERY.md) | Trusted-local A3 delivery manifest, verifier, and draft PR publication boundaries |
 | [`PROJECT_MODEL.md`](./docs/ai/PROJECT_MODEL.md) | Verified project model, capabilities, gaps, and priority order |
 | [`CAPABILITIES.json`](./docs/CAPABILITIES.json) | Machine-readable capability truth and limitations |
 | [`DATA_GOVERNANCE.md`](./docs/evolution/DATA_GOVERNANCE.md) | Data classification, privacy, and retention rules |
