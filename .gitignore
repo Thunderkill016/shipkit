@@ -11,3 +11,7 @@ apps/web/.env.local
 .DS_Store
 coverage
 .vercel
+.playwright-cli
+apps/web/test-results
+apps/web/playwright-report
+output/playwright

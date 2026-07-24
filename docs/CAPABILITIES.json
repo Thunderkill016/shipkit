@@ -3,17 +3,22 @@
   "project": "cyclewarden",
   "primaryProduct": "CycleWarden",
   "lastVerified": "2026-07-24",
-  "verificationScope": "Repository evidence and GitHub Actions through merged pull request #33. CycleWarden supports a standalone Evolution Core package, durable repository and explicit-source research, manifest-grounded named-candidate decisions, bounded GitHub public repository discovery, and a fail-closed six-session external decision-value pilot protocol whose technical gate is ready. The pilot remains 0/6 with its clock not started; general web discovery, direct user decision-value proof, coding-agent delivery, release and measured learning are not claimed.",
+  "verificationScope": "Repository evidence and GitHub Actions through merged pull request #38, plus local unit, type, browser and full-repository verification for the gated interactive Evolution Workspace. CycleWarden supports a standalone Evolution Core package on Node.js 20, 22 and 24, durable repository and explicit-source research, manifest-grounded named-candidate decisions, bounded GitHub public repository discovery, and a fail-closed six-session external decision-value pilot protocol whose technical gate is ready. The pilot remains 0/6 with its clock not started; hosted multi-tenant cycle state, general web discovery, direct user decision-value proof, coding-agent delivery, release and measured learning are not claimed.",
   "capabilities": [
     {
       "id": "integrated-product-workspace",
       "category": "product",
       "status": "partial",
       "verificationStatus": "passing",
-      "summary": "The Next.js workspace reads official Evolution Core CLI output and exposes durable cycles, research usage, coverage gaps, stopping reasons, independent review verdicts, contradictions, opportunities, decisions, experiments and execution handoffs without creating a second state store.",
+      "summary": "The Next.js workspace uses the official Evolution Core CLI and shared journal to create local A2/R1 cycles, expose only the next legal inspect, assess or repository-research action, and review persisted research evidence, independent verdicts, decisions, experiments and execution handoffs without creating a second state store.",
       "evidence": [
         "apps/web/src/app/app/page.tsx",
         "apps/web/src/app/app/evolution/page.tsx",
+        "apps/web/src/app/app/evolution/cycle-controls.tsx",
+        "apps/web/src/app/actions/evolution.ts",
+        "apps/web/src/lib/evolution-access.ts",
+        "apps/web/src/lib/evolution-workspace.ts",
+        "apps/web/e2e/evolution-workspace.spec.ts",
         "packages/auth",
         "packages/db",
         "packages/security",
@@ -24,11 +29,13 @@
       "checks": [
         "CI: production build",
         "CI: E2E / demo mode",
-        "CI: E2E / portable-pg"
+        "CI: E2E / portable-pg",
+        "Local E2E: create through reviewed execution handoff"
       ],
       "limitations": [
-        "The workspace is currently read-only for evolution records",
-        "Research-plan authoring, approvals, execution controls, release and learning surfaces are not yet implemented",
+        "Mutations are local-first, explicitly opt-in, restricted to one server-configured trusted repository and rejected on Vercel ephemeral storage",
+        "Hosted durable multi-user cycle state and operator isolation are not implemented",
+        "Manual research-plan or decision editing, execution controls, release and learning surfaces are not implemented",
         "The local Evolution Core CLI must be built and accessible to the server workspace"
       ]
     },

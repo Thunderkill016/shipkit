@@ -1,0 +1,7 @@
+{
+  "name": "cyclewarden-evolution-browser-fixture",
+  "private": true,
+  "scripts": {
+    "test": "node -e \"console.log('fixture-ok')\""
+  }
+}
