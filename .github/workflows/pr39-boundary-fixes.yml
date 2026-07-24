@@ -1,0 +1,162 @@
+name: PR39 Boundary Fixes
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  apply-fixes:
+    if: ${{ github.actor != 'github-actions[bot]' && github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          fetch-depth: 0
+      - name: Harden project-root and path disclosure boundaries
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          workspace = Path('apps/web/src/lib/evolution-workspace.ts')
+          text = workspace.read_text()
+          text = text.replace(
+              'import { stat } from "node:fs/promises";',
+              'import { realpath, stat } from "node:fs/promises";'
+          )
+          old = '''export async function assertEvolutionProjectRoot(): Promise<string> {
+            const projectRoot = resolveEvolutionProjectRoot();
+            if (projectRoot === parse(projectRoot).root) {
+              throw new Error("CYCLEWARDEN_PROJECT_ROOT may not target a filesystem root");
+            }
+            let info;
+            try {
+              info = await stat(projectRoot);
+            } catch {
+              throw new Error(`Configured project root does not exist: ${projectRoot}`);
+            }
+            if (!info.isDirectory()) {
+              throw new Error(`Configured project root is not a directory: ${projectRoot}`);
+            }
+            return projectRoot;
+          }'''.replace('          ', '')
+          new = '''export async function assertEvolutionProjectRoot(): Promise<string> {
+            const requestedRoot = resolveEvolutionProjectRoot();
+            let projectRoot: string;
+            try {
+              projectRoot = await realpath(requestedRoot);
+            } catch {
+              throw new Error(`Configured project root does not exist: ${requestedRoot}`);
+            }
+            if (projectRoot === parse(projectRoot).root) {
+              throw new Error("CYCLEWARDEN_PROJECT_ROOT may not target a filesystem root");
+            }
+            const info = await stat(projectRoot);
+            if (!info.isDirectory()) {
+              throw new Error(`Configured project root is not a directory: ${projectRoot}`);
+            }
+            return projectRoot;
+          }'''.replace('          ', '')
+          if old not in text:
+              raise SystemExit('project-root function anchor not found')
+          workspace.write_text(text.replace(old, new))
+
+          controls = Path('apps/web/src/app/app/evolution/cycle-controls.tsx')
+          text = controls.read_text()
+          if text.count('projectRoot: string;') != 1:
+              raise SystemExit('cycle-controls projectRoot type anchor missing')
+          text = text.replace('projectRoot: string;', 'projectRoot: string | null;')
+          old = '''          <div className="mt-5 border-t border-border pt-4 text-xs leading-relaxed text-muted">
+            Configured repository:{" "}
+            <code className="break-all text-foreground">{projectRoot}</code>
+          </div>'''
+          new = '''          <div className="mt-5 border-t border-border pt-4 text-xs leading-relaxed text-muted">
+            {projectRoot ? (
+              <>
+                Configured repository:{" "}
+                <code className="break-all text-foreground">{projectRoot}</code>
+              </>
+            ) : (
+              "Configured repository path is hidden until operator access is granted."
+            )}
+          </div>'''
+          if old not in text:
+              raise SystemExit('cycle-controls path display anchor missing')
+          controls.write_text(text.replace(old, new))
+
+          page = Path('apps/web/src/app/app/evolution/page.tsx')
+          text = page.read_text()
+          old = '        projectRoot={resolveEvolutionProjectRoot()}'
+          new = '        projectRoot={mutationAccess.allowed ? resolveEvolutionProjectRoot() : null}'
+          if text.count(old) != 1:
+              raise SystemExit('page projectRoot prop anchor missing')
+          page.write_text(text.replace(old, new))
+
+          plan = Path('docs/ai/plans/2026-07-24-interactive-research-workspace.md')
+          text = plan.read_text()
+          old = 'Autonomy: A3 bounded delivery'
+          new = 'Autonomy: A2 bounded operator workflow'
+          if text.count(old) != 1:
+              raise SystemExit('plan autonomy anchor missing')
+          plan.write_text(text.replace(old, new))
+
+          test = Path('apps/web/src/lib/evolution-workspace.test.ts')
+          test.write_text('''import { afterEach, describe, expect, it, vi } from "vitest";
+import { mkdtemp, realpath, rm, symlink } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join, parse } from "node:path";
+
+vi.mock("server-only", () => ({}));
+
+import { assertEvolutionProjectRoot } from "./evolution-workspace";
+
+const originalEnv = { ...process.env };
+const roots: string[] = [];
+
+afterEach(async () => {
+  process.env = { ...originalEnv };
+  await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
+});
+
+describe("Evolution workspace project-root boundary", () => {
+  it("returns the canonical real path for a configured directory", async () => {
+    const root = await mkdtemp(join(tmpdir(), "cyclewarden-workspace-root-"));
+    roots.push(root);
+    process.env.CYCLEWARDEN_PROJECT_ROOT = root;
+
+    await expect(assertEvolutionProjectRoot()).resolves.toBe(await realpath(root));
+  });
+
+  it("rejects a symlink that resolves to the filesystem root", async () => {
+    const root = await mkdtemp(join(tmpdir(), "cyclewarden-workspace-link-"));
+    roots.push(root);
+    const rootLink = join(root, "root-link");
+    await symlink(parse(root).root, rootLink, "dir");
+    process.env.CYCLEWARDEN_PROJECT_ROOT = rootLink;
+
+    await expect(assertEvolutionProjectRoot()).rejects.toThrow(
+      "CYCLEWARDEN_PROJECT_ROOT may not target a filesystem root"
+    );
+  });
+});
+''')
+
+          Path('.cyclewarden-pr39-fix-trigger').unlink(missing_ok=True)
+          PY
+      - name: Commit boundary fixes
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/src/lib/evolution-workspace.ts \
+            apps/web/src/lib/evolution-workspace.test.ts \
+            apps/web/src/app/app/evolution/cycle-controls.tsx \
+            apps/web/src/app/app/evolution/page.tsx \
+            docs/ai/plans/2026-07-24-interactive-research-workspace.md \
+            .cyclewarden-pr39-fix-trigger
+          git commit -m "Harden interactive workspace boundaries"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
