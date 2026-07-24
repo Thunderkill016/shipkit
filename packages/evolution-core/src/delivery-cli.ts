@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
+import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { executeDelivery, showDelivery, verifyDelivery } from "./delivery.js";
+import { publishDelivery, showDeliveryPublication } from "./delivery-publish.js";
 import { EvolutionStore } from "./persistence.js";
 import { resolveDefaultStateRoot } from "./runtime-paths.js";
 
@@ -23,6 +25,10 @@ Usage:
     --trusted-repository
   cyclewarden-deliver verify <cycle-id>
     [--root .cyclewarden] [--project-root .] [--actor cyclewarden-independent-verifier]
+  cyclewarden-deliver publish <cycle-id> --draft-pr
+    [--root .cyclewarden] [--project-root .] [--actor cyclewarden-publisher]
+    [--remote origin] [--hostname github.com] [--base main]
+    [--title "Draft PR title"] [--body-file draft-pr.md]
   cyclewarden-deliver show <cycle-id> [--root .cyclewarden]
 
 execute requires a planned A3/A4 cycle and a manifest whose expectedParameterDigest matches the
@@ -30,8 +36,12 @@ latest persisted ExecutionHandoff. It creates an isolated git worktree and branc
 without a shell, and rejects changes outside allowedScope or inside enforceable forbiddenScope.
 
 verify requires a different actor. It reruns the manifest verification commands without a shell,
-rejects patch drift, and creates a local commit only after every check passes. This CLI never merges,
-deploys, writes production, or accepts implementation output without an independent verifier.
+rejects patch drift, and creates a local commit only after every check passes.
+
+publish requires a verified cycle and the explicit --draft-pr opt-in. It checks GitHub CLI
+availability and authentication before pushing the exact verified commit, then opens a draft PR.
+It never merges, deploys, writes production, or accepts implementation output without an
+independent verifier.
 `;
 
 function parseArgs(argv: string[]): ParsedArgs {
@@ -121,8 +131,29 @@ export async function runDeliveryCli(
     return 0;
   }
 
+  if (command === "publish") {
+    const bodyFile = one(parsed, "body-file")?.trim();
+    const result = await publishDelivery({
+      store,
+      cycleId,
+      projectRoot: projectRootFrom(parsed),
+      actor: one(parsed, "actor")?.trim() || "cyclewarden-publisher",
+      draftPr: one(parsed, "draft-pr") === "true",
+      remote: one(parsed, "remote")?.trim() || "origin",
+      hostname: one(parsed, "hostname")?.trim(),
+      baseBranch: one(parsed, "base")?.trim(),
+      title: one(parsed, "title")?.trim(),
+      body: bodyFile ? await readFile(resolve(bodyFile), "utf8") : undefined,
+    });
+    printJson(io, result);
+    return 0;
+  }
+
   if (command === "show") {
-    printJson(io, await showDelivery(store, cycleId));
+    printJson(io, {
+      ...(await showDelivery(store, cycleId)),
+      ...(await showDeliveryPublication(store, cycleId)),
+    });
     return 0;
   }
 
