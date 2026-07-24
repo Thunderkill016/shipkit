@@ -12,7 +12,7 @@ import {
 import { EvolutionStore, cycleStorageDirectoryName } from "./persistence.js";
 import { authorizeAction } from "./policy.js";
 import { transitionCycle } from "./state-machine.js";
-import type { EvolutionCycle, ExecutionHandoff } from "./types.js";
+import type { AuthorizationDecision, EvolutionCycle, ExecutionHandoff } from "./types.js";
 
 const execFileAsync = promisify(execFile);
 const DEFAULT_TIMEOUT_MS = 10 * 60 * 1000;
@@ -118,7 +118,43 @@ export type DeliveryVerificationRecord = {
   commitSha: string | null;
 };
 
-type DeliveryControlFile = {
+export type DeliveryPublicationRecord = {
+  schemaVersion: 1;
+  recordType: "delivery-publication";
+  recordId: string;
+  cycleId: string;
+  executionRunId: string;
+  verificationRecordId: string;
+  actor: string;
+  createdAt: string;
+  remoteName: string;
+  repository: string;
+  baseBranch: string;
+  headBranch: string;
+  commitSha: string;
+  authorization: AuthorizationDecision;
+  push: {
+    status: "pushed";
+    remoteCommit: string;
+  };
+  pullRequest:
+    | {
+        status: "created";
+        number: number;
+        url: string;
+        state: "OPEN";
+        isDraft: true;
+      }
+    | {
+        status: "failed";
+        errorDigest: string;
+      };
+  outcome: "published" | "inconclusive";
+  unresolvedRisks: string[];
+  limitations: string[];
+};
+
+export type DeliveryControlFile = {
   schemaVersion: 1;
   integrityDigest: string;
   cycleId: string;
@@ -129,6 +165,8 @@ type DeliveryControlFile = {
   executionEvidenceRef: string;
   verification: DeliveryVerificationRecord | null;
   verificationEvidenceRef: string | null;
+  publication: DeliveryPublicationRecord | null;
+  publicationEvidenceRef: string | null;
 };
 
 export type ExecuteDeliveryInput = {
@@ -442,7 +480,7 @@ function deliveryDirectory(store: EvolutionStore, cycleId: string): string {
   return join(store.rootDir, "delivery", cycleStorageDirectoryName(cycleId));
 }
 
-function controlPath(store: EvolutionStore, cycleId: string): string {
+export function deliveryControlPath(store: EvolutionStore, cycleId: string): string {
   return join(deliveryDirectory(store, cycleId), "control.json");
 }
 
@@ -453,7 +491,7 @@ async function atomicWriteJson(path: string, value: unknown): Promise<void> {
   await rename(temporary, path);
 }
 
-async function writeControl(
+export async function writeDeliveryControl(
   store: EvolutionStore,
   control: Omit<DeliveryControlFile, "integrityDigest"> | DeliveryControlFile
 ): Promise<DeliveryControlFile> {
@@ -462,13 +500,13 @@ async function writeControl(
     ...payload,
     integrityDigest: digestJson(payload),
   };
-  await atomicWriteJson(controlPath(store, value.cycleId), value);
+  await atomicWriteJson(deliveryControlPath(store, value.cycleId), value);
   return value;
 }
 
-async function loadControl(store: EvolutionStore, cycleId: string): Promise<DeliveryControlFile> {
+export async function loadDeliveryControl(store: EvolutionStore, cycleId: string): Promise<DeliveryControlFile> {
   try {
-    const value = JSON.parse(await readFile(controlPath(store, cycleId), "utf8")) as DeliveryControlFile;
+    const value = JSON.parse(await readFile(deliveryControlPath(store, cycleId), "utf8")) as DeliveryControlFile;
     if (value.schemaVersion !== 1 || value.cycleId !== cycleId) {
       throw new DeliveryError("delivery control file does not match the requested cycle");
     }
@@ -676,8 +714,10 @@ export async function executeDelivery(input: ExecuteDeliveryInput) {
     executionEvidenceRef: evidenceRef,
     verification: null,
     verificationEvidenceRef: null,
+    publication: null,
+    publicationEvidenceRef: null,
   };
-  await writeControl(input.store, control);
+  await writeDeliveryControl(input.store, control);
 
   const nextStage = status === "implemented" ? "implemented" : status === "failed" ? "rejected" : "inconclusive";
   const next = transitionCycle(executing, nextStage, {
@@ -691,7 +731,7 @@ export async function executeDelivery(input: ExecuteDeliveryInput) {
     addArtifacts: { changes: [evidenceRef] },
   });
   const cycle = await input.store.save(executing, next);
-  return { authorization, cycle, execution, worktreePath, controlPath: controlPath(input.store, planned.cycleId) };
+  return { authorization, cycle, execution, worktreePath, controlPath: deliveryControlPath(input.store, planned.cycleId) };
 }
 
 function checkRecord(spec: DeliveryCommandSpec, result: ExecutionBackendResult): DeliveryVerificationCheck {
@@ -716,7 +756,7 @@ export async function verifyDelivery(input: VerifyDeliveryInput) {
   if (implemented.stage !== "implemented") {
     throw new DeliveryError(`verify requires an implemented cycle; current stage is ${implemented.stage}`);
   }
-  const control = await loadControl(input.store, input.cycleId);
+  const control = await loadDeliveryControl(input.store, input.cycleId);
   if (!implemented.artifacts.changes.includes(control.executionEvidenceRef)) {
     throw new DeliveryError("delivery execution evidence is not linked from the implemented cycle");
   }
@@ -879,7 +919,7 @@ export async function verifyDelivery(input: VerifyDeliveryInput) {
   const evidenceRef = `evidence:${evidence.occurrenceId}`;
   control.verification = verification;
   control.verificationEvidenceRef = evidenceRef;
-  await writeControl(input.store, control);
+  await writeDeliveryControl(input.store, control);
 
   const nextStage = verdict === "accepted" ? "verified" : verdict === "rejected" ? "rejected" : "inconclusive";
   const next = transitionCycle(implemented, nextStage, {
@@ -896,11 +936,12 @@ export async function verifyDelivery(input: VerifyDeliveryInput) {
 }
 
 export async function showDelivery(store: EvolutionStore, cycleId: string) {
-  const control = await loadControl(store, cycleId);
+  const control = await loadDeliveryControl(store, cycleId);
   return {
     cycleId,
     execution: control.execution,
     verification: control.verification,
+    publication: control.publication,
     branchName: control.execution.branchName,
     worktreeId: control.execution.worktreeId,
   };

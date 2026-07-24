@@ -386,7 +386,7 @@
       "category": "product",
       "status": "partial",
       "verificationStatus": "passing",
-      "summary": "CycleWarden has capability-negotiated trusted-local and Docker backends. A governed-delivery beta now consumes a persisted ExecutionHandoff through a generic command or Codex CLI profile in an isolated git worktree, enforces changed-file scope, requires a distinct verifier and creates a local commit only after accepted checks. Trusted-local delivery is not a security sandbox.",
+      "summary": "CycleWarden has capability-negotiated trusted-local and Docker backends. The governed-delivery beta consumes a persisted ExecutionHandoff through a generic command or Codex CLI profile in an isolated git worktree, enforces changed-file scope, requires a distinct verifier, creates a local commit only after accepted checks, and can explicitly publish that exact commit as a GitHub draft PR. Trusted-local delivery is not a security sandbox.",
       "evidence": [
         "packages/evolution-core/src/execution-backend.ts",
         "packages/evolution-core/src/check-runner.ts",
@@ -417,7 +417,7 @@
         "Trusted-local delivery runs with the current operating-system user's filesystem, credential and network privileges",
         "The Docker baseline is verified for hostile checks, not as a complete authenticated online-agent mutation environment",
         "No crash-safe resume for a cycle interrupted after entering executing",
-        "No automatic push, draft PR, merge or deployment operation",
+        "Draft PR publication is explicit and CLI-only; no merge or deployment operation exists",
         "No hard writable-workspace disk quota, restricted egress allowlist, remote sandbox provider or external security review",
         "Windows and macOS support is not established"
       ]
@@ -427,7 +427,7 @@
       "category": "product",
       "status": "partial",
       "verificationStatus": "passing",
-      "summary": "A planned A3/A4 cycle can bind an exact ExecutionHandoff digest to a shell-free command manifest, create an isolated branch/worktree, record content-addressed implementation evidence, reject filesystem scope escape, run independent verification commands and create a local commit only after an accepted verdict.",
+      "summary": "A planned A3/A4 cycle can bind an exact ExecutionHandoff digest to a shell-free command manifest, create an isolated branch/worktree, record content-addressed implementation evidence, reject filesystem scope escape, run independent verification commands, create a local commit only after an accepted verdict, and explicitly publish that exact commit as an open GitHub draft PR.",
       "evidence": [
         "packages/evolution-core/src/delivery.ts",
         "packages/evolution-core/src/delivery-cli.ts",
@@ -435,7 +435,9 @@
         "packages/evolution-core/src/delivery.test.ts",
         "packages/evolution-core/src/delivery-hardening.test.ts",
         "scripts/test-evolution-core-standalone.mjs",
-        "docs/evolution/GOVERNED_DELIVERY.md"
+        "docs/evolution/GOVERNED_DELIVERY.md",
+        "packages/evolution-core/src/delivery-publish.ts",
+        "packages/evolution-core/src/delivery-publish.test.ts"
       ],
       "checks": [
         "Unit test: in-scope implementation becomes a verified local commit only after a separate verifier passes",
@@ -443,14 +445,18 @@
         "Unit test: implementer cannot verify its own output",
         "Unit tests: dirty base, digest mismatch, no changes, same-file patch drift, mutating verifier and command shell rejection",
         "Standalone package proof on Node.js 20, 22 and 24 includes the installed delivery CLI",
-        "Unit test: delivery control manifest tamper is rejected by its integrity digest"
+        "Unit test: delivery control manifest tamper is rejected by its integrity digest",
+        "Unit test: explicit publication non-force pushes only the exact verified commit and records an open draft PR",
+        "Unit tests: missing confirmation, unavailable gh and failed gh authentication prevent remote mutation",
+        "Unit test: repeat publication is rejected to prevent duplicate draft PRs"
       ],
       "limitations": [
         "CLI only; the web workspace still ends at ExecutionHandoff",
         "Trusted-local execution is not a security sandbox and must be restricted to trusted repositories and commands",
-        "The local verified branch is not pushed and no draft PR is opened",
+        "Draft PR publication requires explicit confirmation, an authenticated local gh CLI and a github.com remote",
         "No crash-safe execute resume, remote sandbox, release, deployment, outcome measurement or external validation",
-        "The integrity-checked delivery control sidecar is outside the synchronized cycle journal; loss blocks verification"
+        "The integrity-checked delivery control sidecar is outside the synchronized cycle journal; loss blocks verification",
+        "Fork publication and GitHub Enterprise are not implemented in the first slice"
       ]
     },
     {
