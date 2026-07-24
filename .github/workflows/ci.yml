@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+
 
 env:
   # Stable host for cookies + Playwright (P2 e2e harden)
