@@ -22,7 +22,9 @@ try {
 
 const result = validateExternalSystems(registry, {
   effectiveDate:
-    process.env.SHIPKIT_REVIEW_DATE ?? new Date().toISOString().slice(0, 10),
+    process.env.CYCLEWARDEN_REVIEW_DATE ??
+      process.env.SHIPKIT_REVIEW_DATE ??
+      new Date().toISOString().slice(0, 10),
 });
 
 if (result.errors.length) {

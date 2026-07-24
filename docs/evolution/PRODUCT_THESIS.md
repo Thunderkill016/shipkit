@@ -1,4 +1,4 @@
-# Shipkit — unified product thesis
+# CycleWarden — unified product thesis
 
 Status: active product definition  
 Issue: #9  
@@ -6,7 +6,7 @@ Date: 2026-07-23
 
 ## Product
 
-Shipkit is one integrated AI-native product development system around human and AI collaborators.
+CycleWarden is one integrated AI-native product development system around human and AI collaborators.
 
 It combines:
 
@@ -21,13 +21,13 @@ It combines:
 - controlled learning and meta-improvement;
 - interoperability with repositories, tools and other agents.
 
-The Evolution Engine is Shipkit's process-control core. It is not the only product surface. The workspace, foundation, research, execution, verification, operations and learning modules together form the product.
+The Evolution Engine is CycleWarden's process-control core. It is not the only product surface. The workspace, foundation, research, execution, verification, operations and learning modules together form the product.
 
 ## The chip-fabrication analogy
 
 A valuable semiconductor process is not one machine. It is a tightly controlled integrated system of design tools, process stages, metrology, defect detection, materials, provenance, yield learning and accumulated know-how.
 
-Shipkit should be built the same way:
+CycleWarden should be built the same way:
 
 - the workspace and product foundation are the design environment and starting substrate;
 - models and agents are interchangeable production tools;
@@ -46,9 +46,9 @@ The moat is the integrated process, evidence corpus, safety rules, evaluation in
 
 ## Product promise
 
-> Define or attach a product once. Shipkit researches what should happen, builds it through governed agents, verifies and ships it safely, measures the outcome and improves later cycles without surrendering control or inventing unsupported claims.
+> Define or attach a product once. CycleWarden researches what should happen, builds it through governed agents, verifies and ships it safely, measures the outcome and improves later cycles without surrendering control or inventing unsupported claims.
 
-Given a product objective, repository and explicit boundaries, Shipkit should:
+Given a product objective, repository and explicit boundaries, CycleWarden should:
 
 1. create or attach a usable product workspace and foundation;
 2. persist a resumable evolution cycle;
@@ -114,7 +114,7 @@ Agents may propose or execute through these modules. They do not own state, perm
 
 ## Proof threshold
 
-A state machine, CLI, starter application or research report alone is not proof of Shipkit.
+A state machine, CLI, starter application or research report alone is not proof of CycleWarden.
 
 The product becomes meaningfully proven when the same integrated flow:
 
@@ -129,11 +129,11 @@ workspace objective
 → evaluated learning
 ```
 
-succeeds on Shipkit and at least one unrelated real project, while a human can reconstruct the decision, authorization, evidence, contradictions, changes, release and outcome.
+succeeds on CycleWarden and at least one unrelated real project, while a human can reconstruct the decision, authorization, evidence, contradictions, changes, release and outcome.
 
 ## Implementation sequencing
 
-Shipkit may be built in vertical integration milestones:
+CycleWarden may be built in vertical integration milestones:
 
 1. durable product understanding;
 2. research-to-decision;
@@ -152,4 +152,4 @@ These milestones are incomplete slices of the same product, not separate product
 - treating technical test success as sufficient product value;
 - learning promotion without later comparable evidence;
 - claims of sentience or guaranteed monotonic improvement;
-- splitting Shipkit into competing product identities that do not share one lifecycle.
+- splitting CycleWarden into competing product identities that do not share one lifecycle.

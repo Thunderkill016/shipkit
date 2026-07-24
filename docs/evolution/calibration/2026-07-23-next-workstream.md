@@ -1,4 +1,4 @@
-# Shipkit Next-Workstream Calibration — 2026-07-23
+# CycleWarden Next-Workstream Calibration — 2026-07-23
 
 ## Status
 
@@ -13,7 +13,7 @@ Internal calibration only. This is not external product validation and does not 
 - Calibration head: `aa14cd5b6f67ddb2fd2ec69ac409b480487aa9f7`
 - Artifact: `decision-calibration-report`
 - Artifact digest: `sha256:1351b164fe32783f40099a128003f076f7a322bc69bef56b0c5bf1f5a4d38566`
-- Cycle: `shipkit:next-workstream-calibration-001`
+- Cycle: `cyclewarden:next-workstream-calibration-001`
 - Adapter: `repository-single-worker`
 - Reviewer: `calibration-independent-reviewer`
 - Verdict: `pass`
@@ -62,7 +62,7 @@ The engine selected opportunity 3 and rejected 1 and 2. Its rationale was that t
 
 The run materially confirmed the main diagnosis behind the revised roadmap:
 
-> Repository correctness and architecture evidence cannot establish that Shipkit changes a decision anyone needs to make.
+> Repository correctness and architecture evidence cannot establish that CycleWarden changes a decision anyone needs to make.
 
 It independently stopped at missing direct user behavior and external corroboration rather than recommending more feature construction. This supports keeping #14 as a falsifiable gate and continuing participant recruitment immediately rather than completing every sandbox, agent or platform feature first.
 

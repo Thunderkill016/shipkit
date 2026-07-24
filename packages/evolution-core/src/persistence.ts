@@ -16,6 +16,7 @@ import {
   RISK_CLASSES,
   type EvolutionCycle,
 } from "./types.js";
+import { resolveDefaultStateRoot } from "./runtime-paths.js";
 
 export const STORE_SCHEMA_VERSIONS = [1, 2] as const;
 export const CURRENT_STORE_SCHEMA_VERSION = 2 as const;
@@ -120,8 +121,11 @@ function checksumCycle(cycle: EvolutionCycle): string {
 }
 
 function maybeCrash(point: string): void {
-  if (process.env.SHIPKIT_PERSISTENCE_CRASH_POINT !== point) return;
-  process.stderr.write(`shipkit persistence fault injection: ${point}\n`);
+  const configuredCrashPoint =
+    process.env.CYCLEWARDEN_PERSISTENCE_CRASH_POINT ??
+    process.env.SHIPKIT_PERSISTENCE_CRASH_POINT;
+  if (configuredCrashPoint !== point) return;
+  process.stderr.write(`cyclewarden persistence fault injection: ${point}\n`);
   if (process.platform === "win32") process.exit(86);
   process.kill(process.pid, "SIGKILL");
   throw new EvolutionStoreError(`fault injection did not terminate process at ${point}`);
@@ -411,7 +415,7 @@ export class EvolutionStore {
   readonly cyclesDir: string;
   readonly options: Required<EvolutionStoreOptions>;
 
-  constructor(rootDir = ".shipkit", options: EvolutionStoreOptions = {}) {
+  constructor(rootDir = resolveDefaultStateRoot(), options: EvolutionStoreOptions = {}) {
     const lockTimeoutMs = options.lockTimeoutMs ?? DEFAULT_LOCK_TIMEOUT_MS;
     const staleLockMs = options.staleLockMs ?? DEFAULT_STALE_LOCK_MS;
     assertPositiveInteger(lockTimeoutMs, "lockTimeoutMs");

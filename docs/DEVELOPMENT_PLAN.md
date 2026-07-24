@@ -1,4 +1,4 @@
-# Shipkit — Current state and development priorities
+# CycleWarden — Current state and development priorities
 
 > Last verified: 2026-07-22  
 > Current capability source: [`CAPABILITIES.json`](./CAPABILITIES.json)  
@@ -11,7 +11,7 @@ repository evidence and are checked by CI.
 
 ## Product direction
 
-Shipkit is an open product foundation for AI-assisted builders who want a
+CycleWarden is an open product foundation for AI-assisted builders who want a
 working landing page, authentication, protected app shell, database patterns,
 security defaults, and deploy paths without rebuilding the foundation for every
 idea.
@@ -58,11 +58,11 @@ The durable backlog lives in
 ### P1 — Product clarity and measured speed
 
 5. Replace the demo-oriented root `IDEA.md` with a deliberate definition of
-   Shipkit itself, while keeping generated projects seeded with a blank product
+   CycleWarden itself, while keeping generated projects seeded with a blank product
    idea.
 6. Measure time-to-first-product for demo, portable-pg, and Supabase paths.
 7. Use the measurement to remove the slowest setup or decision step.
-8. Publish the generator as a supported `create-shipkit` entry point only after
+8. Publish the generator as a supported `create-cyclewarden` entry point only after
    the generated-project integration test remains stable.
 
 ### P2 — Production depth

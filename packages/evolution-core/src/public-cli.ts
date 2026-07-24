@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 import { EvidenceRegistry } from "./evidence.js";
 import { EvolutionStore } from "./persistence.js";
 import { authorizeAction } from "./policy.js";
+import { resolveDefaultStateRoot } from "./runtime-paths.js";
 import {
   preparePublicSourceResearch,
   type PublicResearchRuntime,
@@ -20,13 +21,13 @@ type ParsedArgs = {
   options: Map<string, string[]>;
 };
 
-const HELP = `Shipkit public-source research
+const HELP = `CycleWarden public-source research
 
 Usage:
-  shipkit-research-public <cycle-id> --manifest public-research.json
-    [--root .shipkit] [--project-root .]
+  cyclewarden-research-public <cycle-id> --manifest public-research.json
+    [--root .cyclewarden] [--project-root .]
     [--timeout-ms 15000] [--max-source-bytes 524288]
-    [--actor shipkit-public-researcher] [--reviewer shipkit-citation-reviewer]
+    [--actor cyclewarden-public-researcher] [--reviewer cyclewarden-citation-reviewer]
 
 The command requires a modeled A1+ cycle. It retrieves only explicit HTTP(S) URLs from the
 manifest, blocks private-network destinations and unsafe redirects, stores normalized source text,
@@ -97,7 +98,8 @@ export async function runPublicResearchCli(
 
   const cycleId = parsed.positionals[0];
   if (!cycleId) throw new Error("public research requires a cycle ID");
-  const root = resolve(one(parsed, "root") ?? ".shipkit");
+  const explicitRoot = one(parsed, "root");
+  const root = explicitRoot ? resolve(explicitRoot) : resolveDefaultStateRoot();
   const projectRoot = resolve(one(parsed, "project-root") ?? process.cwd());
   const store = new EvolutionStore(root);
   const previous = await store.load(cycleId);
@@ -127,8 +129,8 @@ export async function runPublicResearchCli(
   const registry = new EvidenceRegistry(root, projectRoot);
   const manifestEvidence = await registry.registerJson("public-research-manifest", manifest);
   const prepared = await preparePublicSourceResearch(previous, manifest, {
-    actor: one(parsed, "actor")?.trim() || "shipkit-public-researcher",
-    reviewerActor: one(parsed, "reviewer")?.trim() || "shipkit-citation-reviewer",
+    actor: one(parsed, "actor")?.trim() || "cyclewarden-public-researcher",
+    reviewerActor: one(parsed, "reviewer")?.trim() || "cyclewarden-citation-reviewer",
     registry,
     manifestEvidenceRef: `evidence:${manifestEvidence.occurrenceId}`,
     startedAt: new Date().toISOString(),
@@ -178,7 +180,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     },
     (error) => {
       process.stderr.write(
-        `shipkit-research-public: ${error instanceof Error ? error.message : String(error)}\n`
+        `cyclewarden-research-public: ${error instanceof Error ? error.message : String(error)}\n`
       );
       process.exitCode = 1;
     }

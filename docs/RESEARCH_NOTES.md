@@ -1,10 +1,10 @@
 # Research notes → product decisions
 
-Living notes. Each finding maps to a Shipkit action.
+Living notes. Each finding maps to a CycleWarden action.
 
 ## Market (SaaS starters 2025–2026)
 
-| Finding | Shipkit action |
+| Finding | CycleWarden action |
 |---------|----------------|
 | Paid kits win on multi-tenant + billing depth | Stay free core; billing as later port |
 | Open SaaS wins on free + agent DX + deploy CLI | Copy **agent skills + one-command deploy story** |
@@ -24,7 +24,7 @@ Living notes. Each finding maps to a Shipkit action.
 
 ## Vibe coding gaps (Supabase + industry checklists)
 
-| Gap in AI prototypes | Shipkit fix |
+| Gap in AI prototypes | CycleWarden fix |
 |----------------------|-------------|
 | No RLS / open tables | SQL samples + checklist |
 | Secrets in client | doctor + AGENTS never-list |
@@ -35,12 +35,12 @@ Living notes. Each finding maps to a Shipkit action.
 ## Auth portable path
 
 Industry default 2026 for self-host TS: **Better Auth + Drizzle + Postgres URL**.  
-Shipkit: `AUTH_ADAPTER=better-auth` when `DATABASE_URL` set; Supabase remains `supabase-full` preset.
+CycleWarden: `AUTH_ADAPTER=better-auth` when `DATABASE_URL` set; Supabase remains `supabase-full` preset.
 
 ## Next research bets
 
 1. OpenAPI / typed client generation from server actions  
 2. Playwright e2e smoke in CI  
-3. `create-shipkit` template publish  
+3. `create-cyclewarden` template publish
 4. StoragePort (S3/R2)  
 5. Second app adapter evaluation (Nuxt vs TanStack)  

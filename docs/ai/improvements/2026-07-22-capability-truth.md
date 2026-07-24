@@ -6,7 +6,7 @@ Source health report: `2026-07-22-health-report.md`
 
 ## Observed problem
 
-Shipkit has several prose documents that describe different points in time.
+CycleWarden has several prose documents that describe different points in time.
 `ROADMAP.md` reflects recent work, while `docs/DEVELOPMENT_PLAN.md` still says
 notes are memory-only, i18n is unwired, welcome mail is unused, billing is absent,
 and portable auth E2E is missing. Current code contradicts those statements.
@@ -30,7 +30,7 @@ it can make the agent repeat completed work or prioritize the wrong gap.
 - CI rejects invalid status, duplicate IDs, unresolved placeholders, and missing
   evidence files.
 - Generated products inherit claims as `not-run` rather than falsely inheriting
-  Shipkit's verification result.
+  CycleWarden's verification result.
 - Human docs link to the registry instead of maintaining contradictory tables.
 
 ## Confidence and uncertainty

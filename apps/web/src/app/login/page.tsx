@@ -10,7 +10,7 @@ export default async function LoginPage() {
     <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12">
       <div className="mb-8 flex items-center justify-between">
         <Link href="/" className="text-sm text-accent">
-          ← shipkit
+          ← cyclewarden
         </Link>
         <LocaleSwitcher locale={locale} />
       </div>

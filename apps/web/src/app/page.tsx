@@ -6,7 +6,7 @@ import { getI18n } from "@/lib/i18n";
 export default async function LandingPage() {
   const { t, locale } = await getI18n();
   const websiteSchema = makeWebsiteSchema({
-    name: "Shipkit",
+    name: "CycleWarden",
     url: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
   });
 
@@ -47,11 +47,11 @@ export default async function LandingPage() {
       <JsonLd schema={websiteSchema} />
 
       <header className="flex items-center justify-between gap-4">
-        <span className="text-sm font-semibold tracking-wide text-accent">✦ shipkit</span>
+        <span className="text-sm font-semibold tracking-wide text-accent">✦ cyclewarden</span>
         <nav className="flex flex-wrap items-center gap-4 text-sm text-muted">
           <LocaleSwitcher locale={locale} />
           <a
-            href="https://github.com/Thunderkill016/shipkit"
+            href="https://github.com/Thunderkill016/cyclewarden"
             className="hover:text-foreground transition-colors"
           >
             {t("landing.viewOnGithub")}
@@ -88,7 +88,7 @@ export default async function LandingPage() {
               {t("landing.cta")} →
             </Link>
             <a
-              href="https://github.com/Thunderkill016/shipkit"
+              href="https://github.com/Thunderkill016/cyclewarden"
               className="rounded-xl border border-border px-6 py-2.5 text-sm text-foreground transition-colors hover:border-accent"
             >
               {t("landing.viewOnGithub")}

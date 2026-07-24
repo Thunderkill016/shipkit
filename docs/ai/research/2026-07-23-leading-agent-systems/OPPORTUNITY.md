@@ -1,24 +1,24 @@
-# Opportunity brief — applying leading-system research to Shipkit
+# Opportunity brief — applying leading-system research to CycleWarden
 
 Status: delivery selected
 Evidence ledger: [`EVIDENCE.md`](./EVIDENCE.md)
 
 ## Desired outcome
 
-Shipkit should make architecture decisions from current, reviewable evidence
+CycleWarden should make architecture decisions from current, reviewable evidence
 without copying mature runtimes or mistaking benchmark and vendor claims for
 user value.
 
 ## Target and triggering context
 
-The target is a Shipkit maintainer deciding what to build in the next 4–6 weeks.
+The target is a CycleWarden maintainer deciding what to build in the next 4–6 weeks.
 The trigger is a new integration proposal, material upstream change, or external
-claim that could change Shipkit's boundary.
+claim that could change CycleWarden's boundary.
 
 ## Current behavior and alternatives
 
 The narrative comparison is broad but its revisions were floating and several
-Shipkit status claims became stale after merged implementation. Alternatives are:
+CycleWarden status claims became stale after merged implementation. Alternatives are:
 
 - manually reread and edit the narrative;
 - depend on a vendor/framework's current architecture;
@@ -29,7 +29,7 @@ Shipkit status claims became stale after merged implementation. Alternatives are
 ## Opportunity map
 
 ```text
-Make evidence-backed Shipkit decisions
+Make evidence-backed CycleWarden decisions
 ├── Keep external architecture evidence current and falsifiable [E2, E19, E20]
 │   ├── pin revision or access date [E3, E8, E13]
 │   ├── retain limitations and contradictions [E6, E9, E18]

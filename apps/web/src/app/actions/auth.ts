@@ -1,11 +1,11 @@
 "use server";
 
-import { EmailPasswordSchema } from "@shipkit/security";
+import { EmailPasswordSchema } from "@cyclewarden/security";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getAuth } from "@/lib/auth";
 import { authRateLimit } from "@/lib/rate-limit";
-import { getLogger } from "@shipkit/logger";
+import { getLogger } from "@cyclewarden/logger";
 
 const logger = getLogger("auth/actions");
 
@@ -71,9 +71,9 @@ export async function signUpAction(
     const { getMailer } = await import("@/lib/mail");
     await getMailer().send({
       to: parsed.data.email,
-      subject: "Welcome to Shipkit",
-      text: `You're in. Open your app and edit IDEA.md to build your product.\n\n— Shipkit`,
-      html: `<p>You're in.</p><p>Open your app and edit <code>IDEA.md</code> to build your product.</p><p>— Shipkit</p>`,
+      subject: "Welcome to CycleWarden",
+      text: `You're in. Open your app and edit IDEA.md to build your product.\n\n— CycleWarden`,
+      html: `<p>You're in.</p><p>Open your app and edit <code>IDEA.md</code> to build your product.</p><p>— CycleWarden</p>`,
     });
   } catch (e) {
     logger.warn("Welcome email failed (non-blocking)", {

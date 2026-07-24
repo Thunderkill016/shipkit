@@ -7,11 +7,11 @@ const isDemo =
   process.env.AUTH_ADAPTER !== "better-auth" &&
   process.env.AUTH_ADAPTER !== "supabase";
 
-test.describe("Shipkit smoke", () => {
+test.describe("CycleWarden smoke", () => {
   test("landing shows product kit messaging", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-    await expect(page.getByText(/shipkit/i).first()).toBeVisible();
+    await expect(page.getByText(/cyclewarden/i).first()).toBeVisible();
   });
 
   test("login page renders forms", async ({ page }) => {
@@ -22,7 +22,7 @@ test.describe("Shipkit smoke", () => {
   });
 
   test("404 page", async ({ page }) => {
-    await page.goto("/this-route-does-not-exist-shipkit");
+    await page.goto("/this-route-does-not-exist-cyclewarden");
     await expect(page.getByText(/404|not found|không tìm thấy/i).first()).toBeVisible();
   });
 });

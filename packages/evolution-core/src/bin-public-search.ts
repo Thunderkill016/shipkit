@@ -8,7 +8,7 @@ runPublicSearchCli(process.argv.slice(2)).then(
   },
   (error) => {
     process.stderr.write(
-      `shipkit-research-search: ${error instanceof Error ? error.message : String(error)}\n`
+      `cyclewarden-research-search: ${error instanceof Error ? error.message : String(error)}\n`
     );
     process.exitCode = 1;
   }

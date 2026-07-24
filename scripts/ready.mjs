@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * pnpm ready — shortest path to a usable local Shipkit
+ * pnpm ready — shortest path to a usable local CycleWarden
  *
  *   pnpm ready
  *   pnpm ready -- --preset=portable-pg
@@ -55,7 +55,7 @@ const supabase =
 
 console.log(`
 ┌─────────────────────────────────────────────┐
-│  ✦ shipkit — đủ xài (local)                 │
+│  ✦ cyclewarden — đủ xài (local)                 │
 └─────────────────────────────────────────────┘
 `);
 

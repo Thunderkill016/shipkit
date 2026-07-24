@@ -18,7 +18,7 @@ const manifest = JSON.parse(
     "utf8"
   )
 );
-const temporaryRoot = await mkdtemp(join(tmpdir(), "shipkit-public-search-proof-"));
+const temporaryRoot = await mkdtemp(join(tmpdir(), "cyclewarden-public-search-proof-"));
 const artifactPath = join(repositoryRoot, "artifacts", "public-search-proof.json");
 
 function response(body, contentType = "application/json", status = 200) {
@@ -44,30 +44,30 @@ const searchFetcher = async (url) => {
   const query = new URL(url).searchParams.get("q") ?? "";
   const item = query.includes("limitations")
     ? repositoryItem(
-        "example/shipkit-limitations",
+        "example/cyclewarden-limitations",
         "Repository search alone is not a general web index.",
         4
       )
     : repositoryItem(
-        "Thunderkill016/shipkit",
-        "Shipkit uses bounded search and exact citations.",
+        "Thunderkill016/cyclewarden",
+        "CycleWarden uses bounded search and exact citations.",
         8
       );
   return response(JSON.stringify({ total_count: 1, incomplete_results: false, items: [item] }));
 };
 
 const sourceFetcher = async (url) =>
-  url.includes("shipkit-limitations")
+  url.includes("cyclewarden-limitations")
     ? response(
         JSON.stringify({
-          full_name: "example/shipkit-limitations",
+          full_name: "example/cyclewarden-limitations",
           description: "Repository search alone is not a general web index.",
         })
       )
     : response(
         JSON.stringify({
-          full_name: "Thunderkill016/shipkit",
-          description: "Shipkit uses bounded search and exact citations.",
+          full_name: "Thunderkill016/cyclewarden",
+          description: "CycleWarden uses bounded search and exact citations.",
         })
       );
 
@@ -75,7 +75,7 @@ const publicResolver = async () => ["140.82.114.5"];
 
 try {
   let cycle = createCycle({
-    cycleId: "public-search-proof:shipkit",
+    cycleId: "public-search-proof:cyclewarden",
     objective: "Prove bounded public search with support and falsification evidence",
     autonomy: "A2",
     risk: "R1",
@@ -90,7 +90,7 @@ try {
     reason: "created project model",
     addArtifacts: { model: ["evidence:model"] },
   });
-  const registry = new EvidenceRegistry(join(temporaryRoot, ".shipkit"), temporaryRoot);
+  const registry = new EvidenceRegistry(join(temporaryRoot, ".cyclewarden"), temporaryRoot);
   const manifestEvidence = await registry.registerJson("public-search-manifest", manifest);
   const now = new Date();
   const prepared = await preparePublicSearchResearch(cycle, manifest, {

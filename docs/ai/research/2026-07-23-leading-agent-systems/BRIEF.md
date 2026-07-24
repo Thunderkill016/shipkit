@@ -1,4 +1,4 @@
-# Research brief — leading agent systems for Shipkit
+# Research brief — leading agent systems for CycleWarden
 
 Status: completed for architecture; user validation remains open
 Owner: Codex
@@ -9,7 +9,7 @@ Issue: user-directed research cycle
 
 Which mechanisms from current leading agentic software-development, durable
 workflow, research, sandbox, policy, provenance and evaluation systems should
-Shipkit adopt, adapt, integrate, defer or reject in the next 4–6 weeks?
+CycleWarden adopt, adapt, integrate, defer or reject in the next 4–6 weeks?
 
 The result must select at most one bounded repository change for this cycle and
 must not bypass the external decision-value gate in issue #14.
@@ -18,8 +18,8 @@ must not bypass the external decision-value gate in issue #14.
 
 - Initial user: solo developers and open-source maintainers already using
   coding agents.
-- System: the integrated Shipkit product at `origin/main` commit `788ca83`.
-- Context: Shipkit has a deterministic kernel, evidence and persistence,
+- System: the integrated CycleWarden product at `origin/main` commit `788ca83`.
+- Context: CycleWarden has a deterministic kernel, evidence and persistence,
   repository/public/candidate research baselines and Docker sandbox baseline.
   It lacks external user decision-value proof, coding-agent handoff consumption,
   independent release and measured learning.
@@ -29,14 +29,14 @@ must not bypass the external decision-value gate in issue #14.
 Desired outcome:
 
 - a current primary-source landscape that a later reviewer can reproduce;
-- a small set of decisions tied to falsifiable Shipkit experiments;
+- a small set of decisions tied to falsifiable CycleWarden experiments;
 - one bounded, dependency-free improvement that makes this research durable and
   mechanically reviewable.
 
 Baseline:
 
 - `docs/evolution/COMPARATIVE_ANALYSIS.md` already compares adjacent systems;
-- its source ledger does not pin reviewed revisions and several Shipkit status
+- its source ledger does not pin reviewed revisions and several CycleWarden status
   claims are stale after PRs #22, #25, #27 and #30;
 - `docs/CAPABILITIES.json` is more current than the narrative project model and
   roadmap;
@@ -46,7 +46,7 @@ Baseline:
 
 Confidence: medium.
 
-Shipkit should not copy a large agent framework. Its differentiated role is the
+CycleWarden should not copy a large agent framework. Its differentiated role is the
 deterministic control/evidence plane around interchangeable agents and runtimes.
 Near-term value likely comes from:
 
@@ -56,7 +56,7 @@ Near-term value likely comes from:
 
 This belief would weaken if a leading system already provides the same
 cross-agent product-governance lifecycle with stronger adoption and compatible
-boundaries, or if current standards make a custom Shipkit contract unnecessary.
+boundaries, or if current standards make a custom CycleWarden contract unnecessary.
 
 ## Decision-changing evidence
 
@@ -64,7 +64,7 @@ Support:
 
 - leading systems keep orchestration/runtime concerns separate from durable
   product authority and independent evidence;
-- official specifications provide portable contracts Shipkit can adapt without
+- official specifications provide portable contracts CycleWarden can adapt without
   importing a full runtime;
 - benchmarks show small baselines are competitive enough to challenge
   orchestration complexity.
@@ -72,7 +72,7 @@ Support:
 Weaken:
 
 - the compared systems have converged on a more complete standard control plane;
-- maintaining Shipkit-specific state, policy or evidence is demonstrably
+- maintaining CycleWarden-specific state, policy or evidence is demonstrably
   redundant;
 - integrations require higher operating cost or trust than the initial
   beachhead will accept.
@@ -93,7 +93,7 @@ Reverse:
 | U3 | Which safety boundaries are proven versus claimed | Risk | High | Threat model, tests, docs |
 | U4 | Which evaluation methods resist headline-score bias | Outcome | High | Benchmark papers/harnesses |
 | U5 | Which mechanisms reduce user time or implementation waste | User/outcome | High | Direct behavioral evidence; currently absent |
-| U6 | Which integration has the smallest reversible Shipkit experiment | Strategic fit | High | Internal code and primary sources |
+| U6 | Which integration has the smallest reversible CycleWarden experiment | Strategic fit | High | Internal code and primary sources |
 
 ## Internal evidence inspected
 
@@ -110,7 +110,7 @@ Reverse:
 |---|---|---:|---|
 | How do leading coding agents separate runtime, workspace and authority? | Codex, OpenHands, SWE-agent, GitHub Copilot, Claude Code official sources | 4 | Four distinct systems and one contradiction |
 | How do durable agent workflows handle state, interrupts and replay? | Temporal, LangGraph, Microsoft Agent Framework official sources | 4 | Ownership boundaries are clear |
-| Which interoperability contracts should Shipkit reuse? | MCP and A2A specifications | 4 | Stable protocol scope and non-goals recorded |
+| Which interoperability contracts should CycleWarden reuse? | MCP and A2A specifications | 4 | Stable protocol scope and non-goals recorded |
 | Which containment mechanisms are common? | OpenSandbox, E2B, Daytona official sources | 4 | Capability/egress/lifecycle differences recorded |
 | Which policy/provenance/telemetry standards fit? | OPA, in-toto, SLSA, OpenTelemetry | 4 | Adopt/defer decision and falsification test exist |
 | How should research and coding quality be evaluated? | OpenAI deep research/BrowseComp, SWE-bench, OpenHands Index primary sources | 4 | Metrics and benchmark limitations recorded |

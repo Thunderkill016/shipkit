@@ -1,15 +1,15 @@
-# Project model — Shipkit
+# Project model — CycleWarden
 
 Status: active verified snapshot  
 Last verified: 2026-07-24<br>
-Product: Shipkit — one integrated AI-native product development system  
+Product: CycleWarden — one integrated AI-native product development system<br>
 Current safe autonomy ceiling: A2 for arbitrary repositories; A3 remains experimental and trusted-only
 
 This model distinguishes local implementation, cross-module integration and experimentally proven product value. It does not claim production use, complete sandbox isolation, a finished research workflow, end-to-end deployment governance or positive recursive improvement.
 
 ## Unified product identity
 
-Shipkit carries a product through one lifecycle:
+CycleWarden carries a product through one lifecycle:
 
 ```text
 objective and workspace
@@ -42,11 +42,19 @@ Initial validation may focus on developers already using coding agents, but this
 | `packages/evolution-core` | deterministic lifecycle, policy, persistence, evidence, inspection and CLI | no model or paid API required | High |
 | shared `packages/*` | auth, DB, security, mail, storage, payment and delivery capabilities | vendor calls behind adapters | High |
 | `docs/evolution` | architecture, research, comparison, governance and integrated roadmap | decisions require evidence and falsification tests | High |
-| `.shipkit` at runtime | shared durable cycle and evidence state | must remain outside committed source | High |
+| `.cyclewarden` at runtime | shared durable cycle and evidence state | new state uses `.cyclewarden`; an existing `.shipkit` store is read in place when no canonical store exists; both remain outside committed source | High |
 | `scripts` | onboarding, generator, diagnostics, dogfood and verification | tooling must remain bounded and attributable | High |
-| generated project | a user product workspace created by Shipkit | receives its own identity while retaining Shipkit tooling | High |
+| generated project | a user product workspace created by CycleWarden | receives its own identity while retaining CycleWarden tooling | High |
 
 ## Module map
+
+### Product identity migration
+
+CycleWarden is the canonical product identity. The project was formerly named
+Shipkit. Package scopes, CLI binaries, UI and active documentation use the new
+name. Runtime state is non-destructively compatible: `.cyclewarden` is
+preferred, while an existing `.shipkit` directory remains readable when the
+canonical directory is absent. See `docs/RENAMING_FROM_SHIPKIT.md`.
 
 ### Product Workspace and Foundation
 
@@ -273,7 +281,7 @@ workspace objective
 → persisted execution handoff
 ```
 
-This is the next slice of the complete Shipkit lifecycle, not a separate final product.
+This is the next slice of the complete CycleWarden lifecycle, not a separate final product.
 
 ## Verification baseline
 
@@ -324,11 +332,11 @@ This order expresses dependency and safety. It does not remove any module from t
   technical gate is ready, but external evidence remains `0/6`;
 - #15 — independent/versioned Evolution Core package.
 
-These issues are modules and prerequisites of the single Shipkit product, not separate product directions.
+These issues are modules and prerequisites of the single CycleWarden product, not separate product directions.
 
 ## Hard constraints
 
-- Shipkit is one product and one lifecycle;
+- CycleWarden is one product and one lifecycle;
 - modules may not create conflicting product definitions;
 - models and agents cannot mutate accepted state directly;
 - approval must match exact cycle, action, scope and parameters;

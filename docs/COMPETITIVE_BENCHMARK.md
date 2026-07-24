@@ -1,7 +1,7 @@
-# Shipkit — So sánh với mốc thị trường (Competitive Benchmark)
+# CycleWarden — So sánh với mốc thị trường (Competitive Benchmark)
 
 > **Mấu chốt:** không chỉ audit nội bộ — lấy **các dự án khác làm mốc** để biết mình đang đứng đâu và cần đuổi gì.  
-> Cập nhật theo code Shipkit + public docs đối thủ (~2026). Thang điểm **0–5** (0 = không có, 5 = best-in-class trong nhóm).
+> Cập nhật theo code CycleWarden + public docs đối thủ (~2026). Thang điểm **0–5** (0 = không có, 5 = best-in-class trong nhóm).
 
 ---
 
@@ -16,15 +16,15 @@
 | 5 | **[nextjs/saas-starter](https://github.com/nextjs/saas-starter)** | Official minimal clean reference | Free | Next + PG + Auth.js + Stripe |
 | 6 | **create-t3-app / t3-turbo** | Type-safe scaffold monorepo | Free | Next + tRPC + Drizzle… |
 
-**Shipkit không so với Lovable/Bolt** (closed AI builders) trên cùng trục — khác model (owned code vs chat SaaS).
+**CycleWarden không so với Lovable/Bolt** (closed AI builders) trên cùng trục — khác model (owned code vs chat SaaS).
 
 ---
 
-## 2. Ma trận feature (mốc vs Shipkit)
+## 2. Ma trận feature (mốc vs CycleWarden)
 
 Ký hiệu: ✅ solid · ⚠️ partial/demo · ❌ missing · 💰 paid only
 
-| Tiêu chí | Open SaaS | MakerKit | supastarter | ShipFast | next saas-starter | **Shipkit (code)** |
+| Tiêu chí | Open SaaS | MakerKit | supastarter | ShipFast | next saas-starter | **CycleWarden (code)** |
 |----------|-----------|----------|-------------|----------|-------------------|--------------------|
 | **Giá / license** | Free MIT-ish | Paid | Paid | Paid | Free | **Free MIT** |
 | **Landing marketing** | ✅ | ✅ | ✅ | ✅✅ | ⚠️ basic | ✅ |
@@ -52,7 +52,7 @@ Ký hiệu: ✅ solid · ⚠️ partial/demo · ❌ missing · 💰 paid only
 
 ## 3. Điểm theo trục chiến lược (0–5)
 
-| Trục | Trọng số | Open SaaS | MakerKit | ShipFast | next starter | **Shipkit** | Mốc cần đuổi |
+| Trục | Trọng số | Open SaaS | MakerKit | ShipFast | next starter | **CycleWarden** | Mốc cần đuổi |
 |------|----------|-----------|----------|----------|--------------|-------------|--------------|
 | **Time-to-product (TTP)** | 15% | 4 | 3 | **5** | 4 | **3.5** | ShipFast simplicity |
 | **Auth completeness** | 12% | 5 | **5** | 4 | 4 | **3.5** | Open SaaS / MakerKit |
@@ -61,7 +61,7 @@ Ký hiệu: ✅ solid · ⚠️ partial/demo · ❌ missing · 💰 paid only
 | **Portability (no lock-in)** | 12% | 4 | **5** | 2 | 3 | **4** | MakerKit Drizzle kit |
 | **Security baseline** | 12% | 3 | **5** | 2 | 3 | **4** | MakerKit |
 | **Agent / vibe DX** | 15% | **5** | 4 | 1 | 1 | **4.5** | Open SaaS (giữ lead) |
-| **Docs for non-devs** | 6% | 2 | 3 | 3 | 2 | **5** | **Shipkit lead** |
+| **Docs for non-devs** | 6% | 2 | 3 | 3 | 2 | **5** | **CycleWarden lead** |
 | **Multi-framework** | 4% | 1 | 3 | 0 | 0 | **1** | supastarter |
 | **Production ops (jobs, admin, email flows)** | 4% | **5** | 4 | 2 | 2 | **2** | Open SaaS |
 
@@ -74,9 +74,9 @@ Ký hiệu: ✅ solid · ⚠️ partial/demo · ❌ missing · 💰 paid only
 | supastarter | **4.1** |
 | ShipFast | **3.3** |
 | next saas-starter | **2.9** |
-| **Shipkit (sau P2)** | **~4.0** (setup/doctor/deploy gates + Sentry optional + e2e harden) |
+| **CycleWarden (sau P2)** | **~4.0** (setup/doctor/deploy gates + Sentry optional + e2e harden) |
 
-**Đọc điểm:** Shipkit đang **ngang/dưới ShipFast về “đủ để bán SaaS”**, **mạnh hơn starter official** về vibe/security/docs VI, **yếu rõ billing/teams/admin** so với Open SaaS & MakerKit.
+**Đọc điểm:** CycleWarden đang **ngang/dưới ShipFast về “đủ để bán SaaS”**, **mạnh hơn starter official** về vibe/security/docs VI, **yếu rõ billing/teams/admin** so với Open SaaS & MakerKit.
 
 ---
 
@@ -91,11 +91,11 @@ Ký hiệu: ✅ solid · ⚠️ partial/demo · ❌ missing · 💰 paid only
 | Background jobs | Ports/adapters rõ (đa vendor) |
 | Blog + AI demo app | IDEA.md workflow |
 
-**Kết luận:** Open SaaS = mốc **feature surface free**. Shipkit muốn “free + vibe” phải **đuổi billing + email flow + admin tối thiểu**, không cần copy Wasp.
+**Kết luận:** Open SaaS = mốc **feature surface free**. CycleWarden muốn “free + vibe” phải **đuổi billing + email flow + admin tối thiểu**, không cần copy Wasp.
 
 ### vs MakerKit (production leader)
 
-| Họ | Shipkit |
+| Họ | CycleWarden |
 |----|---------|
 | Teams, RBAC, billing, RLS-as-architecture | Single-user foundation |
 | Packages production-hardened | Packages đúng hướng, depth mỏng |
@@ -105,7 +105,7 @@ Ký hiệu: ✅ solid · ⚠️ partial/demo · ❌ missing · 💰 paid only
 
 ### vs ShipFast (speed leader)
 
-| Họ | Shipkit |
+| Họ | CycleWarden |
 |----|---------|
 | Checkout + landing conversion cực nhanh | Foundation + agent rules |
 | Ít test / nông security | Headers, rate limit, e2e, ports |
@@ -115,7 +115,7 @@ Ký hiệu: ✅ solid · ⚠️ partial/demo · ❌ missing · 💰 paid only
 
 ### vs supastarter (multi-FW leader)
 
-| Họ | Shipkit |
+| Họ | CycleWarden |
 |----|---------|
 | Next + Nuxt + TanStack **code** | Chỉ guide multi-FW |
 | Nhiều payment provider | Stripe adapter env-gated (1 provider) |
@@ -124,14 +124,14 @@ Ký hiệu: ✅ solid · ⚠️ partial/demo · ❌ missing · 💰 paid only
 
 ### vs nextjs/saas-starter (minimal official)
 
-Shipkit **đã vượt** về: dual auth, agent DX, storage/mail ports, VI docs, rate limit.  
-Shipkit **chưa bằng** về: Stripe end-to-end đơn giản, activity logging polish.
+CycleWarden **đã vượt** về: dual auth, agent DX, storage/mail ports, VI docs, rate limit.
+CycleWarden **chưa bằng** về: Stripe end-to-end đơn giản, activity logging polish.
 
 ---
 
 ## 5. Positioning từ benchmark (1 câu)
 
-> **Shipkit = free, agent-first product kit trên Next, portable infra (Supabase *hoặc* any Postgres), docs cả người trái ngành — đuổi Open SaaS về billing/email/admin, đuổi MakerKit về security/isolation, đuổi ShipFast về TTP — không đua multi-tenant B2B hay multi-FW sớm.**
+> **CycleWarden = free, agent-first product kit trên Next, portable infra (Supabase *hoặc* any Postgres), docs cả người trái ngành — đuổi Open SaaS về billing/email/admin, đuổi MakerKit về security/isolation, đuổi ShipFast về TTP — không đua multi-tenant B2B hay multi-FW sớm.**
 
 ---
 
@@ -184,7 +184,7 @@ Mỗi quý chấm lại bảng §3. **Rule:**
 
 - Không tăng version major nếu **Billing** & **Auth e2e** &lt; 4  
 - Không claim “multi-framework” nếu không có `apps/*` thứ 2 build trên CI  
-- Unique metric Shipkit: **Non-dev docs** + **Agent DX** phải ≥ 4.5 (giữ lợi thế)
+- Unique metric CycleWarden: **Non-dev docs** + **Agent DX** phải ≥ 4.5 (giữ lợi thế)
 
 ### Target score end of next phase
 
@@ -216,7 +216,7 @@ Mỗi quý chấm lại bảng §3. **Rule:**
 | Câu hỏi | Trả lời |
 |---------|---------|
 | Hiểu mấu chốt “so mốc ngoài”? | **Có — đây là scoreboard chính** |
-| Shipkit đang ở đâu? | **~3.2/5**: mạnh vibe/docs/portable; yếu billing/teams/admin/domain persist |
+| CycleWarden đang ở đâu? | **~3.2/5**: mạnh vibe/docs/portable; yếu billing/teams/admin/domain persist |
 | Đuổi ai trước? | **Open SaaS free features** (Stripe + mail + persist demo) + **MakerKit quality** (session/RLS) + **ShipFast TTP** |
 | Không đuổi sớm? | Multi-FW supastarter, full B2B multi-tenant MakerKit |
 

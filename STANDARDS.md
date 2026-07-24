@@ -1,6 +1,6 @@
 # Standards — what “good” means
 
-Shipkit is measured against **public standards**, not a single private codebase.
+CycleWarden is measured against **public standards**, not a single private codebase.
 
 ## Layer 1 — Cloud app
 

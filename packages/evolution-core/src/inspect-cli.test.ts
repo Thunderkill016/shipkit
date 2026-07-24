@@ -23,9 +23,9 @@ function outputCollector() {
   };
 }
 
-describe("shipkit-evolve inspect", () => {
+describe("cyclewarden-evolve inspect", () => {
   it("turns a repository scan into hashed blob evidence and an observed cycle occurrence", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "shipkit-inspect-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "cyclewarden-inspect-"));
     temporaryRoots.push(projectRoot);
     await mkdir(join(projectRoot, "src"), { recursive: true });
     await writeFile(
@@ -39,7 +39,7 @@ describe("shipkit-evolve inspect", () => {
     await writeFile(join(projectRoot, "src", "index.ts"), "export const value = 1;\n", "utf8");
     await writeFile(join(projectRoot, "README.md"), "# Outside product\n", "utf8");
 
-    const storeRoot = join(projectRoot, ".shipkit");
+    const storeRoot = join(projectRoot, ".cyclewarden");
     await runEvolutionCli(
       [
         "start",

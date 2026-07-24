@@ -80,7 +80,7 @@ function cleanFetcher(): PublicFetch {
 function manifest(): PublicResearchManifest {
   return {
     brief: {
-      decisionQuestion: "Which external-evidence improvement should Shipkit implement next?",
+      decisionQuestion: "Which external-evidence improvement should CycleWarden implement next?",
       owner: "public-researcher",
       deadline: null,
       assumptions: ["The supplied URLs are relevant to the explicit decision."],
@@ -234,9 +234,9 @@ function manifest(): PublicResearchManifest {
 }
 
 async function registry() {
-  const root = await mkdtemp(join(tmpdir(), "shipkit-public-research-"));
+  const root = await mkdtemp(join(tmpdir(), "cyclewarden-public-research-"));
   temporaryRoots.push(root);
-  return new EvidenceRegistry(join(root, ".shipkit"), root);
+  return new EvidenceRegistry(join(root, ".cyclewarden"), root);
 }
 
 describe("public source capture and citation review", () => {

@@ -1,10 +1,10 @@
-# Shipkit integrated product build roadmap
+# CycleWarden integrated product build roadmap
 
 Status: active  
 Issue: #9  
 Product definition: [`../../IDEA.md`](../../IDEA.md)
 
-Shipkit is one product. This roadmap sequences implementation by dependency and safety while retaining the full destination: workspace, application foundation, evolution kernel, research, execution, sandbox, verification, release, deployment, measurement, learning and interoperability.
+CycleWarden is one product. This roadmap sequences implementation by dependency and safety while retaining the full destination: workspace, application foundation, evolution kernel, research, execution, sandbox, verification, release, deployment, measurement, learning and interoperability.
 
 The current implementation reaches reviewed repository and explicit-public-source research decisions with typed execution handoffs (`created → observed → modeled → diagnosed → researched → decided → planned`) and includes an application foundation. It does not yet provide broad web discovery, direct user evidence, sandboxed implementation, release, measurement or learning in one complete user-visible cycle.
 
@@ -42,9 +42,9 @@ The current implementation reaches reviewed repository and explicit-public-sourc
 - [ ] verification, release and rollback views;
 - [ ] product metrics and learning history;
 - [ ] organization/team roles after the solo workflow is proven;
-- [ ] ensure generated projects retain their own product identity while connecting to Shipkit tooling.
+- [ ] ensure generated projects retain their own product identity while connecting to CycleWarden tooling.
 
-Exit: a user can operate each integrated milestone from one coherent Shipkit workspace rather than assembling CLI outputs manually.
+Exit: a user can operate each integrated milestone from one coherent CycleWarden workspace rather than assembling CLI outputs manually.
 
 ## Workstream B — deterministic evolution kernel
 
@@ -89,7 +89,7 @@ Exit: every later module can rely on durable, versioned, crash-safe and reviewab
 - [x] structural auth, database, deployment, secret and payment boundaries;
 - [x] temporary-workspace checks with timeout, output bounds and reduced environment;
 - [x] separate research, execution and verification readiness;
-- [x] proof on Shipkit and a pinned unrelated repository;
+- [x] proof on CycleWarden and a pinned unrelated repository;
 - [x] deterministic repository model consumed by the research decision flow.
 
 ### Required product understanding
@@ -103,7 +103,7 @@ Exit: every later module can rely on durable, versioned, crash-safe and reviewab
 - [ ] blind-spot and evidence-coverage reports beyond the repository baseline;
 - [ ] readiness dimensions for release and measurement.
 
-Exit: Shipkit understands both the codebase and the product context required to make responsible decisions.
+Exit: CycleWarden understands both the codebase and the product context required to make responsible decisions.
 
 ## Workstream D — research intelligence
 
@@ -177,18 +177,18 @@ Exit: Shipkit understands both the codebase and the product context required to 
 - [x] deterministic single-worker repository baseline;
 - [x] deterministic single-worker explicit-public-source baseline;
 - [x] durable query/source/time/cost usage and coverage gaps;
-- [x] Shipkit repository dogfood run with journal reload and passing independent review;
+- [x] CycleWarden repository dogfood run with journal reload and passing independent review;
 - [x] tests for insufficient budget, reviewer separation and unsupported user claims;
 - [x] tests for private-network destinations, unsafe redirects, hostile source content and missing exact quotes;
 - [x] public research CLI journal reload retains runs, evaluation and citation spans;
 - [ ] bounded parallel research for genuinely independent branches;
 - [ ] compare manifest, search, single-worker, multi-worker and human-assisted configurations;
-- [ ] autonomous external research proof on Shipkit and an unrelated real product using pinned live sources;
+- [ ] autonomous external research proof on CycleWarden and an unrelated real product using pinned live sources;
 - [ ] retrieval correctness, external citation precision/completeness and contradiction recall benchmarks;
 - [ ] decision usefulness, recommendation survival, avoided waste, cost and latency across real users;
 - [ ] research skill registry only after baseline evidence exists.
 
-Exit: Shipkit produces reproducible, reviewable product decisions and a typed experiment ready for governed implementation.
+Exit: CycleWarden produces reproducible, reviewable product decisions and a typed experiment ready for governed implementation.
 
 ## Workstream E — execution and sandbox
 
@@ -306,7 +306,7 @@ Exit: at least one accepted learning improves a later comparable end-to-end prod
 - [ ] import/export of cycles, evidence and attestations;
 - [ ] extension packs for agents, sandboxes, research sources, verification and deployment.
 
-Exit: local, repository and hosted surfaces present the same Shipkit product and lifecycle.
+Exit: local, repository and hosted surfaces present the same CycleWarden product and lifecycle.
 
 ## Integrated milestones
 
@@ -341,7 +341,7 @@ Each milestone is a vertical integration of the final product, not a separate pr
 
 ## Full-product acceptance
 
-Shipkit reaches its intended v1 only when:
+CycleWarden reaches its intended v1 only when:
 
 - one product workspace operates the complete lifecycle;
 - a project can be created or attached;
@@ -352,4 +352,4 @@ Shipkit reaches its intended v1 only when:
 - technical and product outcomes are measured;
 - rollback is exercised;
 - later learning is causally evaluated;
-- the complete cycle is proven on Shipkit and unrelated real products.
+- the complete cycle is proven on CycleWarden and unrelated real products.

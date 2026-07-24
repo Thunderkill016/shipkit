@@ -2,7 +2,7 @@
   "provider": "github-repository-search",
   "maxResultAgeMinutes": 60,
   "brief": {
-    "decisionQuestion": "Should Shipkit add a reproducible public search baseline before the external pilot?",
+    "decisionQuestion": "Should CycleWarden add a reproducible public search baseline before the external pilot?",
     "owner": "search-researcher",
     "deadline": null,
     "assumptions": ["GitHub repository search is a bounded first discovery provider."],
@@ -21,13 +21,13 @@
   },
   "queries": [
     {
-      "query": "shipkit evidence research in:name,description",
-      "rationale": "Find the primary Shipkit repository result.",
+      "query": "cyclewarden evidence research in:name,description",
+      "rationale": "Find the primary CycleWarden repository result.",
       "intent": "support",
       "maxResults": 3
     },
     {
-      "query": "shipkit limitations archived in:name,description",
+      "query": "cyclewarden limitations archived in:name,description",
       "rationale": "Search explicitly for a limitation or contrary implementation.",
       "intent": "falsification",
       "maxResults": 3
@@ -65,14 +65,14 @@
   ],
   "claims": [
     {
-      "statement": "Shipkit has a bounded search and exact-citation implementation path.",
+      "statement": "CycleWarden has a bounded search and exact-citation implementation path.",
       "claimType": "fact",
       "confidence": 0.9,
       "uncertainty": "The fixture proves the baseline contract, not external product value.",
       "supportingCitations": [
         {
           "sourceIndex": 0,
-          "quote": "\"description\":\"Shipkit uses bounded search and exact citations.\""
+          "quote": "\"description\":\"CycleWarden uses bounded search and exact citations.\""
         }
       ],
       "contradictingCitations": [],

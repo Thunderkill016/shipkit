@@ -1,6 +1,6 @@
 # Production Deployment Guide (L2)
 
-Shipkit hỗ trợ hai phương thức triển khai chuẩn công nghiệp (Level 2 Deploy Paths): **Vercel** và **Docker**.
+CycleWarden hỗ trợ hai phương thức triển khai chuẩn công nghiệp (Level 2 Deploy Paths): **Vercel** và **Docker**.
 
 ## Pre-flight (local)
 
@@ -12,12 +12,12 @@ pnpm build               # must be green
 
 ## One-click style (Vercel)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FThunderkill016%2Fshipkit&env=NEXT_PUBLIC_APP_URL,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY&envDescription=See%20docs%2FDEPLOY.md%20and%20.env.example&project-name=shipkit&repository-name=shipkit)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FThunderkill016%2Fcyclewarden&env=NEXT_PUBLIC_APP_URL,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY&envDescription=See%20docs%2FDEPLOY.md%20and%20.env.example&project-name=cyclewarden&repository-name=cyclewarden)
 
 Repo includes root **`vercel.json`**:
 
 - `installCommand`: `pnpm install`
-- `buildCommand`: `pnpm --filter @shipkit/web build`
+- `buildCommand`: `pnpm --filter @cyclewarden/web build`
 
 After clone on Vercel, set env vars (see below), then Deploy.
 

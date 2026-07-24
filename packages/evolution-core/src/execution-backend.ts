@@ -464,7 +464,7 @@ export class DockerExecutionBackend implements ExecutionBackend {
 
   async execute(request: ExecutionRequest): Promise<ExecutionBackendResult> {
     await this.assertAvailable();
-    const containerName = `shipkit-check-${randomUUID()}`;
+    const containerName = `cyclewarden-check-${randomUUID()}`;
     const args = buildDockerRunArguments({
       containerName,
       image: this.image,

@@ -14,10 +14,10 @@ export interface MailPort {
 }
 
 /** Dev stub — logs instead of sending. */
-export function createConsoleMailer(defaultFrom = "noreply@shipkit.local"): MailPort {
+export function createConsoleMailer(defaultFrom = "noreply@cyclewarden.local"): MailPort {
   return {
     async send(message) {
-      console.log("[shipkit/mail]", {
+      console.log("[cyclewarden/mail]", {
         from: message.from ?? defaultFrom,
         to: message.to,
         subject: message.subject,

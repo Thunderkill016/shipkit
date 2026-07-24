@@ -2,7 +2,7 @@
 
 ## Name
 
-**Shipkit** — ship products, not micro-frameworks.
+**CycleWarden** — ship products, not micro-frameworks.
 
 ## Why this exists
 
@@ -25,7 +25,7 @@ We explicitly **do not** ship three UI frameworks half-broken on day one.
 | App | Next.js App Router | Dominant full-stack TS surface for agents |
 | Auth | Supabase Auth adapter → Better Auth next | Fast path + portable self-host path |
 | Data | Postgres (any URL) + optional Supabase | Twelve-factor backing service |
-| ORM contract | Drizzle schema in `@shipkit/db` | DB-agnostic TS industry default |
+| ORM contract | Drizzle schema in `@cyclewarden/db` | DB-agnostic TS industry default |
 | Security | Headers + Zod + rate-limit port | ASVS L1 practical baseline |
 | Deploy | Vercel recipe + Docker Compose | Two first-class hosts, no single religion |
 | Agent DX | AGENTS.md + IDEA.md + llms.txt | agents.md standard + vibe workflow |
@@ -37,7 +37,7 @@ We explicitly **do not** ship three UI frameworks half-broken on day one.
 | HTTP-only microframework | Wrong problem (already solved by Hono/etc.) |
 | Full MakerKit feature parity | Scope death for a free OSS core |
 | Multi-framework SKU day one | Needs commercial team (supastarter model) |
-| Anchoring brand to one private product | Shipkit is for **everyone’s** ideas |
+| Anchoring brand to one private product | CycleWarden is for **everyone’s** ideas |
 
 ## Success criteria
 

@@ -3,8 +3,8 @@
 ## Demo (xem UI ngay)
 
 ```bash
-git clone https://github.com/Thunderkill016/shipkit.git
-cd shipkit
+git clone https://github.com/Thunderkill016/cyclewarden.git
+cd cyclewarden
 pnpm install
 pnpm ready                 # tạo .env.local demo nếu chưa có
 pnpm dev

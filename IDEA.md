@@ -1,11 +1,11 @@
-# Shipkit — unified product source of truth
+# CycleWarden — unified product source of truth
 
 > This file defines the single product built by this repository.
 > Engineering constraints live in `AGENTS.md`; architecture, research and implementation details live in `docs/evolution/`.
 
 ## Product
 
-**Shipkit is one integrated AI-native product development system.**
+**CycleWarden is one integrated AI-native product development system.**
 
 It helps a person or team take a project through one governed lifecycle:
 
@@ -22,15 +22,15 @@ idea and product definition
 → retained learning and controlled improvement
 ```
 
-The deterministic Evolution Engine is the control core of Shipkit, not a separate product. The web workspace, starter foundation, generator, research system, agent adapters, sandbox, evidence registry, verification, deployment, integrations and learning system are modules of the same product.
+The deterministic Evolution Engine is the control core of CycleWarden, not a separate product. The web workspace, starter foundation, generator, research system, agent adapters, sandbox, evidence registry, verification, deployment, integrations and learning system are modules of the same product.
 
 ## Product promise
 
-> Give Shipkit a product objective and a repository. Shipkit understands the current system, researches what should happen next, builds the selected change through governed agents, verifies it, ships it safely, measures the result and uses accepted evidence to improve future cycles.
+> Give CycleWarden a product objective and a repository. CycleWarden understands the current system, researches what should happen next, builds the selected change through governed agents, verifies it, ships it safely, measures the result and uses accepted evidence to improve future cycles.
 
 ## Users
 
-Shipkit must ultimately support:
+CycleWarden must ultimately support:
 
 - solo developers using coding agents;
 - product and engineering teams coordinating human and AI work;
@@ -42,7 +42,7 @@ The initial beachhead remains developers already using coding agents, but this n
 ## Unified product modules
 
 ```text
-Shipkit
+CycleWarden
 ├── Product Workspace
 │   ├── product brief, roadmap and experiment surfaces
 │   ├── generated application foundation
@@ -75,11 +75,11 @@ Shipkit
     └── optional telemetry and portable trust
 ```
 
-Implementation packages may be separated for safety and maintainability, but they must converge into one user-visible Shipkit workflow and one shared state, policy and evidence model.
+Implementation packages may be separated for safety and maintainability, but they must converge into one user-visible CycleWarden workflow and one shared state, policy and evidence model.
 
 ## Integrated product loop
 
-A complete Shipkit cycle is:
+A complete CycleWarden cycle is:
 
 ```text
 created
@@ -114,11 +114,11 @@ The next milestone is an **A2 Research and Decision slice inside the complete pr
 8. select the smallest reversible experiment;
 9. hand the accepted decision to the future execution module through the same persisted cycle.
 
-This milestone ends before code mutation because sandboxed execution is not safe yet. It is not the final product and it does not remove execution, delivery, measurement or learning from Shipkit.
+This milestone ends before code mutation because sandboxed execution is not safe yet. It is not the final product and it does not remove execution, delivery, measurement or learning from CycleWarden.
 
 ## Final product requirements
 
-Shipkit is not complete until the same product can:
+CycleWarden is not complete until the same product can:
 
 - create or attach to a real product repository;
 - provide a usable workspace and application foundation;
@@ -139,8 +139,8 @@ Shipkit is not complete until the same product can:
 Near-term proof:
 
 - setup to first inspected project model in under five minutes;
-- an evidence-backed research and decision cycle on Shipkit and an unrelated project;
-- a real user confirms that Shipkit changed, confirmed or prevented a meaningful decision.
+- an evidence-backed research and decision cycle on CycleWarden and an unrelated project;
+- a real user confirms that CycleWarden changed, confirmed or prevented a meaningful decision.
 
 Full-product proof:
 
@@ -152,7 +152,7 @@ Full-product proof:
 
 ## Product rules
 
-1. Shipkit is one product; modules are not competing product lines.
+1. CycleWarden is one product; modules are not competing product lines.
 2. Sequencing implementation is allowed; deleting the unified destination is not.
 3. The workspace and starter foundation are part of the product experience, not disposable demos.
 4. Research determines what to build; agents do not own the decision.

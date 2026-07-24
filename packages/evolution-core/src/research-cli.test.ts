@@ -24,7 +24,7 @@ function collector() {
 }
 
 const bundle = {
-  brief: { decisionQuestion: "Which integrated workflow should Shipkit implement next?" },
+  brief: { decisionQuestion: "Which integrated workflow should CycleWarden implement next?" },
   plan: {
     questions: ["Which workflow removes the largest coordination gap?"],
     sourceStrategy: ["Repository evidence"],
@@ -32,7 +32,7 @@ const bundle = {
   },
   queries: [
     {
-      query: "Shipkit disconnected workflow evidence",
+      query: "CycleWarden disconnected workflow evidence",
       rationale: "Find gaps between existing modules",
       tool: "repository-search",
     },
@@ -40,8 +40,8 @@ const bundle = {
   sources: [
     {
       canonicalId: "repo:roadmap",
-      title: "Shipkit integrated roadmap",
-      publisher: "Shipkit",
+      title: "CycleWarden integrated roadmap",
+      publisher: "CycleWarden",
       sourceClass: "repository",
       authority: 1,
       directness: 1,
@@ -117,11 +117,11 @@ const bundle = {
 
 describe("prepare-handoff CLI", () => {
   it("persists research records and reloads the execution handoff", async () => {
-    const root = await mkdtemp(join(tmpdir(), "shipkit-research-cli-"));
+    const root = await mkdtemp(join(tmpdir(), "cyclewarden-research-cli-"));
     temporaryRoots.push(root);
-    const storeRoot = join(root, ".shipkit");
+    const storeRoot = join(root, ".cyclewarden");
     const bundlePath = join(root, "research.json");
-    const cycleId = "shipkit:research-cli-001";
+    const cycleId = "cyclewarden:research-cli-001";
     await writeFile(bundlePath, JSON.stringify(bundle), "utf8");
 
     await runEvolutionCli(

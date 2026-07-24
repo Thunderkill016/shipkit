@@ -1,5 +1,5 @@
 import { setLocaleAction } from "@/app/actions/locale";
-import type { Locale } from "@shipkit/i18n";
+import type { Locale } from "@cyclewarden/i18n";
 
 export function LocaleSwitcher({ locale }: { locale: Locale }) {
   return (

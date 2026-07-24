@@ -13,13 +13,13 @@ type ParsedArgs = {
   options: Map<string, string[]>;
 };
 
-const HELP = `Shipkit Sandbox Check
+const HELP = `CycleWarden Sandbox Check
 
 Usage:
-  shipkit-sandbox-check --project-root . --backend trusted-local \
+  cyclewarden-sandbox-check --project-root . --backend trusted-local \
     --acknowledge-trusted-repository --check test [--check build]
 
-  shipkit-sandbox-check --project-root . --backend docker \
+  cyclewarden-sandbox-check --project-root . --backend docker \
     --docker-image sha256:<64-hex> --check test
 
 Options:
@@ -149,7 +149,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     },
     (error) => {
       process.stderr.write(
-        `shipkit-sandbox-check: ${error instanceof Error ? error.message : String(error)}\n`
+        `cyclewarden-sandbox-check: ${error instanceof Error ? error.message : String(error)}\n`
       );
       process.exitCode = 1;
     }

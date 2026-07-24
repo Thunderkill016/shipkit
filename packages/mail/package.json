@@ -1,5 +1,5 @@
 {
-  "name": "@shipkit/mail",
+  "name": "@cyclewarden/mail",
   "version": "0.1.0",
   "private": true,
   "type": "module",

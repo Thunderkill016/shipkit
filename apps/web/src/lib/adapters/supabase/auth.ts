@@ -1,4 +1,4 @@
-import type { AuthPort, AuthUser } from "@shipkit/auth";
+import type { AuthPort, AuthUser } from "@cyclewarden/auth";
 import { createSupabaseServerClient } from "./server";
 
 /** Supabase implementation of AuthPort (server). */

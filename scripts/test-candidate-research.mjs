@@ -21,12 +21,12 @@ const manifestPath = join(
   "evolution-core",
   "src",
   "fixtures",
-  "shipkit-next-workstream.candidates.json"
+  "cyclewarden-next-workstream.candidates.json"
 );
 const capabilitiesPath = join(repositoryRoot, "docs", "CAPABILITIES.json");
-const temporaryRoot = await mkdtemp(join(tmpdir(), "shipkit-candidate-proof-"));
-const storeRoot = join(temporaryRoot, ".shipkit");
-const cycleId = "shipkit:candidate-proof-001";
+const temporaryRoot = await mkdtemp(join(tmpdir(), "cyclewarden-candidate-proof-"));
+const storeRoot = join(temporaryRoot, ".cyclewarden");
+const cycleId = "cyclewarden:candidate-proof-001";
 const reportPath = join(repositoryRoot, "artifacts", "candidate-research-proof.json");
 
 function run(cli, args) {
@@ -59,7 +59,7 @@ try {
     "--id",
     cycleId,
     "--objective",
-    "Choose Shipkit's next named workstream among #15, #13, #12 and #17",
+    "Choose CycleWarden's next named workstream among #15, #13, #12 and #17",
     "--autonomy",
     "A2",
     "--risk",

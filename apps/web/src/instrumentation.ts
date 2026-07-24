@@ -1,6 +1,6 @@
 /**
  * Next.js instrumentation — optional Sentry when SENTRY_DSN is set.
- * Install peer: pnpm --filter @shipkit/web add @sentry/node
+ * Install peer: pnpm --filter @cyclewarden/web add @sentry/node
  * Docs: docs/SENTRY.md
  */
 export async function register() {
@@ -20,7 +20,7 @@ export async function register() {
     });
   } catch {
     console.warn(
-      "[shipkit] SENTRY_DSN set but @sentry/node is not installed. Run: pnpm --filter @shipkit/web add @sentry/node"
+      "[cyclewarden] SENTRY_DSN set but @sentry/node is not installed. Run: pnpm --filter @cyclewarden/web add @sentry/node"
     );
   }
 }

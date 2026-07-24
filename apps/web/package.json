@@ -1,5 +1,5 @@
 {
-  "name": "@shipkit/web",
+  "name": "@cyclewarden/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,15 +13,15 @@
     "test:e2e:install": "playwright install chromium"
   },
   "dependencies": {
-    "@shipkit/auth": "workspace:*",
-    "@shipkit/config": "workspace:*",
-    "@shipkit/db": "workspace:*",
-    "@shipkit/i18n": "workspace:*",
-    "@shipkit/logger": "workspace:*",
-    "@shipkit/mail": "workspace:*",
-    "@shipkit/payment": "workspace:^",
-    "@shipkit/security": "workspace:*",
-    "@shipkit/storage": "workspace:*",
+    "@cyclewarden/auth": "workspace:*",
+    "@cyclewarden/config": "workspace:*",
+    "@cyclewarden/db": "workspace:*",
+    "@cyclewarden/i18n": "workspace:*",
+    "@cyclewarden/logger": "workspace:*",
+    "@cyclewarden/mail": "workspace:*",
+    "@cyclewarden/payment": "workspace:^",
+    "@cyclewarden/security": "workspace:*",
+    "@cyclewarden/storage": "workspace:*",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.49.8",
     "better-auth": "^1.6.23",

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * shipkit doctor v3 — checklist UX (ShipFast-style clarity)
+ * cyclewarden doctor v3 — checklist UX (ShipFast-style clarity)
  * Flags: --json
  */
 import { readFileSync, existsSync } from "node:fs";
@@ -172,7 +172,7 @@ const dim = (v) => (v ? "✓" : "·");
 
 console.log(`
 ┌─────────────────────────────────────────┐
-│  ✦ shipkit doctor                       │
+│  ✦ cyclewarden doctor                       │
 │  score ${String(score).padStart(3)}/100 · adapter: ${adapter.padEnd(12)} │
 └─────────────────────────────────────────┘
 `);

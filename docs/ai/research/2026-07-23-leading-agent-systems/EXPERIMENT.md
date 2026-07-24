@@ -7,7 +7,7 @@ Owner: Codex
 ## Decision and assumption
 
 Test whether a dependency-free registry check can make current external evidence
-mechanically reviewable and reject the concrete drift modes found in Shipkit.
+mechanically reviewable and reject the concrete drift modes found in CycleWarden.
 
 This does not test user value.
 
@@ -26,7 +26,7 @@ Technical spike with positive and negative deterministic fixtures.
 
 ## Participants or system
 
-Shipkit repository at `origin/main` commit `788ca83`, Node.js 24.16.0.
+CycleWarden repository at `origin/main` commit `788ca83`, Node.js 24.16.0.
 
 ## Procedure
 

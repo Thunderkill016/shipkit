@@ -1,4 +1,4 @@
-# Shipkit repository instructions
+# CycleWarden repository instructions
 
 - Read `AGENTS.md` and follow its linked source-of-truth documents.
 - Read `docs/ai/PROJECT_MODEL.md` and `docs/CAPABILITIES.json` before broad or

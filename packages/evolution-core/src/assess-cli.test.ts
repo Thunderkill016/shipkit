@@ -27,10 +27,10 @@ function collector() {
 }
 
 async function createProject(): Promise<{ root: string; projectRoot: string; storeRoot: string }> {
-  const root = await mkdtemp(join(tmpdir(), "shipkit-assess-cli-"));
+  const root = await mkdtemp(join(tmpdir(), "cyclewarden-assess-cli-"));
   temporaryRoots.push(root);
   const projectRoot = join(root, "external-product");
-  const storeRoot = join(root, ".shipkit");
+  const storeRoot = join(root, ".cyclewarden");
   await mkdir(join(projectRoot, "src"), { recursive: true });
   await mkdir(join(projectRoot, ".github", "workflows"), { recursive: true });
   await writeFile(join(projectRoot, "src", "index.js"), "export const value = 1;\n", "utf8");

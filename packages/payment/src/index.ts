@@ -70,14 +70,14 @@ export function createNoopPaymentPort(): PaymentPort {
   return {
     async createCheckoutSession() {
       throw new Error(
-        "[shipkit/payment] No payment adapter configured. " +
+        "[cyclewarden/payment] No payment adapter configured. " +
           "Set STRIPE_SECRET_KEY (+ STRIPE_PRICE_ID) — see packages/payment and /app/billing."
       );
     },
 
     async createBillingPortalSession() {
       throw new Error(
-        "[shipkit/payment] No payment adapter configured. " +
+        "[cyclewarden/payment] No payment adapter configured. " +
           "Set STRIPE_SECRET_KEY — see packages/payment and /app/billing."
       );
     },

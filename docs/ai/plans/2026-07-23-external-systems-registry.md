@@ -8,7 +8,7 @@
 
 ## Problem and outcome
 
-Shipkit's external comparison is useful but had floating revisions and stale
+CycleWarden's external comparison is useful but had floating revisions and stale
 internal status. Create a machine-readable, expiring decision record and fail the
 existing AI workflow when evidence loses required breadth, revision, limitation,
 contradiction, or falsification metadata.
@@ -42,7 +42,7 @@ contradiction, or falsification metadata.
 
 - adding a paid search provider or API key;
 - adding a remote sandbox;
-- executing a Shipkit handoff with Codex or OpenHands;
+- executing a CycleWarden handoff with Codex or OpenHands;
 - MCP or A2A endpoints;
 - claiming user demand or product-market validation;
 - rewriting all historical research.
@@ -119,7 +119,7 @@ Passed:
 - `pnpm lint`;
 - `git diff --check`;
 - JSON parse checks;
-- `@shipkit/evolution-core` build inside the broader build attempt.
+- `@cyclewarden/evolution-core` build inside the broader build attempt.
 
 Full `pnpm verify` was attempted but stopped in pre-existing areas outside this
 diff:

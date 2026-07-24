@@ -20,7 +20,7 @@ const expectedPreAudit = [
   "alternatives-currently-considered",
   "preferred-decision-and-confidence",
   "evidence-already-used",
-  "likely-action-without-shipkit",
+  "likely-action-without-cyclewarden",
   "estimated-cost-of-wrong-decision",
   "evidence-that-could-change-the-decision",
 ];
@@ -32,7 +32,7 @@ const expectedEligibility = [
   "agrees-to-recent-behavior-not-hypothetical-preference",
 ];
 const expectedExclusions = [
-  "shipkit-audit-designer",
+  "cyclewarden-audit-designer",
   "unscopable-secret-regulated-or-private-data",
   "enthusiasm-only-recruitment",
   "no-real-decision-due-during-pilot",
@@ -239,7 +239,7 @@ function validateTemplateShape(template, errors) {
       "preferredAlternative",
       "confidence0To100",
       "evidenceAlreadyUsed",
-      "likelyActionWithoutShipkit",
+      "likelyActionWithoutCycleWarden",
       "estimatedWrongDecisionCost",
       "decisionChangingEvidenceRequested",
       "capturedAt",
@@ -316,12 +316,12 @@ export function validatePilotArtifacts({ protocol, state, sessionTemplate }) {
   if (protocol.protocolVersion !== "2026-07-24-v1") {
     errors.push("protocol.protocolVersion must remain 2026-07-24-v1");
   }
-  if (protocol.issueUrl !== "https://github.com/Thunderkill016/shipkit/issues/14") {
+  if (protocol.issueUrl !== "https://github.com/Thunderkill016/cyclewarden/issues/14") {
     errors.push("protocol.issueUrl must reference issue #14");
   }
   if (
     protocol.decision !==
-    "Determine whether one Shipkit A2 Research Audit creates inspectable decision value for solo developers and open-source maintainers already using coding agents."
+    "Determine whether one CycleWarden A2 Research Audit creates inspectable decision value for solo developers and open-source maintainers already using coding agents."
   ) {
     errors.push("protocol.decision changed from the precommitted decision");
   }
@@ -723,7 +723,7 @@ export function validateSessionRecord(record, protocol) {
     "preferredAlternative",
     "confidence0To100",
     "evidenceAlreadyUsed",
-    "likelyActionWithoutShipkit",
+    "likelyActionWithoutCycleWarden",
     "estimatedWrongDecisionCost",
     "decisionChangingEvidenceRequested",
     "capturedAt",
@@ -752,7 +752,7 @@ export function validateSessionRecord(record, protocol) {
   ) {
     errors.push("session.preAuditDecision.confidence0To100 must be 0-100");
   }
-  requireText(errors, pre.likelyActionWithoutShipkit, "session.preAuditDecision.likelyActionWithoutShipkit");
+  requireText(errors, pre.likelyActionWithoutCycleWarden, "session.preAuditDecision.likelyActionWithoutCycleWarden");
   requireText(errors, pre.estimatedWrongDecisionCost, "session.preAuditDecision.estimatedWrongDecisionCost");
   requireText(errors, pre.decisionChangingEvidenceRequested, "session.preAuditDecision.decisionChangingEvidenceRequested");
   if (!validIsoTimestamp(pre.capturedAt)) {

@@ -1,5 +1,5 @@
 {
-  "name": "@shipkit/storage",
+  "name": "@cyclewarden/storage",
   "version": "0.1.0",
   "private": true,
   "type": "module",

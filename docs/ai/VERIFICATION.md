@@ -19,9 +19,9 @@ Use the strongest practical evidence.
 Run the narrowest check first:
 
 ```bash
-pnpm --filter @shipkit/web lint
-pnpm --filter @shipkit/web typecheck
-pnpm --filter @shipkit/web test
+pnpm --filter @cyclewarden/web lint
+pnpm --filter @cyclewarden/web typecheck
+pnpm --filter @cyclewarden/web test
 ```
 
 Then run the repository gate:

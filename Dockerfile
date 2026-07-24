@@ -1,4 +1,4 @@
-# Multi-stage production Dockerfile for Shipkit monorepo (Next.js apps/web)
+# Multi-stage production Dockerfile for CycleWarden monorepo (Next.js apps/web)
 FROM node:20-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const siteName = "Shipkit";
+const siteName = "CycleWarden";
 const defaultDescription =
   "Open product kit for vibe coding — idea to landing, auth, app, security, and deploy.";
 

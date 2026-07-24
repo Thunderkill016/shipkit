@@ -7,7 +7,7 @@ import { createUpstashRateLimiter } from "./upstash";
 export function createRateLimiter(
   limit: number,
   windowMs: number,
-  prefix = "shipkit"
+  prefix = "cyclewarden"
 ): RateLimitPort {
   const windowSeconds = Math.max(1, Math.ceil(windowMs / 1000));
   const upstash = createUpstashRateLimiter(limit, windowSeconds, prefix);

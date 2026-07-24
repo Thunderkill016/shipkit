@@ -13,7 +13,7 @@ describe("persistence platform contract", () => {
   it("supports directory fsync on the declared Linux CI platform", async () => {
     if (process.platform !== "linux") return;
 
-    const root = await mkdtemp(join(tmpdir(), "shipkit-directory-sync-"));
+    const root = await mkdtemp(join(tmpdir(), "cyclewarden-directory-sync-"));
     temporaryRoots.push(root);
     const handle = await open(root, "r");
     try {

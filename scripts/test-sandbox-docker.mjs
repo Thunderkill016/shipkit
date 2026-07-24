@@ -6,20 +6,23 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const shipkitRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const cli = join(shipkitRoot, "packages/evolution-core/dist/sandbox-cli.js");
-const image = process.env.SHIPKIT_SANDBOX_IMAGE?.trim();
+const cyclewardenRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const cli = join(cyclewardenRoot, "packages/evolution-core/dist/sandbox-cli.js");
+const image = (
+  process.env.CYCLEWARDEN_SANDBOX_IMAGE ??
+  process.env.SHIPKIT_SANDBOX_IMAGE
+)?.trim();
 if (!image || !/^sha256:[a-f0-9]{64}$/i.test(image)) {
-  throw new Error("SHIPKIT_SANDBOX_IMAGE must contain an explicitly pulled immutable local image ID");
+  throw new Error("CYCLEWARDEN_SANDBOX_IMAGE must contain an explicitly pulled immutable local image ID");
 }
 
-const temporary = await mkdtemp(join(tmpdir(), "shipkit-docker-hostile-"));
+const temporary = await mkdtemp(join(tmpdir(), "cyclewarden-docker-hostile-"));
 const projectRoot = join(temporary, "project");
 const hostSentinel = join(temporary, "host-sentinel.txt");
 
 function command(executable, args, options = {}) {
   const result = spawnSync(executable, args, {
-    cwd: options.cwd ?? shipkitRoot,
+    cwd: options.cwd ?? cyclewardenRoot,
     encoding: "utf8",
     env: options.env ?? process.env,
     timeout: options.timeout ?? 120_000,
@@ -35,13 +38,13 @@ function command(executable, args, options = {}) {
 try {
   await mkdir(projectRoot, { recursive: true });
   await writeFile(hostSentinel, "host-original\n", "utf8");
-  await writeFile(join(projectRoot, ".env"), "SHIPKIT_HOST_SECRET=source-secret\n", "utf8");
+  await writeFile(join(projectRoot, ".env"), "CYCLEWARDEN_HOST_SECRET=source-secret\n", "utf8");
   await symlink(hostSentinel, join(projectRoot, "outside-link"));
   await writeFile(
     join(projectRoot, "package.json"),
     `${JSON.stringify(
       {
-        name: "shipkit-hostile-sandbox-fixture",
+        name: "cyclewarden-hostile-sandbox-fixture",
         private: true,
         scripts: { test: "node hostile.mjs" },
       },
@@ -56,12 +59,12 @@ import { existsSync, writeFileSync } from "node:fs";
 import { createConnection } from "node:net";
 
 const failures = [];
-if (process.env.SHIPKIT_HOST_SECRET !== undefined) failures.push("host secret inherited");
+if (process.env.CYCLEWARDEN_HOST_SECRET !== undefined) failures.push("host secret inherited");
 if (existsSync("/workspace/.env")) failures.push("credential file copied");
 if (existsSync("/workspace/outside-link")) failures.push("external symlink copied");
 
 try {
-  writeFileSync("/etc/shipkit-hostile-write", "escape");
+  writeFileSync("/etc/cyclewarden-hostile-write", "escape");
   failures.push("read-only root write succeeded");
 } catch {}
 
@@ -125,7 +128,7 @@ process.stdout.write(JSON.stringify({
     {
       env: {
         ...process.env,
-        SHIPKIT_HOST_SECRET: "must-never-enter-the-container",
+        CYCLEWARDEN_HOST_SECRET: "must-never-enter-the-container",
       },
       timeout: 60_000,
     }
@@ -156,7 +159,7 @@ process.stdout.write(JSON.stringify({
     "ps",
     "-a",
     "--filter",
-    "name=shipkit-check-",
+    "name=cyclewarden-check-",
     "--format",
     "{{.Names}}",
   ]).trim();

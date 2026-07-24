@@ -49,7 +49,10 @@ export function LoginForm({ labels }: { labels: LoginLabels }) {
   const [signUpState, signUp, signUpPending] = useActionState(signUpAction, initial);
   const [oauthState, oauthSignIn, oauthPending] = useActionState(oauthSignInAction, initial);
 
-  const mode = process.env.NEXT_PUBLIC_SHIPKIT_MODE || "";
+  const mode =
+    process.env.NEXT_PUBLIC_CYCLEWARDEN_MODE ??
+    process.env.NEXT_PUBLIC_SHIPKIT_MODE ??
+    "";
   const configured =
     mode === "better-auth" ||
     mode === "supabase" ||

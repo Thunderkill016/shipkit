@@ -5,6 +5,7 @@ dist
 .env
 .env.local
 apps/web/.env.local
+.cyclewarden
 .shipkit
 *.log
 .DS_Store

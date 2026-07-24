@@ -30,7 +30,7 @@
     "preferredAlternative": null,
     "confidence0To100": null,
     "evidenceAlreadyUsed": [],
-    "likelyActionWithoutShipkit": null,
+    "likelyActionWithoutCycleWarden": null,
     "estimatedWrongDecisionCost": null,
     "decisionChangingEvidenceRequested": null,
     "capturedAt": null

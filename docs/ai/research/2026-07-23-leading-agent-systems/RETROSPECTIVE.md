@@ -1,4 +1,4 @@
-# Research retrospective — leading external systems for Shipkit
+# Research retrospective — leading external systems for CycleWarden
 
 Date: 2026-07-23
 Final status: bounded delivery
@@ -7,7 +7,7 @@ Final status: bounded delivery
 
 High confidence in the architecture decision:
 
-- keep Shipkit's portable deterministic decision/evidence kernel;
+- keep CycleWarden's portable deterministic decision/evidence kernel;
 - integrate rather than rebuild mature execution, workflow, sandbox, protocol,
   policy and telemetry systems;
 - differentiate through decision-to-outcome evidence and honest evaluation,
@@ -25,7 +25,7 @@ evidence and evaluations need revisions, limitations, expiry, and dissent.
 
 ## Most important contradiction
 
-Shipkit's strongest internal architecture evidence does not establish that users
+CycleWarden's strongest internal architecture evidence does not establish that users
 will value the governed decision workflow. Issue #14 remains the product gate.
 
 ## Belief that changed

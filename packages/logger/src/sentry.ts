@@ -12,18 +12,18 @@ export async function captureSentryError(
   try {
     const name = "@sentry/node";
     const Sentry = (await import(/* webpackIgnore: true */ name)) as {
-      __shipkitInit?: boolean;
+      __cyclewardenInit?: boolean;
       init: (opts: Record<string, unknown>) => void;
       captureException: (e: unknown, o?: Record<string, unknown>) => void;
       captureMessage: (m: string, o?: Record<string, unknown>) => void;
     };
-    if (!Sentry.__shipkitInit) {
+    if (!Sentry.__cyclewardenInit) {
       Sentry.init({
         dsn: process.env.SENTRY_DSN,
         tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE ?? 0.1),
         environment: process.env.NODE_ENV,
       });
-      Sentry.__shipkitInit = true;
+      Sentry.__cyclewardenInit = true;
     }
     if (err instanceof Error) {
       Sentry.captureException(err, { extra: { message, ...ctx } });

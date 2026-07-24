@@ -36,17 +36,17 @@ openssl rand -hex 32
 
 ```bash
 # Tạo user DB mới
-CREATE USER shipkit_v2 WITH PASSWORD 'new-secure-password';
-GRANT ALL PRIVILEGES ON DATABASE shipkit TO shipkit_v2;
+CREATE USER cyclewarden_v2 WITH PASSWORD 'new-secure-password';
+GRANT ALL PRIVILEGES ON DATABASE cyclewarden TO cyclewarden_v2;
 
 # Cập nhật DATABASE_URL trong env
-DATABASE_URL=postgresql://shipkit_v2:new-secure-password@host:5432/shipkit
+DATABASE_URL=postgresql://cyclewarden_v2:new-secure-password@host:5432/cyclewarden
 
 # Restart app (zero-downtime với rolling deploy)
 
 # Sau khi xác nhận app hoạt động, thu hồi quyền user cũ
-REVOKE ALL PRIVILEGES ON DATABASE shipkit FROM shipkit_old;
-DROP USER shipkit_old;
+REVOKE ALL PRIVILEGES ON DATABASE cyclewarden FROM cyclewarden_old;
+DROP USER cyclewarden_old;
 ```
 
 ---

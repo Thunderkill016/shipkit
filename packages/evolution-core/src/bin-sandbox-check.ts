@@ -8,7 +8,7 @@ runSandboxCli(process.argv.slice(2)).then(
   },
   (error) => {
     process.stderr.write(
-      `shipkit-sandbox-check: ${error instanceof Error ? error.message : String(error)}\n`
+      `cyclewarden-sandbox-check: ${error instanceof Error ? error.message : String(error)}\n`
     );
     process.exitCode = 1;
   }

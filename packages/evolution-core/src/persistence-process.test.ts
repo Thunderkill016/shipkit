@@ -19,9 +19,9 @@ type WorkerResult = {
 };
 
 async function temporaryStore(): Promise<EvolutionStore> {
-  const root = await mkdtemp(join(tmpdir(), "shipkit-persistence-process-"));
+  const root = await mkdtemp(join(tmpdir(), "cyclewarden-persistence-process-"));
   temporaryRoots.push(root);
-  return new EvolutionStore(join(root, ".shipkit"), {
+  return new EvolutionStore(join(root, ".cyclewarden"), {
     lockTimeoutMs: 10_000,
     staleLockMs: 100,
   });
@@ -42,7 +42,7 @@ function spawnWriter(input: {
       env: {
         ...process.env,
         ...(input.crashPoint
-          ? { SHIPKIT_PERSISTENCE_CRASH_POINT: input.crashPoint }
+          ? { CYCLEWARDEN_PERSISTENCE_CRASH_POINT: input.crashPoint }
           : {}),
       },
       stdio: ["ignore", "pipe", "pipe"],

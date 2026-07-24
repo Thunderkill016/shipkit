@@ -8,9 +8,9 @@ import { spawnSync } from "node:child_process";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const cli = join(root, "packages/evolution-core/dist/cli.js");
-const temporary = await mkdtemp(join(tmpdir(), "shipkit-evolution-smoke-"));
-const store = join(temporary, ".shipkit");
-const cycleId = "shipkit:ci-dogfood-001";
+const temporary = await mkdtemp(join(tmpdir(), "cyclewarden-evolution-smoke-"));
+const store = join(temporary, ".cyclewarden");
+const cycleId = "cyclewarden:ci-dogfood-001";
 const reportPath = join(root, "artifacts", "evolution-dogfood-report.json");
 
 function run(args) {
@@ -42,7 +42,7 @@ try {
     "--id",
     cycleId,
     "--objective",
-    "Choose Shipkit's next evidence-backed product experiment",
+    "Choose CycleWarden's next evidence-backed product experiment",
     "--autonomy",
     "A2",
     "--risk",
@@ -68,10 +68,10 @@ try {
   }
   const checkNames = new Set((inspected.snapshot?.checks ?? []).map((check) => check.name));
   if (!checkNames.has("test") || !checkNames.has("build")) {
-    throw new Error("repository perception did not discover Shipkit test/build checks");
+    throw new Error("repository perception did not discover CycleWarden test/build checks");
   }
   if (!(inspected.snapshot?.ci ?? []).includes(".github/workflows/ci.yml")) {
-    throw new Error("repository perception did not discover Shipkit CI");
+    throw new Error("repository perception did not discover CycleWarden CI");
   }
 
   const assessed = run([
@@ -100,7 +100,7 @@ try {
     checkSummary.unavailable > 0
   ) {
     throw new Error(
-      `one or more isolated Shipkit test checks did not pass; diagnostic: ${reportPath}`
+      `one or more isolated CycleWarden test checks did not pass; diagnostic: ${reportPath}`
     );
   }
   if (!/^sha256:[a-f0-9]{64}$/.test(assessed.evidence?.scorecard?.id ?? "")) {

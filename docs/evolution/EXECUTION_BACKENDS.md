@@ -1,6 +1,6 @@
 # Execution Backends
 
-Shipkit separates repository check discovery from command execution. A check may only run through an `ExecutionBackend` whose declared capabilities satisfy the requested policy.
+CycleWarden separates repository check discovery from command execution. A check may only run through an `ExecutionBackend` whose declared capabilities satisfy the requested policy.
 
 ## Explicit CLI selection
 
@@ -31,7 +31,7 @@ It does **not** claim filesystem, network, dependency, CPU, memory, process-tree
 
 ## Docker sandbox
 
-`DockerExecutionBackend` is the first untrusted backend. Before any command runs, Shipkit verifies that the Docker daemon is available and that the backend declares every required capability. Missing runtime or capability rejects execution.
+`DockerExecutionBackend` is the first untrusted backend. Before any command runs, CycleWarden verifies that the Docker daemon is available and that the backend declares every required capability. Missing runtime or capability rejects execution.
 
 The Docker invocation uses:
 
@@ -49,7 +49,7 @@ The Docker invocation uses:
 - `--rm` cleanup;
 - `--pull never` supply-chain enforcement.
 
-The backend requires an explicit immutable image digest that already exists locally. Shipkit checks the image with `docker image inspect` and refuses implicit pulls. Projects must select a reviewed image that already contains the required runtime or isolated dependencies.
+The backend requires an explicit immutable image digest that already exists locally. CycleWarden checks the image with `docker image inspect` and refuses implicit pulls. Projects must select a reviewed image that already contains the required runtime or isolated dependencies.
 
 ## Hostile integration proof
 
@@ -61,10 +61,10 @@ CI explicitly provisions a local Node image, converts it to an immutable local i
 - an embedded host path cannot modify the host sentinel;
 - outbound network access is blocked;
 - the isolated workspace remains writable;
-- no `shipkit-check-*` container remains after execution.
+- no `cyclewarden-check-*` container remains after execution.
 
 ## Current honest boundary
 
 The Docker backend does not yet claim a hard writable-workspace disk quota. `disk-limit` exists in the capability contract, but requesting it fails closed until a backend proves it. Egress allowlists, remote sandbox providers, Windows/macOS container support and an independent external security review also remain required before issue #12 can close.
 
-Source files are copied as data. Only repository package scripts discovered by Shipkit may be selected for execution; arbitrary source instructions or prompt text do not become commands.
+Source files are copied as data. Only repository package scripts discovered by CycleWarden may be selected for execution; arbitrary source instructions or prompt text do not become commands.

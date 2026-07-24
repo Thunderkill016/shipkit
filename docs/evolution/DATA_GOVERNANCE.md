@@ -1,4 +1,4 @@
-# Shipkit Evolution Engine — data governance
+# CycleWarden Evolution Engine — data governance
 
 Status: required policy before private-source research  
 Issue: #9  
@@ -53,7 +53,7 @@ A source collected for one cycle must not silently become general training data,
 
 ## Model and provider routing
 
-Before content is sent to any external model or service, Shipkit must know:
+Before content is sent to any external model or service, CycleWarden must know:
 
 - provider and model identity;
 - data class allowed by policy;
@@ -85,7 +85,7 @@ Research should retain findings and evidence spans when possible, not unnecessar
 
 - secret-bearing paths and values are rejected before evidence registration;
 - logs store a redacted failure reason, never the secret value;
-- browsing or repository content cannot instruct Shipkit to reveal credentials;
+- browsing or repository content cannot instruct CycleWarden to reveal credentials;
 - agent and research sandboxes receive no ambient protected credentials;
 - a future explicit secret capability must be scoped to one operation and never persisted as evidence.
 

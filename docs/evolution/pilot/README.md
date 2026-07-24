@@ -1,7 +1,7 @@
 # A2 Research Audit external pilot
 
 This folder operationalizes issue #14 without changing its precommitted sample,
-timebox or decision rule. The internal Shipkit calibration is already complete
+timebox or decision rule. The internal CycleWarden calibration is already complete
 and is not part of the external sample.
 
 ## Current status
@@ -18,7 +18,7 @@ and is not part of the external sample.
 
 ## Recruitment message
 
-> I’m testing whether Shipkit can help a developer make one real repository
+> I’m testing whether CycleWarden can help a developer make one real repository
 > decision—not whether the interface looks impressive. The session uses one
 > repository you control, records your decision before the audit, then compares
 > it with an evidence-linked recommendation. It may confirm, change, prevent,

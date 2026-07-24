@@ -8,7 +8,7 @@ import { inspectRepository } from "./repository.js";
 const temporaryRoots: string[] = [];
 
 async function temporaryProject(): Promise<string> {
-  const root = await mkdtemp(join(tmpdir(), "shipkit-project-"));
+  const root = await mkdtemp(join(tmpdir(), "cyclewarden-project-"));
   temporaryRoots.push(root);
   await mkdir(join(root, "src", "auth"), { recursive: true });
   await mkdir(join(root, "tests"), { recursive: true });
@@ -84,7 +84,7 @@ describe("repository perception", () => {
 describe("evidence registry", () => {
   it("deduplicates blobs while preserving distinct evidence occurrences", async () => {
     const root = await temporaryProject();
-    const registry = new EvidenceRegistry(join(root, ".shipkit"), root);
+    const registry = new EvidenceRegistry(join(root, ".cyclewarden"), root);
     const first = await registry.registerJson("project-snapshot", { b: 2, a: 1 });
     const second = await registry.registerJson("decision-input", { a: 1, b: 2 });
 
@@ -100,18 +100,18 @@ describe("evidence registry", () => {
 
   it("detects a changed blob during verification", async () => {
     const root = await temporaryProject();
-    const registry = new EvidenceRegistry(join(root, ".shipkit"), root);
+    const registry = new EvidenceRegistry(join(root, ".cyclewarden"), root);
     const reference = await registry.registerJson("project-snapshot", { stable: true });
-    await writeFile(join(root, ".shipkit", reference.storedPath), "tampered\n", "utf8");
+    await writeFile(join(root, ".cyclewarden", reference.storedPath), "tampered\n", "utf8");
     await expect(registry.verify(reference)).resolves.toBe(false);
   });
 
   it("captures bounded project files but refuses secrets and outside paths", async () => {
     const root = await temporaryProject();
-    const outsideRoot = await mkdtemp(join(tmpdir(), "shipkit-outside-"));
+    const outsideRoot = await mkdtemp(join(tmpdir(), "cyclewarden-outside-"));
     temporaryRoots.push(outsideRoot);
     await writeFile(join(outsideRoot, "outside.txt"), "outside\n", "utf8");
-    const registry = new EvidenceRegistry(join(root, ".shipkit"), root);
+    const registry = new EvidenceRegistry(join(root, ".cyclewarden"), root);
 
     await expect(registry.registerFile("roadmap", "docs/ROADMAP.md")).resolves.toMatchObject({
       sourcePath: "docs/ROADMAP.md",

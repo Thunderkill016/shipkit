@@ -127,7 +127,7 @@ export function validateExternalSystems(registry, options = {}) {
     }
 
     requireText(system.mechanism, `${prefix}.mechanism`);
-    requireText(system.shipkitBoundary, `${prefix}.shipkitBoundary`);
+    requireText(system.cyclewardenBoundary, `${prefix}.cyclewardenBoundary`);
     requireText(system.limitation, `${prefix}.limitation`);
     requireText(system.falsificationTest, `${prefix}.falsificationTest`);
 

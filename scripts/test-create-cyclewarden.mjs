@@ -5,7 +5,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(join(fileURLToPath(import.meta.url), "../.."));
-const sandbox = await mkdtemp(join(tmpdir(), "shipkit-create-"));
+const sandbox = await mkdtemp(join(tmpdir(), "cyclewarden-create-"));
 const name = "generated-product";
 const generated = join(sandbox, name);
 
@@ -25,7 +25,7 @@ function run(command, args, cwd) {
 }
 
 try {
-  run(process.execPath, [join(root, "scripts/create-shipkit.mjs"), name], sandbox);
+  run(process.execPath, [join(root, "scripts/create-cyclewarden.mjs"), name], sandbox);
 
   const required = [
     "AGENTS.md",
@@ -51,18 +51,18 @@ try {
   }
 
   const idea = await readFile(join(generated, "IDEA.md"), "utf8");
-  if (!idea.includes(`Product idea — ${name}`) || idea.includes("product source of truth\n\nShipkit Evolution Engine")) {
+  if (!idea.includes(`Product idea — ${name}`) || idea.includes("product source of truth\n\nCycleWarden Evolution Engine")) {
     throw new Error("Generated IDEA.md still carries the source repository product identity.");
   }
 
   const readme = await readFile(join(generated, "README.md"), "utf8");
-  if (!readme.startsWith(`# ${name}`) || !readme.includes("generated from Shipkit")) {
+  if (!readme.startsWith(`# ${name}`) || !readme.includes("generated from CycleWarden")) {
     throw new Error("Generated README was not rewritten for the generated product.");
   }
 
   const roadmap = await readFile(join(generated, "ROADMAP.md"), "utf8");
-  if (!roadmap.includes(`# ${name} roadmap`) || roadmap.includes("Primary product: **Shipkit Evolution Engine**")) {
-    throw new Error("Generated roadmap still carries Shipkit's primary roadmap identity.");
+  if (!roadmap.includes(`# ${name} roadmap`) || roadmap.includes("Primary product: **CycleWarden Evolution Engine**")) {
+    throw new Error("Generated roadmap still carries CycleWarden's primary roadmap identity.");
   }
 
   const model = await readFile(join(generated, "docs/ai/PROJECT_MODEL.md"), "utf8");
@@ -76,7 +76,7 @@ try {
   if (
     registry.project !== name ||
     registry.primaryProduct !== name ||
-    registry.inheritedFrom !== "shipkit"
+    registry.inheritedFrom !== "cyclewarden"
   ) {
     throw new Error("Generated capability registry identity was not rewritten.");
   }
@@ -94,7 +94,7 @@ try {
   run(process.execPath, [join(generated, "scripts/check-ai-workflow.mjs")], generated);
 
   console.log(
-    "Shipkit generator OK: generated product identity, workflow, capabilities, and project model are independent."
+    "CycleWarden generator OK: generated product identity, workflow, capabilities, and project model are independent."
   );
 } finally {
   await rm(sandbox, { recursive: true, force: true });

@@ -1,6 +1,6 @@
 # Learning mode
 
-Shipkit's owner is learning software engineering. AI should accelerate learning,
+CycleWarden's owner is learning software engineering. AI should accelerate learning,
 not hide the system behind unnecessary abstractions.
 
 After a meaningful task, explain:

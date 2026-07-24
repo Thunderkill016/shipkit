@@ -6,6 +6,7 @@ import { prepareCandidateResearch } from "./candidate-research.js";
 import { EvidenceRegistry } from "./evidence.js";
 import { EvolutionStore } from "./persistence.js";
 import { authorizeAction } from "./policy.js";
+import { resolveDefaultStateRoot } from "./runtime-paths.js";
 
 type CliIo = {
   stdout: (message: string) => void;
@@ -17,12 +18,12 @@ type ParsedArgs = {
   options: Map<string, string[]>;
 };
 
-const HELP = `Shipkit named-candidate research
+const HELP = `CycleWarden named-candidate research
 
 Usage:
-  shipkit-research-candidates <cycle-id> --manifest candidate-decision.json
-    [--capabilities docs/CAPABILITIES.json] [--root .shipkit] [--project-root .]
-    [--actor shipkit-candidate-researcher] [--reviewer shipkit-candidate-reviewer]
+  cyclewarden-research-candidates <cycle-id> --manifest candidate-decision.json
+    [--capabilities docs/CAPABILITIES.json] [--root .cyclewarden] [--project-root .]
+    [--actor cyclewarden-candidate-researcher] [--reviewer cyclewarden-candidate-reviewer]
 
 The command requires a modeled A1+ cycle. It compares only the explicitly named candidates in the
 manifest. Every candidate must link issue, roadmap, current capability and implementation evidence.
@@ -116,7 +117,8 @@ export async function runCandidateResearchCli(
 
   const cycleId = parsed.positionals[0];
   if (!cycleId) throw new Error("candidate research requires a cycle ID");
-  const root = resolve(one(parsed, "root") ?? ".shipkit");
+  const explicitRoot = one(parsed, "root");
+  const root = explicitRoot ? resolve(explicitRoot) : resolveDefaultStateRoot();
   const projectRoot = resolve(one(parsed, "project-root") ?? process.cwd());
   const store = new EvolutionStore(root);
   const previous = await store.load(cycleId);
@@ -151,8 +153,8 @@ export async function runCandidateResearchCli(
   const manifestEvidence = await registry.registerJson("candidate-decision-manifest", manifest);
   const capabilitiesEvidence = await registry.registerJson("capability-registry-snapshot", capabilities);
   const prepared = prepareCandidateResearch(previous, manifest, capabilities, {
-    actor: one(parsed, "actor")?.trim() || "shipkit-candidate-researcher",
-    reviewerActor: one(parsed, "reviewer")?.trim() || "shipkit-candidate-reviewer",
+    actor: one(parsed, "actor")?.trim() || "cyclewarden-candidate-researcher",
+    reviewerActor: one(parsed, "reviewer")?.trim() || "cyclewarden-candidate-reviewer",
     startedAt: new Date().toISOString(),
     evidenceRefs: {
       manifest: `evidence:${manifestEvidence.occurrenceId}`,
@@ -199,7 +201,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     },
     (error) => {
       process.stderr.write(
-        `shipkit-research-candidates: ${error instanceof Error ? error.message : String(error)}\n`
+        `cyclewarden-research-candidates: ${error instanceof Error ? error.message : String(error)}\n`
       );
       process.exitCode = 1;
     }

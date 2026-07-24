@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * shipkit check:deploy — production readiness (no deploy, just gates)
+ * cyclewarden check:deploy — production readiness (no deploy, just gates)
  */
 import { readFileSync, existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
@@ -68,7 +68,7 @@ const gates = [
   },
 ];
 
-console.log("\n✦ shipkit check:deploy\n");
+console.log("\n✦ cyclewarden check:deploy\n");
 let failed = 0;
 for (const g of gates) {
   console.log(`  ${g.ok ? "✓" : "✗"}  ${g.label}`);

@@ -2,16 +2,16 @@
 
 ## Purpose
 
-Named-candidate research is the smallest follow-up to the Shipkit-on-Shipkit calibration. It answers a decision that already names concrete alternatives without replacing them with a generic opportunity portfolio.
+Named-candidate research is the smallest follow-up to the CycleWarden-on-CycleWarden calibration. It answers a decision that already names concrete alternatives without replacing them with a generic opportunity portfolio.
 
 The adapter is manifest-driven. It does not discover GitHub issues, search the web, call a model, infer user demand, modify code, merge, or deploy.
 
 ## Inputs
 
-`shipkit-research-candidates` consumes two explicit snapshots:
+`cyclewarden-research-candidates` consumes two explicit snapshots:
 
 1. a candidate decision manifest;
-2. the current Shipkit capability registry.
+2. the current CycleWarden capability registry.
 
 Every candidate must provide all four evidence categories:
 
@@ -87,7 +87,7 @@ Protected experiment parameters, success criteria, and failure criteria are copi
 - experiment guardrails;
 - content-addressed manifest evidence.
 
-For the fixed Shipkit fixture, the authoritative #14 values remain:
+For the fixed CycleWarden fixture, the authoritative #14 values remain:
 
 - 6 developers;
 - 6 repositories;
@@ -100,12 +100,12 @@ For the fixed Shipkit fixture, the authoritative #14 values remain:
 
 ```bash
 pnpm research:candidates -- <cycle-id> \
-  --root .shipkit \
+  --root .cyclewarden \
   --project-root . \
-  --manifest packages/evolution-core/src/fixtures/shipkit-next-workstream.candidates.json \
+  --manifest packages/evolution-core/src/fixtures/cyclewarden-next-workstream.candidates.json \
   --capabilities docs/CAPABILITIES.json \
-  --actor shipkit-candidate-researcher \
-  --reviewer shipkit-candidate-reviewer
+  --actor cyclewarden-candidate-researcher \
+  --reviewer cyclewarden-candidate-reviewer
 ```
 
 The cycle must already be at `modeled`, and policy must authorize `cycle:<cycle-id>:research`.

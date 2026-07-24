@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "decisionQuestion": "Which Shipkit workstream should be prioritized next among #15 standalone core, minimal #13 candidate-grounded research, remaining #12 sandbox hardening, and #17 governed execution?",
+  "decisionQuestion": "Which CycleWarden workstream should be prioritized next among #15 standalone core, minimal #13 candidate-grounded research, remaining #12 sandbox hardening, and #17 governed execution?",
   "executionBackend": "trusted-local",
   "protectedConstraints": [
     "Recruit exactly 6 external developers across exactly 6 repositories.",
@@ -10,7 +10,7 @@
   ],
   "protectedExperiment": {
     "name": "A2 Research Audit external decision-value pilot",
-    "sourceUri": "https://github.com/Thunderkill016/shipkit/issues/14",
+    "sourceUri": "https://github.com/Thunderkill016/cyclewarden/issues/14",
     "parameters": {
       "participants": 6,
       "repositories": 6,
@@ -54,7 +54,7 @@
           "kind": "issue",
           "canonicalId": "github-issue:15:completed",
           "title": "Issue #15 completion snapshot",
-          "uri": "https://github.com/Thunderkill016/shipkit/issues/15",
+          "uri": "https://github.com/Thunderkill016/cyclewarden/issues/15",
           "version": "closed-completed",
           "observedAt": "2026-07-23T13:21:33.000Z",
           "statement": "Issue #15 is closed completed after standalone Node 20 and Node 22 package proofs.",
@@ -90,7 +90,7 @@
           "kind": "implementation",
           "canonicalId": "merge:f946c20d",
           "title": "Merged standalone core implementation",
-          "uri": "https://github.com/Thunderkill016/shipkit/commit/f946c20d0d059e29a94a9596b07582bb0392b5f0",
+          "uri": "https://github.com/Thunderkill016/cyclewarden/commit/f946c20d0d059e29a94a9596b07582bb0392b5f0",
           "version": "f946c20d0d059e29a94a9596b07582bb0392b5f0",
           "observedAt": "2026-07-23T13:21:33.000Z",
           "statement": "PR #27 merged the independent package toolchain, tarball consumer proof, and npm CLI entrypoints.",
@@ -135,7 +135,7 @@
           "kind": "issue",
           "canonicalId": "github-issue:29:open",
           "title": "Issue #29 candidate-grounding requirement",
-          "uri": "https://github.com/Thunderkill016/shipkit/issues/29",
+          "uri": "https://github.com/Thunderkill016/cyclewarden/issues/29",
           "version": "open",
           "observedAt": "2026-07-23T13:22:00.000Z",
           "statement": "Issue #29 requires named candidate evidence, stale capability rejection, protected pilot parameters, and an explainable ranking or inconclusive outcome.",
@@ -201,7 +201,7 @@
       "verificationPlan": [
         "Run candidate research unit tests.",
         "Persist and reload one candidate CLI cycle.",
-        "Run the fixed Shipkit candidate calibration fixture."
+        "Run the fixed CycleWarden candidate calibration fixture."
       ],
       "rollbackPlan": [
         "Remove the candidate adapter and retain issue #29 plus the original calibration evidence."
@@ -224,7 +224,7 @@
           "kind": "issue",
           "canonicalId": "github-issue:12:open",
           "title": "Issue #12 remaining sandbox work",
-          "uri": "https://github.com/Thunderkill016/shipkit/issues/12",
+          "uri": "https://github.com/Thunderkill016/cyclewarden/issues/12",
           "version": "open",
           "observedAt": "2026-07-23T13:22:00.000Z",
           "statement": "Issue #12 remains open for guarantees beyond the verified local Docker baseline.",
@@ -305,7 +305,7 @@
           "kind": "issue",
           "canonicalId": "github-issue:17:open",
           "title": "Issue #17 governed agent adapters",
-          "uri": "https://github.com/Thunderkill016/shipkit/issues/17",
+          "uri": "https://github.com/Thunderkill016/cyclewarden/issues/17",
           "version": "open",
           "observedAt": "2026-07-23T13:22:00.000Z",
           "statement": "Issue #17 requires approved handoff consumption, isolated execution, manifests, cancellation, and draft-only delivery.",
@@ -355,7 +355,7 @@
         "Build multiple agent adapters before testing one real path"
       ],
       "smallestExperiment": "After #14 passes, run one approved handoff through one thin real-agent adapter and an independent verifier.",
-      "hypothesis": "A real-agent integration should shape the adapter contract only after Shipkit proves the decision is worth implementing.",
+      "hypothesis": "A real-agent integration should shape the adapter contract only after CycleWarden proves the decision is worth implementing.",
       "allowedScope": [
         "packages/evolution-core/src/agent-adapter.ts",
         "packages/evolution-core/src/agent-adapter.test.ts"

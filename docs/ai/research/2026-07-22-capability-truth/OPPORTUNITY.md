@@ -5,7 +5,7 @@ Evidence ledger: `EVIDENCE.md`
 
 ## Desired outcome
 
-A human or agent can answer “what does Shipkit currently support, and what is
+A human or agent can answer “what does CycleWarden currently support, and what is
 actually verified?” without reconciling several contradictory prose documents.
 
 ## Opportunity map
@@ -36,7 +36,7 @@ Capability JSON + dependency-free checker, with concise docs linking to it.
 
 - Evidence path can exist while behavior is broken; keep verification status.
 - Registry can become stale; make it part of active workflow and review.
-- Generated products must not inherit Shipkit's pass state.
+- Generated products must not inherit CycleWarden's pass state.
 - A registry should not become an excuse to remove E2E tests.
 
 ## Decision

@@ -85,7 +85,7 @@ function validSession() {
     preferredAlternative: "Improve reliability",
     confidence0To100: 60,
     evidenceAlreadyUsed: ["issue:example-1"],
-    likelyActionWithoutShipkit: "Implement the reliability change first.",
+    likelyActionWithoutCycleWarden: "Implement the reliability change first.",
     estimatedWrongDecisionCost: "One week of implementation that may not affect the target decision.",
     decisionChangingEvidenceRequested: "A source-backed reason that discovery is the actual blocker.",
     capturedAt: "2026-07-24T01:00:00.000Z",

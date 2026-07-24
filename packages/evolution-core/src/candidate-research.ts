@@ -880,7 +880,7 @@ function createBundle(
     bundle: {
       brief: {
         decisionQuestion: manifest.decisionQuestion,
-        owner: "shipkit-candidate-researcher",
+        owner: "cyclewarden-candidate-researcher",
         deadline: null,
         assumptions: [
           "Priority signals are typed judgments supplied in the manifest and remain inspectable.",

@@ -1,14 +1,14 @@
-# Shipkit unified product architecture
+# CycleWarden unified product architecture
 
 Status: integrated architecture v1  
 Issue: #9
 
 ## One product boundary
 
-Shipkit is one AI-native product development system. Repository packages are safety and implementation boundaries, not separate products.
+CycleWarden is one AI-native product development system. Repository packages are safety and implementation boundaries, not separate products.
 
 ```text
-Shipkit product
+CycleWarden product
 ├── Product Workspace and Foundation
 ├── Evolution Kernel
 ├── Research Intelligence
@@ -159,7 +159,7 @@ Responsibility:
 - optional OpenTelemetry-compatible telemetry;
 - portable policy, evidence and attestation formats.
 
-These protocols expose Shipkit capabilities; they do not replace Shipkit governance.
+These protocols expose CycleWarden capabilities; they do not replace CycleWarden governance.
 
 ## Shared control/evidence planes
 
@@ -201,7 +201,7 @@ Human and organization objectives
 Each attached product owns a local-first store:
 
 ```text
-.shipkit/
+.cyclewarden/
   config.json
   cycles/
     <portable-cycle-directory>/
@@ -321,7 +321,7 @@ Missing required capability must fail closed.
 
 ## Readiness model
 
-Shipkit must distinguish:
+CycleWarden must distinguish:
 
 - `researchReadiness`;
 - `executionReadiness`;
@@ -382,7 +382,7 @@ The current arbitrary-repository ceiling is A2. This is a temporary implementati
 
 ## Hard invariants
 
-- Shipkit is one product; packages may not create conflicting product identities;
+- CycleWarden is one product; packages may not create conflicting product identities;
 - every accepted state change is attributable and replayable;
 - policy decisions are deterministic for the same inputs;
 - approvals match exact cycle, action, scope and parameters;
