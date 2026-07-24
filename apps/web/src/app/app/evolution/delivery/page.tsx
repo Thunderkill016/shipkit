@@ -43,8 +43,8 @@ export default async function DeliveryWorkspacePage({ searchParams }: PageProps)
           </p>
           <h1 className="mt-2 text-2xl font-semibold text-foreground">Delivery operations</h1>
           <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted">
-            Inspect implementation, independent verification, draft publication, process ownership
-            and fail-closed recovery from the same durable state used by the CLI.
+            Follow live heartbeat and phase, inspect durable delivery evidence, request graceful
+            cancellation and reconcile interrupted work through the same CLI boundary.
           </p>
         </div>
         <Link
@@ -82,6 +82,9 @@ export default async function DeliveryWorkspacePage({ searchParams }: PageProps)
                 <Badge>cycle: {selected.stage}</Badge>
                 <Badge>lease: {state?.operation.disposition ?? "unavailable"}</Badge>
                 <Badge>control: {state?.operation.controlStatus ?? "unavailable"}</Badge>
+                <Badge>
+                  cancel: {state?.operation.cancellable ? "available" : "unavailable"}
+                </Badge>
               </div>
             </div>
           </section>
@@ -127,9 +130,9 @@ export default async function DeliveryWorkspacePage({ searchParams }: PageProps)
                   </p>
                 </div>
                 <div className="rounded-xl border border-border bg-card p-5">
-                  <p className="text-xs uppercase tracking-wider text-muted">Operation lease</p>
+                  <p className="text-xs uppercase tracking-wider text-muted">Live operation</p>
                   <p className="mt-2 text-lg font-semibold text-foreground">
-                    {state.operation.disposition}
+                    {state.operation.record?.phase ?? state.operation.disposition}
                   </p>
                   <p className="mt-2 text-xs text-muted">
                     owner {state.operation.ownerState} · child {state.operation.childState}
@@ -244,8 +247,20 @@ export default async function DeliveryWorkspacePage({ searchParams }: PageProps)
                         <p>
                           Status: <span className="text-foreground">{state.operation.record.status}</span>
                         </p>
+                        <p>
+                          Phase: <span className="text-foreground">{state.operation.record.phase}</span>
+                        </p>
                         <p>Actor: {state.operation.record.actor}</p>
                         <p>Heartbeat: {state.operation.record.heartbeatAt}</p>
+                        {state.operation.cancellation && (
+                          <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 text-amber-100">
+                            <p>Cancellation requested by {state.operation.cancellation.actor}</p>
+                            <p className="mt-1">Requested: {state.operation.cancellation.requestedAt}</p>
+                            <p className="mt-1">
+                              Signal: {state.operation.cancellation.signalSentAt ?? "not sent"}
+                            </p>
+                          </div>
+                        )}
                       </>
                     ) : (
                       <p>No operation checkpoint has been recorded.</p>
@@ -267,14 +282,16 @@ export default async function DeliveryWorkspacePage({ searchParams }: PageProps)
                 enabled={mutationAccess.allowed}
                 accessReason={mutationAccess.reason}
                 operationDisposition={state.operation.disposition}
+                operationCancellable={state.operation.cancellable}
               />
 
               <section className="rounded-2xl border border-border bg-background p-5 text-sm leading-relaxed text-muted">
                 <p className="font-medium text-foreground">Boundary</p>
                 <p className="mt-2">
-                  This console exposes inspection and recovery only. It cannot upload a delivery
-                  manifest, run an implementation command, accept verification, push a branch, merge,
-                  deploy or write production.
+                  This console exposes inspection, graceful cancellation and recovery only. It cannot
+                  upload a delivery manifest, run an implementation command, accept verification,
+                  push a branch, merge, deploy or write production. Cancellation is SIGTERM-only and
+                  remains subject to normal fail-closed reconciliation.
                 </p>
               </section>
             </>
