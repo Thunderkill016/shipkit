@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { lstat, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { promisify } from "node:util";
@@ -26,6 +26,17 @@ async function run(cwd: string, executable: string, arguments_: string[]): Promi
 
 function digestJson(value: unknown): string {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
+}
+
+async function fixturePatchDigest(worktreePath: string): Promise<string> {
+  const path = "docs/result.md";
+  const absolutePath = join(worktreePath, path);
+  const info = await lstat(absolutePath);
+  const digest = createHash("sha256");
+  digest.update(`file\0${path}\0${info.mode}\0`);
+  digest.update(await readFile(absolutePath));
+  digest.update("\0");
+  return digest.digest("hex");
 }
 
 afterEach(async () => {
@@ -125,6 +136,7 @@ async function createInterruptedFixture(name: string) {
   await run(projectRoot, "git", ["worktree", "add", "-b", branchName, worktreePath, baseCommit]);
   await mkdir(join(worktreePath, "docs"), { recursive: true });
   await writeFile(join(worktreePath, "docs", "result.md"), "ok", "utf8");
+  const implementationPatchDigest = await fixturePatchDigest(worktreePath);
 
   const executing = transitionCycle(planned, "executing", {
     actor: "fixture-implementer",
@@ -147,7 +159,7 @@ async function createInterruptedFixture(name: string) {
     baseCommit,
     branchName,
     worktreeId: name,
-    patchDigest: "b".repeat(64),
+    patchDigest: implementationPatchDigest,
     executable: "node",
     argumentsDigest: "c".repeat(64),
     commandStatus: "passed",
@@ -228,6 +240,7 @@ describe("delivery recovery reconciliation", () => {
     expect(inspected.recovery.decision).toBe("apply-transition");
     expect(inspected.recovery.targetStage).toBe("implemented");
     expect(inspected.recovery.applied).toBe(false);
+    expect(inspected.recovery.observedPatchDigest).toBe(fixture.execution.patchDigest);
     expect((await fixture.store.load(fixture.cycleId)).stage).toBe("executing");
 
     const applied = await recoverDelivery({
@@ -243,6 +256,26 @@ describe("delivery recovery reconciliation", () => {
     expect((await showDeliveryRecovery(fixture.store, fixture.cycleId)).recovery?.stageAfter).toBe(
       "implemented"
     );
+  });
+
+  it("marks same-file patch content drift inconclusive instead of recovering it", async () => {
+    const fixture = await createInterruptedFixture("patch-drift");
+    await writeControl(fixture, null, null);
+    await writeFile(join(fixture.worktreePath, "docs", "result.md"), "tampered", "utf8");
+
+    const recovered = await recoverDelivery({
+      store: fixture.store,
+      cycleId: fixture.cycleId,
+      projectRoot: fixture.projectRoot,
+      actor: "fixture-recovery-operator",
+      apply: true,
+    });
+
+    expect(recovered.worktree.status).toBe("diverged");
+    expect(recovered.recovery.recordedPatchDigest).toBe(fixture.execution.patchDigest);
+    expect(recovered.recovery.observedPatchDigest).not.toBe(fixture.execution.patchDigest);
+    expect(recovered.recovery.findings.join(" ")).toMatch(/patch content digest/);
+    expect(recovered.cycle.stage).toBe("inconclusive");
   });
 
   it("completes a durable accepted verification only when the exact clean commit remains", async () => {
