@@ -33,6 +33,7 @@ The inspection returns:
 - current and proposed lifecycle stages;
 - control-sidecar validity;
 - worktree and branch status;
+- recorded and observed implementation patch digests;
 - the recovery decision;
 - findings and unresolved state;
 - the next operator action.
@@ -53,7 +54,7 @@ pnpm deliver -- recover <cycle-id> \
 
 Recovery can complete these bounded cases:
 
-- `executing → implemented` when a durable implemented execution record exists and the isolated uncommitted patch still matches its changed-file manifest;
+- `executing → implemented` when a durable implemented execution record exists and the isolated uncommitted patch still matches the exact changed-file list and content-addressed `patchDigest` captured after execution;
 - `executing → rejected` or `executing → inconclusive` when the durable execution record already has that outcome;
 - `implemented → verified` when an accepted verification record, evidence reference, exact commit SHA, branch ref and clean worktree all agree;
 - `implemented → rejected` or `implemented → inconclusive` when the durable verification verdict already has that outcome.
@@ -62,7 +63,7 @@ The normal `EvolutionStore.save` stale-state check still protects the final writ
 
 ## Safe resume cases
 
-When the cycle is `implemented`, no verification verdict exists, and the original uncommitted patch remains intact, recovery leaves the cycle at `implemented` and instructs the operator to rerun:
+When the cycle is `implemented`, no verification verdict exists, and the original uncommitted patch remains intact by both changed-file list and patch content digest, recovery leaves the cycle at `implemented` and instructs the operator to rerun:
 
 ```bash
 pnpm deliver -- verify <cycle-id> \
@@ -81,9 +82,11 @@ Recovery marks an interrupted `executing` or `implemented` cycle `inconclusive` 
 
 - the delivery control sidecar is missing, unreadable, mismatched or fails its integrity digest;
 - the isolated worktree is missing or unavailable;
-- the branch ref, worktree HEAD or changed-file manifest diverges;
+- the branch ref, worktree HEAD, changed-file list or exact patch content digest diverges;
 - an accepted verification record lacks its evidence reference or exact clean commit;
 - a clean commit exists on the isolated branch but no durable verification verdict proves that checks passed.
+
+Changing bytes inside the same recorded filename is still divergence. Recovery recomputes the same file-mode, path and content digest used by execution rather than trusting filenames alone.
 
 An unrecorded commit is never upgraded to `verified`. The branch is preserved for inspection, but it must not be published as accepted CycleWarden output.
 
