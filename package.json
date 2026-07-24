@@ -28,7 +28,8 @@
     "db:down": "docker compose down",
     "db:migrate": "node scripts/db-migrate.mjs",
     "research:candidates": "pnpm --filter @cyclewarden/evolution-core build && node packages/evolution-core/dist/candidate-cli.js",
-    "research:search": "pnpm --filter @cyclewarden/evolution-core build && node packages/evolution-core/dist/search-cli.js"
+    "research:search": "pnpm --filter @cyclewarden/evolution-core build && node packages/evolution-core/dist/search-cli.js",
+    "deliver": "pnpm --filter @cyclewarden/evolution-core build && node packages/evolution-core/dist/bin-delivery.js"
   },
   "engines": {
     "node": ">=20.9"

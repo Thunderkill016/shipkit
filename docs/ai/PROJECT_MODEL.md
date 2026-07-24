@@ -32,7 +32,7 @@ The Evolution Engine is the deterministic control core. The web workspace, appli
 - open-source maintainers;
 - builders who need a ready product foundation and governed development lifecycle.
 
-Initial validation may focus on developers already using coding agents, but this is a beachhead rather than the final product boundary.
+The owner chose an owner-directed single-user beta before external recruitment. The preserved external pilot remains a future validation option, not proof of value or a blocker for the current implementation sequence.
 
 ## Repository structure
 
@@ -168,69 +168,69 @@ Remaining:
 
 ### External Decision-Value Validation
 
-Operationally ready:
+Preserved but deferred:
 
-- the fixed issue #14 protocol is machine-readable and merged on `main`;
-- exactly six pseudonymous participant/repository slots are precommitted;
-- the protocol and fail-closed operations pack technical gate is ready after PR #31;
-- the bounded interactive A2/R1 operator surface is merged after PR #39;
-- eligibility, consent, pre-audit decision, product/technical outcome
-  separation, redaction and aggregate classification are checked in CI;
-- schema drift, early session start, timebox violations, record-path mismatch,
-  common sensitive-content patterns and unsupported decision-value claims fail
-  closed.
-
-Current evidence boundary:
-
-- external completed audits are `0/6`;
-- the 14-day clock has not started;
+- the fixed issue #14 protocol, six pseudonymous slots, consent boundary,
+  redaction schema and aggregate classifier remain machine-readable;
+- issue #14 was closed as `not planned` for the current owner-directed phase,
+  not completed;
+- external completed audits remain `0/6` and the 14-day clock never started;
 - no participant or external repository has been contacted or accessed;
-- operational readiness does not establish decision value, user demand or
-  repeat use.
+- internal dogfood, technical CI and future organic adoption cannot be counted
+  retroactively as results from this protocol.
 
-Remaining human gates:
-
-- choose an authorized recruitment channel;
-- recruit eligible developers or maintainers and obtain explicit consent;
-- run exactly six primary audits within the original timebox;
-- apply the locked success, inconclusive, failure or protocol-gap rule without
-  changing thresholds after observing results.
+The protocol may be reactivated later without changing its original sample,
+timebox or thresholds. Until then CycleWarden has no external decision-value,
+demand or repeat-use proof.
 
 ### Execution and Sandbox
 
-Implemented baseline:
+Implemented beta baseline:
 
-- capability-negotiated `ExecutionBackend`;
-- honestly named trusted-local execution for acknowledged repositories;
-- Docker execution with an immutable local image, denied network, read-only
-  root, reduced environment, resource bounds and forced cleanup;
-- hostile fixtures for secrets, credentials, symlinks, root writes, host paths,
-  network and cleanup;
-- generic command baseline and explicit sandbox-check CLI.
+- capability-negotiated `ExecutionBackend` with honestly named trusted-local
+  and hostile-check Docker paths;
+- a manifest-bound generic command adapter and Codex CLI command profile;
+- exact `ExecutionHandoff.parameterDigest` binding;
+- clean-base requirement and isolated git branch/worktree;
+- shell-free bounded command invocation with reduced environment, timeout and
+  output limits;
+- content-addressed change manifests, filesystem-scope enforcement and external
+  symlink rejection;
+- separate implementation and verification actors;
+- independent command checks, patch-drift rejection and local commit only after
+  an accepted verdict;
+- Docker hostile fixtures for secrets, credentials, symlinks, root writes, host
+  paths, network and cleanup.
 
 Remaining:
 
-- egress allowlists and remote sandbox providers;
-- hard writable-workspace disk quota;
-- cross-platform container support and external security review;
-- Codex, OpenHands and additional coding-agent adapters;
-- isolated branch/worktree;
-- progress, cost and artifact records;
-- draft PR and rollback plan.
+- trusted-local execution is not a sandbox and can exercise the current user's
+  filesystem, credentials and network privileges;
+- the integrity-checked delivery control sidecar is outside the synchronized cycle journal; loss blocks verification;
+- crash-safe resume or rollback for a cycle stranded at `executing`;
+- explicit push and draft-PR operation after verification;
+- workspace execution, pause/cancel, progress and intervention controls;
+- writable remote or microVM agent backend, egress policy and disk quota;
+- OpenHands and additional agent adapters, cross-platform support and external
+  security review.
 
 ### Verification, Release and Operations
 
-Planned:
+Partially implemented:
 
-- independent verifier separate from implementer;
-- test, lint, type, build, security and policy packs;
-- regression and adversarial checks;
-- GitHub Action and PR scorecard;
-- provenance and attestations;
-- authorized release/deployment adapters;
-- Vercel and Docker operational paths;
-- database migration and environment checks;
-- release evidence, rollback and incident records.
+- independent verifier identity must differ from the implementer;
+- manifest-defined shell-free checks produce accepted, rejected or inconclusive
+  durable evidence;
+- patch content is digested before and after checks and accepted changes receive
+  a local commit on the isolated branch.
+
+Remaining:
+
+- project-generated test/lint/type/build/security packs and policy re-evaluation;
+- explicit push and draft PR with a GitHub scorecard;
+- provenance attestations, authorized release/deployment adapters, rollback and
+  incident records;
+- Vercel/Docker operational execution and environment-specific evidence.
 
 ### Measurement and Learning
 
@@ -278,22 +278,20 @@ A repository may be ready for research while blocked for execution or release.
 ```text
 workspace objective
 → inspect and assess
-→ research plan and reproducible search
-→ sources, claims and contradictions
-→ opportunities and decision
-→ reversible experiment
-→ persisted execution handoff
+→ research and decision
+→ persisted ExecutionHandoff
+→ isolated trusted-local implementation
+→ independent verification
+→ verified local commit
 ```
 
-The local workspace now operates this bounded deterministic slice against one
-server-configured trusted repository. It remains one slice of the complete
-CycleWarden lifecycle: public-web and direct-user research, manual decision
-authoring, execution, verification, release and learning are still separate
-future gates.
+The web workspace still ends at `ExecutionHandoff`; governed delivery is
+currently a CLI-only, trusted-repository beta. Push, draft PR, release,
+deployment, measurement and learning remain separate future gates.
 
 ## Verification baseline
 
-Latest verified merged state through PRs #41 and #39:
+Latest verified candidate state through PR #45:
 
 - Test & Build;
 - Evolution Core standalone on Node.js 20, 22 and 24;
@@ -310,34 +308,36 @@ Passing CI proves compatibility with the tested repository state, not complete i
 
 - no single workspace operates the complete lifecycle;
 - the interface operates only the deterministic local A2 repository path, not
-  hosted collaboration, manual research authoring or external evidence;
-- no real untrusted sandbox or coding-agent delivery;
-- no independent full verification-to-release flow;
+  hosted collaboration, manual research authoring, delivery or external evidence;
+- governed delivery is trusted-local CLI-only and not an untrusted sandbox;
+- no push/draft-PR or complete verification-to-release flow;
 - no deployment governed by the durable cycle;
 - no product-outcome measurement linked to a released experiment;
 - no causally evaluated learning from a later comparable cycle;
-- the external decision-value pilot is operational but remains `0/6`;
+- the preserved external decision-value pilot is deferred and remains `0/6`;
 - no external user has yet demonstrated repeat complete-cycle use.
 
 ## Priority order
 
-1. Keep one unified product identity, capability truth and fixed pilot protocol.
-2. Keep the merged A2 workspace stable while running exactly six consented external decision audits under #14.
-3. Apply the precommitted success, inconclusive, failure or protocol-gap rule without changing thresholds.
-4. If successful, build one governed execution vertical slice from approved `ExecutionHandoff` through one real agent, independent verification and a draft PR.
-5. If inconclusive, run at most one evidence-targeted redesigned pilot of the same size; if failed, reassess the beachhead, problem and value proposition before expanding capability.
-6. Activate broader research, sandbox, release, learning, interoperability or hosted operation only when pilot evidence or a required dependency justifies it.
+1. Finish issue #44 as a reliable single-user local beta: handoff, isolated implementation, independent verification and reviewable change.
+2. Add explicit push and draft-PR creation after an accepted verdict; never merge or deploy implicitly.
+3. Add workspace controls for delivery status, approval, progress, pause/cancel and unresolved risks.
+4. Replace trusted-local online-agent execution with a writable remote or microVM backend before accepting untrusted repositories.
+5. Extend release, rollback, outcome measurement and learning through the same durable cycle.
+6. Measure real adoption and outcomes when the owner introduces the product; external validation remains absent until evidence is actually collected.
 
-This order is a product-value gate, not a deletion of the intended full product.
+The fixed six-session protocol is preserved for optional future reactivation but no longer blocks this owner-directed sequence.
 
 ## Workstream tracking
 
 - #11 — persistence crash, migration and multi-process proof;
 - #12 — fail-closed sandbox execution backends;
 - #13 — research-to-decision integrated milestone;
-- #14 — real-user decision-value validation; operations and the A2 operator surface are merged, but external evidence remains `0/6`;
+- #14 — external decision-value validation deferred as not planned; evidence remains `0/6`;
 - #15 — independent/versioned Evolution Core package;
-- #16 — interactive product workspace integration.
+- #16 — interactive product workspace integration;
+- #17/#18 — governed agent execution and independent verification foundations;
+- #44 — active owner-directed single-user beta vertical slice.
 
 These issues are modules and prerequisites of the single CycleWarden product, not separate product directions.
 

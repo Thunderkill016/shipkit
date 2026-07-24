@@ -3,7 +3,7 @@
   "project": "cyclewarden",
   "primaryProduct": "CycleWarden",
   "lastVerified": "2026-07-24",
-  "verificationScope": "Repository evidence and GitHub Actions through merged pull requests #41 and #39. CycleWarden supports a standalone Evolution Core package on Node.js 20, 22 and 24, a bounded local A2/R1 workspace from objective through reviewed execution handoff, durable repository and explicit-source research, manifest-grounded named-candidate decisions, bounded GitHub public repository discovery, and a fail-closed six-session external decision-value pilot protocol whose technical operating gate is ready. The pilot remains 0/6 with its clock not started; hosted multi-tenant cycle state, general web discovery, direct user decision-value proof, coding-agent delivery, release and measured learning are not claimed.",
+  "verificationScope": "Repository evidence and GitHub Actions through the PR #45 governed-delivery candidate. CycleWarden supports a standalone Evolution Core package on Node.js 20, 22 and 24, a bounded local A2 workspace through ExecutionHandoff, and an experimental A3/R1 trusted-local CLI path through isolated implementation, independent verification and a verified local commit. The external six-session protocol is preserved but deferred at 0/6; hosted multi-tenant operation, an untrusted writable agent sandbox, automatic push or draft PR, release, measured learning and external product value are not claimed.",
   "capabilities": [
     {
       "id": "integrated-product-workspace",
@@ -355,7 +355,7 @@
       "category": "research",
       "status": "partial",
       "verificationStatus": "passing",
-      "summary": "A repository-backed, fail-closed protocol precommits six external A2 Research Audits, separates technical success from product decision value, preserves negative evidence and derives the aggregate verdict without changing thresholds after results are observed.",
+      "summary": "A repository-backed fail-closed six-session protocol remains preserved for optional future external validation. The owner deferred this protocol on 2026-07-24; it is not completed and no internal or technical result is counted as external decision value.",
       "evidence": [
         "docs/evolution/pilot/A2_RESEARCH_AUDIT_PROTOCOL.json",
         "docs/evolution/pilot/PILOT_STATE.json",
@@ -374,9 +374,10 @@
         "GitHub Actions on merged PR #33: 8/8 checks passed"
       ],
       "limitations": [
-        "External completed audits remain 0/6 and the 14-day clock has not started",
+        "The protocol is deferred and issue #14 is closed as not planned for the current phase, not completed",
+        "External completed audits remain 0/6 and the 14-day clock never started",
         "No participant or external repository has been contacted or accessed",
-        "Operational and technical readiness do not establish user decision value",
+        "Operational readiness, internal dogfood and technical CI do not establish user decision value",
         "Sensitive-content pattern checks support but do not replace human redaction review"
       ]
     },
@@ -385,7 +386,7 @@
       "category": "product",
       "status": "partial",
       "verificationStatus": "passing",
-      "summary": "CycleWarden now has capability-negotiated trusted-local and Docker execution backends plus an explicit sandbox-check CLI. The Docker baseline uses immutable local images, denied network, read-only root, reduced environment, no host dependencies, resource bounds and forced cleanup, but no coding-agent adapter consumes ExecutionHandoff yet.",
+      "summary": "CycleWarden has capability-negotiated trusted-local and Docker backends. A governed-delivery beta now consumes a persisted ExecutionHandoff through a generic command or Codex CLI profile in an isolated git worktree, enforces changed-file scope, requires a distinct verifier and creates a local commit only after accepted checks. Trusted-local delivery is not a security sandbox.",
       "evidence": [
         "packages/evolution-core/src/execution-backend.ts",
         "packages/evolution-core/src/check-runner.ts",
@@ -395,22 +396,61 @@
         "packages/evolution-core/src/sandbox-cli.test.ts",
         "scripts/test-sandbox-docker.mjs",
         "docs/evolution/EXECUTION_BACKENDS.md",
-        ".github/workflows/ci.yml"
+        ".github/workflows/ci.yml",
+        "packages/evolution-core/src/delivery.ts",
+        "packages/evolution-core/src/delivery-cli.ts",
+        "packages/evolution-core/src/delivery.test.ts",
+        "packages/evolution-core/src/delivery-hardening.test.ts",
+        "docs/evolution/GOVERNED_DELIVERY.md"
       ],
       "checks": [
         "CI: Sandbox / hostile Docker proof",
         "Fail-closed capability mismatch and unavailable-Docker tests",
         "Mutable-image and implicit-pull rejection",
         "Working-directory traversal and external-symlink rejection",
-        "Host secret, credential file, root write, host path, network and container cleanup proof"
+        "Host secret, credential file, root write, host path, network and container cleanup proof",
+        "Delivery tests: isolated branch/worktree, scope escape rejection and separate verifier",
+        "Delivery hardening tests: clean base, exact digest, no-change, patch-content drift and shell rejection",
+        "Standalone consumer proof: installed cyclewarden-deliver CLI"
       ],
       "limitations": [
-        "No hard writable-workspace disk quota",
-        "No restricted egress allowlist mode",
-        "No remote sandbox provider",
-        "No coding-agent or command-agent adapter consumes approved handoffs",
-        "Windows and macOS support is not established",
-        "No independent external security review"
+        "Trusted-local delivery runs with the current operating-system user's filesystem, credential and network privileges",
+        "The Docker baseline is verified for hostile checks, not as a complete authenticated online-agent mutation environment",
+        "No crash-safe resume for a cycle interrupted after entering executing",
+        "No automatic push, draft PR, merge or deployment operation",
+        "No hard writable-workspace disk quota, restricted egress allowlist, remote sandbox provider or external security review",
+        "Windows and macOS support is not established"
+      ]
+    },
+    {
+      "id": "governed-local-delivery-beta",
+      "category": "product",
+      "status": "partial",
+      "verificationStatus": "passing",
+      "summary": "A planned A3/A4 cycle can bind an exact ExecutionHandoff digest to a shell-free command manifest, create an isolated branch/worktree, record content-addressed implementation evidence, reject filesystem scope escape, run independent verification commands and create a local commit only after an accepted verdict.",
+      "evidence": [
+        "packages/evolution-core/src/delivery.ts",
+        "packages/evolution-core/src/delivery-cli.ts",
+        "packages/evolution-core/src/bin-delivery.ts",
+        "packages/evolution-core/src/delivery.test.ts",
+        "packages/evolution-core/src/delivery-hardening.test.ts",
+        "scripts/test-evolution-core-standalone.mjs",
+        "docs/evolution/GOVERNED_DELIVERY.md"
+      ],
+      "checks": [
+        "Unit test: in-scope implementation becomes a verified local commit only after a separate verifier passes",
+        "Unit test: outside-scope mutation is rejected",
+        "Unit test: implementer cannot verify its own output",
+        "Unit tests: dirty base, digest mismatch, no changes, same-file patch drift, mutating verifier and command shell rejection",
+        "Standalone package proof on Node.js 20, 22 and 24 includes the installed delivery CLI",
+        "Unit test: delivery control manifest tamper is rejected by its integrity digest"
+      ],
+      "limitations": [
+        "CLI only; the web workspace still ends at ExecutionHandoff",
+        "Trusted-local execution is not a security sandbox and must be restricted to trusted repositories and commands",
+        "The local verified branch is not pushed and no draft PR is opened",
+        "No crash-safe execute resume, remote sandbox, release, deployment, outcome measurement or external validation",
+        "The integrity-checked delivery control sidecar is outside the synchronized cycle journal; loss blocks verification"
       ]
     },
     {

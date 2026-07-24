@@ -18,7 +18,8 @@
     "cyclewarden-research-public": "./dist/bin-public-research.js",
     "cyclewarden-sandbox-check": "./dist/bin-sandbox-check.js",
     "cyclewarden-research-candidates": "./dist/bin-candidate-research.js",
-    "cyclewarden-research-search": "./dist/bin-public-search.js"
+    "cyclewarden-research-search": "./dist/bin-public-search.js",
+    "cyclewarden-deliver": "./dist/bin-delivery.js"
   },
   "exports": {
     ".": {
