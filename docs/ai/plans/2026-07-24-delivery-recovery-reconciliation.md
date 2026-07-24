@@ -14,7 +14,7 @@ Recovery must inspect first and mutate only after explicit `--apply`.
 ## Recoverable transitions
 
 ```text
-executing + durable implemented execution + intact patch
+executing + durable implemented execution + exact intact patch digest
 → implemented
 
 executing + durable failed/inconclusive execution
@@ -27,11 +27,13 @@ implemented + durable rejected/inconclusive verification
 → rejected/inconclusive
 ```
 
-An implemented cycle with no verification record and an intact patch remains `implemented`; the independent verifier command can be rerun normally.
+An implemented cycle with no verification record and an intact patch remains `implemented`; the independent verifier command can be rerun normally. “Intact” requires the same changed-file list and the same path, file-mode and content digest captured by the execution record.
 
 ## Fail-closed rule
 
 A clean commit without a durable verification verdict is not evidence that checks passed. Recovery must mark the cycle `inconclusive` when apply is requested rather than infer `verified`.
+
+Changing content inside the same filename is also not evidence-equivalent. If the recomputed execution patch digest differs, recovery must report divergence and refuse to complete `executing → implemented` or resume verification.
 
 Missing, corrupt or mismatched control state also becomes `inconclusive` for interrupted `executing` or `implemented` stages. A cycle already at `verified` is blocked from recovery-assisted publication when local control cannot be trusted; recovery does not silently reconstruct or demote that state.
 
@@ -41,6 +43,7 @@ Every inspection creates:
 
 - a content-addressed `delivery-recovery` evidence record;
 - an integrity-covered `recovery.json` sidecar containing the latest decision;
+- both recorded and observed patch digests when control and worktree inspection are available;
 - lifecycle history evidence when a transition is applied.
 
 ## Concurrency boundary
@@ -55,6 +58,7 @@ Regression coverage must prove:
 
 - inspection is read-only without `--apply`;
 - a durable implemented execution can complete `executing → implemented`;
+- same-filename content drift fails the exact patch-digest check and becomes inconclusive;
 - a durable accepted verification can complete `implemented → verified` only when the exact clean commit remains;
 - an unrecorded commit never becomes verified;
 - missing control during `executing` becomes inconclusive when explicitly applied;
