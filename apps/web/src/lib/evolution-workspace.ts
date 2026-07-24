@@ -196,10 +196,10 @@ export async function loadEvolutionWorkspace(selectedCycleId?: string) {
           root,
         ])).cycle
       : null;
-    return { root: status.root, summaries: status.cycles, selected, error: null };
+    return { root: basename(status.root), summaries: status.cycles, selected, error: null };
   } catch (error) {
     return {
-      root,
+      root: basename(root),
       summaries: [] as CycleSummary[],
       selected: null as CycleView | null,
       error: error instanceof Error ? error.message : String(error),
