@@ -1,0 +1,143 @@
+name: Apply delivery lock authority fix
+
+on:
+  push:
+    branches:
+      - agent/delivery-operation-checkpoints
+    paths:
+      - .github/workflows/apply-delivery-lock-authority.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Make acquisition lock authoritative
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("packages/evolution-core/src/delivery-operation.ts")
+          text = path.read_text(encoding="utf-8")
+          old = '''  let record: DeliveryOperationRecord;
+            const checkpointFindings: string[] = [];
+            try {
+              if (existsSync(path)) {
+                record = readRecord(path);
+              } else {
+                record = readRecord(acquisitionPath);
+                checkpointFindings.push(
+                  "primary checkpoint is missing; using the integrity-valid acquisition lock record"
+                );
+              }
+            } catch (error) {
+              return {
+                controlStatus: "invalid",
+                record: null,
+                lockPresent,
+                ownerState: "not-recorded",
+                childState: "not-recorded",
+                disposition: "blocked",
+                findings: [error instanceof Error ? error.message : String(error)],
+              };
+            }
+
+            const ownerState = processState(record.ownerHost, record.ownerPid);
+            const childState = childProcessState(record.ownerHost, record.childPid);
+            const findings: string[] = [...checkpointFindings];
+          '''
+          new = '''  let primaryRecord: DeliveryOperationRecord | null = null;
+            let acquisitionRecord: DeliveryOperationRecord | null = null;
+            const checkpointFindings: string[] = [];
+
+            if (lockPresent) {
+              try {
+                acquisitionRecord = readRecord(acquisitionPath);
+              } catch (error) {
+                return {
+                  controlStatus: "invalid",
+                  record: null,
+                  lockPresent,
+                  ownerState: "not-recorded",
+                  childState: "not-recorded",
+                  disposition: "blocked",
+                  findings: [
+                    `delivery acquisition lock cannot be trusted: ${
+                      error instanceof Error ? error.message : String(error)
+                    }`,
+                  ],
+                };
+              }
+            }
+
+            if (existsSync(path)) {
+              try {
+                primaryRecord = readRecord(path);
+              } catch (error) {
+                if (!acquisitionRecord) {
+                  return {
+                    controlStatus: "invalid",
+                    record: null,
+                    lockPresent,
+                    ownerState: "not-recorded",
+                    childState: "not-recorded",
+                    disposition: "blocked",
+                    findings: [error instanceof Error ? error.message : String(error)],
+                  };
+                }
+                checkpointFindings.push(
+                  `primary checkpoint cannot be trusted; using the acquisition lock record: ${
+                    error instanceof Error ? error.message : String(error)
+                  }`
+                );
+              }
+            }
+
+            let record: DeliveryOperationRecord;
+            if (
+              acquisitionRecord &&
+              (!primaryRecord || acquisitionRecord.operationId !== primaryRecord.operationId)
+            ) {
+              record = acquisitionRecord;
+              checkpointFindings.push(
+                primaryRecord
+                  ? "acquisition lock belongs to a different operation and is authoritative"
+                  : "primary checkpoint is missing; using the integrity-valid acquisition lock record"
+              );
+            } else if (primaryRecord) {
+              record = primaryRecord;
+            } else if (acquisitionRecord) {
+              record = acquisitionRecord;
+              checkpointFindings.push(
+                "primary checkpoint is missing; using the integrity-valid acquisition lock record"
+              );
+            } else {
+              throw new DeliveryOperationError("delivery operation state disappeared during inspection");
+            }
+
+            const ownerState = processState(record.ownerHost, record.ownerPid);
+            const childState = childProcessState(record.ownerHost, record.childPid);
+            const findings: string[] = [...checkpointFindings];
+          '''
+          if text.count(old) != 1:
+              raise SystemExit(f"expected one inspection block, found {text.count(old)}")
+          path.write_text(text.replace(old, new), encoding="utf-8")
+          PY
+          git diff --check
+
+      - name: Commit authority fix
+        run: |
+          rm .github/workflows/apply-delivery-lock-authority.yml
+          git config user.name "CycleWarden Automation"
+          git config user.email "cyclewarden@local"
+          git add --all
+          git commit -m "Prefer active acquisition lock ownership"
+          git push origin HEAD:${{ github.ref_name }}
