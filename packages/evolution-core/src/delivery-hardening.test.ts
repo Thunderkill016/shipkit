@@ -390,4 +390,84 @@ describe("governed delivery hardening", () => {
     expect(executed.execution.scopeViolations.join(" ")).toMatch(/working directory resolves outside/);
     expect(executed.cycle.stage).toBe("rejected");
   });
+
+  it("rejects an implementation command that creates its own git commit", async () => {
+    const fixture = await setup("implementation-commit");
+    const manifestPath = await writeManifest(fixture.root, {
+      commandSource:
+        "const fs=require('node:fs');const cp=require('node:child_process');fs.mkdirSync('docs',{recursive:true});fs.writeFileSync('docs/result.md','ok');cp.execFileSync('git',['add','--all']);cp.execFileSync('git',['commit','-m','agent commit'])",
+    });
+    const executed = await executeDelivery({
+      store: fixture.store,
+      cycleId: fixture.cycleId,
+      projectRoot: fixture.projectRoot,
+      manifestPath,
+      actor: "fixture-implementer",
+      trustedRepository: true,
+    });
+    temporaryRoots.push(dirname(executed.worktreePath));
+    expect(executed.execution.status).toBe("failed");
+    expect(executed.execution.scopeViolations.join(" ")).toMatch(/changed git HEAD/);
+    expect(executed.cycle.stage).toBe("rejected");
+  });
+
+  it("rejects a verification command that changes git HEAD", async () => {
+    const fixture = await setup("verifier-commit");
+    const manifestPath = await writeManifest(fixture.root, {
+      commandSource:
+        "const fs=require('node:fs');fs.mkdirSync('docs',{recursive:true});fs.writeFileSync('docs/result.md','ok')",
+      verificationSource:
+        "const cp=require('node:child_process');cp.execFileSync('git',['add','--all']);cp.execFileSync('git',['commit','-m','verifier commit'])",
+    });
+    const executed = await executeDelivery({
+      store: fixture.store,
+      cycleId: fixture.cycleId,
+      projectRoot: fixture.projectRoot,
+      manifestPath,
+      actor: "fixture-implementer",
+      trustedRepository: true,
+    });
+    temporaryRoots.push(dirname(executed.worktreePath));
+    const verified = await verifyDelivery({
+      store: fixture.store,
+      cycleId: fixture.cycleId,
+      projectRoot: fixture.projectRoot,
+      actor: "fixture-independent-verifier",
+    });
+    expect(verified.verification.verdict).toBe("rejected");
+    expect(verified.verification.unresolvedRisks).toContain(
+      "verification commands changed git HEAD"
+    );
+  });
+
+  it("creates the verified commit without running repository commit hooks", async () => {
+    const fixture = await setup("commit-hooks-disabled");
+    const hooksPath = await run(fixture.projectRoot, "git", ["rev-parse", "--git-path", "hooks"]);
+    await mkdir(hooksPath, { recursive: true });
+    const hookPath = join(hooksPath, "pre-commit");
+    await writeFile(hookPath, "#!/bin/sh
+exit 91
+", { encoding: "utf8", mode: 0o755 });
+    const manifestPath = await writeManifest(fixture.root, {
+      commandSource:
+        "const fs=require('node:fs');fs.mkdirSync('docs',{recursive:true});fs.writeFileSync('docs/result.md','ok')",
+    });
+    const executed = await executeDelivery({
+      store: fixture.store,
+      cycleId: fixture.cycleId,
+      projectRoot: fixture.projectRoot,
+      manifestPath,
+      actor: "fixture-implementer",
+      trustedRepository: true,
+    });
+    temporaryRoots.push(dirname(executed.worktreePath));
+    const verified = await verifyDelivery({
+      store: fixture.store,
+      cycleId: fixture.cycleId,
+      projectRoot: fixture.projectRoot,
+      actor: "fixture-independent-verifier",
+    });
+    expect(verified.verification.verdict).toBe("accepted");
+    expect(verified.verification.commitSha).toMatch(/^[a-f0-9]{40}$/);
+  });
 });
