@@ -178,7 +178,7 @@ async function createVerifiedFixture(name: string) {
 
 async function installFakeGh(
   root: string,
-  options: { authenticationFails?: boolean } = {}
+  options: { authenticationFails?: boolean; wrongHeadSha?: boolean } = {}
 ): Promise<{ logPath: string }> {
   const bin = join(root, "fake-bin");
   const logPath = join(root, "gh-calls.jsonl");
@@ -187,6 +187,7 @@ async function installFakeGh(
   const scriptPath = join(bin, process.platform === "win32" ? "gh.exe" : "gh");
   const script = `#!/usr/bin/env node
 const fs = require("node:fs");
+const childProcess = require("node:child_process");
 const args = process.argv.slice(2);
 const logPath = ${JSON.stringify(logPath)};
 const statePath = ${JSON.stringify(statePath)};
@@ -200,7 +201,8 @@ if (args[0] === "pr" && args[1] === "list") {
   process.exit(0);
 }
 if (args[0] === "pr" && args[1] === "create") {
-  const state = { url: "https://github.com/example/cyclewarden/pull/1", isDraft: true, state: "OPEN", headRefName: value("--head"), baseRefName: value("--base"), number: 1 };
+  const verifiedHead = childProcess.execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+  const state = { url: "https://github.com/example/cyclewarden/pull/1", isDraft: true, state: "OPEN", headRefName: value("--head"), headRefOid: ${options.wrongHeadSha ? '"f".repeat(40)' : "verifiedHead"}, baseRefName: value("--base"), number: 1 };
   fs.writeFileSync(statePath, JSON.stringify(state));
   process.stdout.write(state.url + "\\n");
   process.exit(0);
@@ -266,6 +268,26 @@ describe.sequential("verified draft PR publication", () => {
       .map((line) => JSON.parse(line) as string[]);
     expect(calls.filter((args) => args[0] === "pr" && args[1] === "create")).toHaveLength(1);
     expect(calls.some((args) => args.includes("merge"))).toBe(false);
+  });
+
+  it("rejects a draft PR whose head is not the independently verified commit", async () => {
+    const fixture = await createVerifiedFixture("wrong-pr-head");
+    await installFakeGh(fixture.root, { wrongHeadSha: true });
+
+    const result = await publishDelivery({
+      store: fixture.store,
+      cycleId: fixture.cycleId,
+      projectRoot: fixture.projectRoot,
+      actor: "fixture-publisher",
+      draftPr: true,
+      hostname: "github.com",
+    });
+
+    expect(result.publication.status).toBe("rejected");
+    expect(result.publication.steps.draftPr).toBe("passed");
+    expect(result.publication.unresolvedRisks).toContain(
+      "created pull request did not match the verified draft publication contract"
+    );
   });
 
   it("does not push without the explicit draft PR opt-in", async () => {
