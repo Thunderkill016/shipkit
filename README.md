@@ -68,6 +68,23 @@ Every product improvement cycle (`EvolutionCycle`) progresses through one durabl
 
 ---
 
+## 💡 Product Usability & Readiness (Is Shipkit Usable Today?)
+
+### 🟢 What is Ready to Use Now?
+- **Web App Foundation (`apps/web`):** Fully usable today as a modern production starter kit (Next.js 14, Supabase / Better-Auth, Drizzle/PostgreSQL, Tailwind CSS, Sentry, Vitest, Playwright, Vercel/Docker deployment recipes).
+- **Evolution Core CLI (`packages/evolution-core`):** Fully operational at **A2 Autonomy** for initializing evolution cycles (`pnpm evolve start`), repository modeling, readiness assessments, public research discovery, SHA-256 evidence logging, and contradiction auditing.
+
+### 🔴 What is Still in Development?
+- **Autonomous Code Editing & PR Delivery (A3 Autonomy):** Unattended agent code modification is currently restricted until the full secure container/microVM sandbox backend is integrated.
+- **Unified Graphical Web UI:** The Next.js web application and the Evolution Core Engine are currently linked via CLI rather than a full graphical web dashboard.
+- **Autonomous Deployment & Outcome Measurement:** Post-release outcome tracking and autonomous deployment execution remain manual or semi-automated steps.
+
+### 📌 Recommended Usage Today
+- **For Web SaaS Builders:** Use `apps/web` & `pnpm create-shipkit` as your product application foundation.
+- **For AI Systems Engineering:** Use `pnpm evolve` CLI to run evidence-backed project audits, research discovery, and decision-value pilots.
+
+---
+
 ## ⚡ Quickstart
 
 ### Prerequisites
