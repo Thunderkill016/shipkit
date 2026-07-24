@@ -1,188 +1,151 @@
 # ✦ Shipkit
 
-**One AI-native system for researching, building, verifying, shipping and continuously improving real products.**
+**Unified AI-Native Product Evolution System & Deterministic Control Engine**
 
-Shipkit combines a product workspace, application foundation, deterministic evolution engine, modern research system, coding-agent execution, sandboxing, evidence, verification, deployment and measured learning into one governed lifecycle.
+Shipkit combines a product workspace, Next.js application foundation, deterministic evolution kernel, evidence-backed research intelligence, sandboxed agent execution, automated verification, and continuous measured learning into one governed product lifecycle.
 
-Models and agents are interchangeable workers. They do not own Shipkit's state, permissions, evidence, deployment authority or final verdict.
+> **Core Philosophy:** Models and agents are *interchangeable workers*. They do not own Shipkit's state, permissions, evidence, deployment authority, or final verdicts. Shipkit wraps probabilistic AI in a deterministic control harness.
 
-MIT · Node ≥ 20 · pnpm · local-first foundation
+[![Node.js](https://img.shields.io/badge/node-%E2%89%A520-brightgreen.svg)](https://nodejs.org)
+[![pnpm](https://img.shields.io/badge/pnpm-9.15.0-blue.svg)](https://pnpm.io)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Security: Protected](https://img.shields.io/badge/Security-Secret%20Scanning%20%26%20Push%20Protection-success.svg)](#security-boundary)
+[![Autonomy: A2 Operational](https://img.shields.io/badge/Autonomy-A2%20Pilot%20Operational-blueviolet.svg)](#current-status)
 
-## Unified product loop
+---
 
-```text
-idea and product definition
-→ product workspace and foundation
-→ inspect and model
-→ research and discover
-→ decide and plan
-→ implement through governed agents
-→ verify independently
-→ release and deploy
-→ measure product outcomes
-→ learn and improve
-```
+## 🔄 Unified Product Loop
 
-All modules share one durable cycle, policy model and evidence chain.
-
-## Product modules
-
-| Module | Role |
-| --- | --- |
-| Product Workspace | Product brief, roadmap, experiments, approvals and human review |
-| Product Foundation | Generated Next.js application, auth, data, security, integrations and deployment baseline |
-| Evolution Kernel | Durable state, transitions, risk, approvals, recovery and rollback |
-| Research Intelligence | Repository, web, paper, competitor and user research; claims and contradictions |
-| Execution & Sandbox | Command and coding-agent adapters with capability-negotiated containment |
-| Verification & Evidence | Tests, CI, reviews, provenance, attestations and verdicts |
-| Delivery & Operations | Draft PRs, release, deployment, rollback and environment management |
-| Learning & Improvement | Memory, skills, benchmarks, paired evaluation, promotion and retirement |
-| Interoperability | GitHub, MCP, A2A, telemetry and portable trust |
-
-These are implementation boundaries inside one product—not separate Shipkit products.
-
-## Current status
-
-**Experimental integrated foundation — draft PR #10, unmerged and undeployed.**
-
-Implemented now:
-
-- deterministic evidence-gated evolution cycles;
-- A0–A4 autonomy and R0–R4 risk policy;
-- exact cycle/action/scope approvals;
-- append-only journal, atomic snapshots, recovery and serialized writers;
-- content-addressed evidence blobs and contextual evidence occurrences;
-- bounded repository inspection and trust-boundary discovery;
-- temporary-workspace checks with timeout and output limits;
-- separate research, execution and verification readiness;
-- existing Next.js product foundation with auth, PostgreSQL, security, integrations and deployment recipes;
-- project generator and AI engineering workflow;
-- CI dogfood on Shipkit and an unrelated repository.
-
-Not integrated yet:
-
-- complete persistence crash/migration proof;
-- real containment for untrusted execution;
-- the research-and-decision workflow through the product interface;
-- coding-agent adapters and isolated branch delivery;
-- independent product-outcome evaluation;
-- authorized release/deployment through the cycle;
-- measured learning and meta-improvement;
-- unified end-user workspace across the whole lifecycle.
-
-## Next integrated milestone
-
-The next milestone completes the research and decision portion of the same product loop:
+Every product improvement cycle (`EvolutionCycle`) progresses through one durable, evidence-gated lifecycle:
 
 ```text
-inspect → assess → decision brief → bounded research
-→ atomic claims → contradiction review → 3 opportunities
-→ transparent ranking → smallest reversible experiment
-→ persisted handoff to execution
+  idea & product definition
+→ product workspace & foundation
+→ repository inspection & modeling
+→ evidence-backed research & discovery
+→ opportunity decision & experiment planning
+→ sandboxed agent-assisted implementation
+→ independent verification & security audit
+→ authorized release & deployment
+→ outcome measurement & continuous learning
 ```
 
-It ends before code mutation only because the sandbox boundary is not yet complete. Execution, deployment, measurement and learning remain required product modules.
+---
 
-## Try the current foundation
+## 🧩 Architecture & Product Modules
+
+| Module | Description & Role |
+| :--- | :--- |
+| **Product Workspace** | Web UI (`apps/web`) for product briefs, roadmaps, experiment selection, human approvals, and evidence inspection. |
+| **Product Foundation** | Generated Next.js 14 application with Supabase / Better-Auth, Drizzle/PostgreSQL, Tailwind CSS, Sentry, and Vercel/Docker recipes. |
+| **Evolution Kernel** | Deterministic lifecycle engine (`packages/evolution-core`), append-only journal (`events.jsonl`), write-locks, and atomic recovery snapshots. |
+| **Research Intelligence** | Public repository search, claim extraction, citation integrity verification, deduplication, and contradiction analysis. |
+| **Execution & Sandbox** | Capability-negotiated agent execution backends, isolated workspaces, and hostile Docker sandbox containment. |
+| **Verification & Evidence** | SHA-256 content-addressed evidence blobs, test runners, static analysis, and independent reviewer verdicts. |
+| **Delivery & Operations** | Draft PR generation, deployment adapters, operational health checks, and rollback safety. |
+| **Learning & Improvement** | Durable memory records with expiry/scope, skill registry, paired cycle evaluations, and evidence-gated promotion. |
+| **Interoperability** | Model Context Protocol (MCP) server, GitHub workflows, OpenTelemetry tracing, and portable trust attestations. |
+
+---
+
+## 🚦 Current Status & Autonomy Levels
+
+**Current Autonomy Stage: A2 Pilot Operational** *(PR #33 merged)*
+
+### Safe Autonomy Scale
+- **A0:** Inspect & display repository evidence.
+- **A1:** Bounded research, planning, static checks, and record creation.
+- **A2 (Active):** Autonomous research & decision-value pilot within approved data scopes.
+- **A3 (Next):** Bounded code modification and draft PR creation inside a verified sandbox.
+- **A4:** Production deployment, secret access, and infrastructure spending (requires explicit human approval).
+
+### Implemented & Verified Capabilities
+- ✅ **Deterministic Evolution Engine:** Append-only transaction journal, atomic snapshots, write-lock serialization, and recovery.
+- ✅ **Evidence Registry:** SHA-256 content-addressed storage for evidence blobs, occurrences, and citations.
+- ✅ **Research Intelligence:** Public GitHub search provider, atomic claim extraction, and contradiction auditing.
+- ✅ **Application Foundation:** Next.js workspace, Supabase / Better-Auth, PostgreSQL schema migrations, and Playwright E2E testing.
+- ✅ **Security Hardening:** Secret scanning, push protection, automated security updates, and hostile Docker sandbox proof (`test-sandbox-docker.mjs`).
+
+---
+
+## ⚡ Quickstart
+
+### Prerequisites
+- Node.js `≥ 20`
+- `pnpm` (`≥ 9`)
+
+### 1. Install & Initialize Engine
 
 ```bash
+# Clone repository
 git clone https://github.com/Thunderkill016/shipkit.git
 cd shipkit
+
+# Install dependencies
 pnpm install
 
+# Build core evolution engine
+pnpm --filter @shipkit/evolution-core build
+
+# Initialize durable local Shipkit store (.shipkit/)
 pnpm evolve -- init
+```
+
+### 2. Run an Evolution Cycle (CLI)
+
+```bash
+# Create a new product cycle
 pnpm evolve -- start \
   --id shipkit:cycle-001 \
   --objective "Identify and deliver the highest-value bounded improvement" \
   --autonomy A2 \
   --risk R1
 
+# Inspect repository baseline evidence
 pnpm evolve -- inspect shipkit:cycle-001 --project-root .
+
+# Assess readiness and run authorized checks
 pnpm evolve -- assess shipkit:cycle-001 --project-root . --check test
+
+# Show cycle state & evidence graph
 pnpm evolve -- show shipkit:cycle-001
 ```
 
-Current kernel commands:
-
-| Command | Purpose |
-| --- | --- |
-| `pnpm evolve -- init` | Initialize local Shipkit state |
-| `pnpm evolve -- start` | Create a durable product evolution cycle |
-| `pnpm evolve -- inspect` | Register repository baseline evidence |
-| `pnpm evolve -- assess` | Run authorized checks and create a readiness model |
-| `pnpm evolve -- status` | List stored cycles |
-| `pnpm evolve -- show` / `resume` | Load and recover a cycle |
-| `pnpm evolve -- advance` | Apply one legal evidence-backed transition |
-
-## Product workspace and foundation
-
-`apps/web` and the shared packages are part of Shipkit's integrated product surface. They currently provide:
-
-- localized landing, login and protected workspace;
-- Supabase or Better Auth adapters;
-- portable PostgreSQL and user-scoped data;
-- security, mail, storage and payment ports;
-- Vercel and Docker delivery recipes;
-- Vitest and Playwright verification;
-- a generator for new product workspaces.
-
-This foundation will evolve into the human-facing surface for product definition, research review, approvals, execution progress, verification, release and learning—not remain only a test project.
-
-Run the current web foundation:
+### 3. Run Web Application Workspace
 
 ```bash
 pnpm ready
 pnpm dev
 ```
+Navigate to `http://localhost:3000` to access the web foundation workspace.
 
-## Security boundary
+---
 
-The current package-script runner uses a temporary workspace but is **not a security sandbox**:
+## 🛡️ Security Boundary & Policy
 
-- network isolation is not enforced;
-- filesystem writes outside the workspace are not contained;
-- process containment is incomplete;
-- host `node_modules` may be linked.
+Shipkit enforces strict security boundaries:
 
-Untrusted execution requires a dedicated sandbox backend. Shipkit must fail closed when an operation requests capabilities that the selected backend cannot provide.
+- **Evidence-Gated Approvals:** No state transition occurs without explicit evidence matching requested action, cycle, and risk scope.
+- **Secret Redaction & Protection:** Active GitHub Secret Scanning and Push Protection prevent credential leaks.
+- **Sandbox Policy:** Code execution is strictly bounded. Untrusted repositories require a dedicated Docker container backend advertising filesystem, network, and process containment.
 
-## Repository structure
+---
 
-```text
-Shipkit
-├── apps/web                  integrated product workspace and application foundation
-├── packages/evolution-core  deterministic lifecycle, policy, evidence and CLI
-├── packages/*               auth, data, security, mail, storage and payment modules
-├── docs/evolution           architecture, research and integrated roadmap
-├── scripts                  generator, setup, dogfood and verification
-└── .shipkit at runtime      durable cycles and evidence
-```
-
-## Core principles
-
-1. One product and one lifecycle across every module.
-2. Deterministic control around nondeterministic agents.
-3. Research determines what should be built.
-4. Exact authorization and evidence precede autonomy.
-5. Temporary workspaces are not security sandboxes.
-6. Verification is independent from implementation.
-7. Passing technical checks does not prove product value.
-8. Learning is promoted only after measured later-cycle benefit.
-9. Sequencing implementation must never erase the unified destination.
-
-## Documentation
+## 📚 Documentation Index
 
 | Document | Purpose |
-| --- | --- |
-| [`IDEA.md`](./IDEA.md) | Unified product source of truth |
-| [`ROADMAP.md`](./ROADMAP.md) | Integrated milestones and workstreams |
-| [`docs/evolution/ARCHITECTURE.md`](./docs/evolution/ARCHITECTURE.md) | One-product module and control architecture |
-| [`docs/evolution/ROADMAP.md`](./docs/evolution/ROADMAP.md) | Detailed implementation roadmap |
-| [`docs/evolution/RESEARCH_CAPABILITY.md`](./docs/evolution/RESEARCH_CAPABILITY.md) | Modern research operating model |
-| [`docs/evolution/COMPARATIVE_ANALYSIS.md`](./docs/evolution/COMPARATIVE_ANALYSIS.md) | External-system comparison and decisions |
-| [`docs/evolution/DATA_GOVERNANCE.md`](./docs/evolution/DATA_GOVERNANCE.md) | Data classification, privacy and retention gates |
-| [`docs/CAPABILITIES.json`](./docs/CAPABILITIES.json) | Machine-readable capability evidence |
+| :--- | :--- |
+| [`IDEA.md`](./IDEA.md) | Single product source of truth and vision |
+| [`ARCHITECTURE.md`](./docs/evolution/ARCHITECTURE.md) | Unified product architecture & module contracts |
+| [`ROADMAP.md`](./ROADMAP.md) | Milestone roadmap and workstreams |
+| [`COMPARATIVE_ANALYSIS.md`](./docs/evolution/COMPARATIVE_ANALYSIS.md) | External system comparison (Temporal, LangGraph, OpenHands, MCP, SLSA) |
+| [`PROJECT_MODEL.md`](./docs/ai/PROJECT_MODEL.md) | Machine-readable project model & capabilities |
+| [`DATA_GOVERNANCE.md`](./docs/evolution/DATA_GOVERNANCE.md) | Data classification, privacy, and retention rules |
 
-## Contribution rule
+---
 
-A module is not complete because it works alone. Material work must show how it connects to the shared Shipkit cycle, policy, evidence and user workflow. Claims must link to code, tests, evidence or product-outcome data.
+## 🤝 License & Contribution
+
+Distributed under the **MIT License**. See [`LICENSE`](./LICENSE) for details.
+
+Contributions must align with the **One Product Loop** principle: claims must link to verifiable code, tests, evidence, or product-outcome data.
