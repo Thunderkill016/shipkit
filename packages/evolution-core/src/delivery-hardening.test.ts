@@ -445,9 +445,10 @@ describe("governed delivery hardening", () => {
     const hooksPath = await run(fixture.projectRoot, "git", ["rev-parse", "--git-path", "hooks"]);
     await mkdir(hooksPath, { recursive: true });
     const hookPath = join(hooksPath, "pre-commit");
-    await writeFile(hookPath, "#!/bin/sh
-exit 91
-", { encoding: "utf8", mode: 0o755 });
+    await writeFile(hookPath, "#!/bin/sh\nexit 91\n", {
+      encoding: "utf8",
+      mode: 0o755,
+    });
     const manifestPath = await writeManifest(fixture.root, {
       commandSource:
         "const fs=require('node:fs');fs.mkdirSync('docs',{recursive:true});fs.writeFileSync('docs/result.md','ok')",
