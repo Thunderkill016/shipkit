@@ -18,6 +18,7 @@ export * from "./scorecard.js";
 export * from "./delivery.js";
 export * from "./delivery-publish.js";
 export * from "./delivery-recovery.js";
+export * from "./delivery-operation.js";
 export * from "./delivery-cli.js";
 
 export * from "./candidate-research.js";

@@ -267,6 +267,10 @@ export async function withDeliveryOperation<T>(
 ): Promise<{ value: T; operation: DeliveryOperationRecord }> {
   const actor = input.actor.trim();
   if (!actor) throw new DeliveryOperationError("delivery operation actor is required");
+  const heartbeatIntervalMs = input.heartbeatIntervalMs ?? DEFAULT_HEARTBEAT_INTERVAL_MS;
+  if (!Number.isInteger(heartbeatIntervalMs) || heartbeatIntervalMs <= 0) {
+    throw new DeliveryOperationError("delivery heartbeat interval must be a positive integer");
+  }
   const existing = inspectDeliveryOperation(input.store, input.cycleId);
   if (existing.disposition !== "healthy") {
     throw new DeliveryOperationError(
@@ -303,11 +307,6 @@ export async function withDeliveryOperation<T>(
     throw error;
   }
 
-  const heartbeatIntervalMs = input.heartbeatIntervalMs ?? DEFAULT_HEARTBEAT_INTERVAL_MS;
-  if (!Number.isInteger(heartbeatIntervalMs) || heartbeatIntervalMs <= 0) {
-    releaseOperationLock(input.store, input.cycleId);
-    throw new DeliveryOperationError("delivery heartbeat interval must be a positive integer");
-  }
   let heartbeatFailure: Error | null = null;
   const heartbeat = setInterval(() => {
     try {
