@@ -1,8 +1,12 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { createHash, randomUUID } from "node:crypto";
 import {
+  closeSync,
   existsSync,
+  fsyncSync,
+  linkSync,
   mkdirSync,
+  openSync,
   readFileSync,
   renameSync,
   rmSync,
@@ -103,14 +107,37 @@ function lockPath(store: EvolutionStore, cycleId: string): string {
   return join(operationDirectory(store, cycleId), "operation.lock");
 }
 
+function candidatePath(store: EvolutionStore, cycleId: string, operationId: string): string {
+  const portableId = operationId.replace(/[^A-Za-z0-9._-]/g, "-");
+  return join(operationDirectory(store, cycleId), `${portableId}.candidate.json`);
+}
+
 function atomicWriteJsonSync(path: string, value: unknown): void {
   mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
   const temporary = `${path}.${process.pid}.${randomUUID()}.tmp`;
-  writeFileSync(temporary, `${JSON.stringify(value, null, 2)}\n`, {
-    encoding: "utf8",
-    mode: 0o600,
-  });
-  renameSync(temporary, path);
+  const descriptor = openSync(temporary, "wx", 0o600);
+  try {
+    writeFileSync(descriptor, `${JSON.stringify(value, null, 2)}\n`, "utf8");
+    fsyncSync(descriptor);
+  } finally {
+    closeSync(descriptor);
+  }
+  try {
+    renameSync(temporary, path);
+  } catch (error) {
+    rmSync(temporary, { force: true });
+    throw error;
+  }
+  try {
+    const directory = openSync(dirname(path), "r");
+    try {
+      fsyncSync(directory);
+    } finally {
+      closeSync(directory);
+    }
+  } catch {
+    // Directory fsync is not available on every supported platform.
+  }
 }
 
 function withDigest(record: Omit<DeliveryOperationRecord, "integrityDigest">): DeliveryOperationRecord {
@@ -119,11 +146,26 @@ function withDigest(record: Omit<DeliveryOperationRecord, "integrityDigest">): D
 
 function readRecord(path: string): DeliveryOperationRecord {
   const value = JSON.parse(readFileSync(path, "utf8")) as DeliveryOperationRecord;
+  const validOperation = value.operation === "execute" || value.operation === "verify" || value.operation === "publish";
+  const validStatus =
+    value.status === "running" ||
+    value.status === "completed" ||
+    value.status === "failed" ||
+    value.status === "abandoned";
+  const validOwnerPid = Number.isInteger(value.ownerPid) && value.ownerPid > 0;
+  const validChildPid =
+    value.childPid === null || (Number.isInteger(value.childPid) && value.childPid > 0);
   if (
     value.schemaVersion !== 1 ||
     value.recordType !== "delivery-operation" ||
     !value.operationId ||
-    !value.cycleId
+    !value.cycleId ||
+    !value.actor ||
+    !value.ownerHost ||
+    !validOperation ||
+    !validStatus ||
+    !validOwnerPid ||
+    !validChildPid
   ) {
     throw new DeliveryOperationError("delivery operation checkpoint has an unsupported shape");
   }
@@ -144,6 +186,7 @@ function writeRecord(path: string, value: DeliveryOperationRecord): DeliveryOper
 function processState(ownerHost: string, pid: number | null): DeliveryProcessState {
   if (pid === null) return "not-recorded";
   if (ownerHost !== hostname()) return "foreign-host";
+  if (!Number.isInteger(pid) || pid <= 0) return "dead";
   try {
     process.kill(pid, 0);
     return "alive";
@@ -152,29 +195,49 @@ function processState(ownerHost: string, pid: number | null): DeliveryProcessSta
   }
 }
 
+function childProcessState(ownerHost: string, pid: number | null): DeliveryProcessState {
+  if (pid === null || ownerHost !== hostname() || process.platform === "win32") {
+    return processState(ownerHost, pid);
+  }
+  try {
+    process.kill(-pid, 0);
+    return "alive";
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "EPERM") return "alive";
+    return processState(ownerHost, pid);
+  }
+}
+
 export function inspectDeliveryOperation(
   store: EvolutionStore,
   cycleId: string
 ): DeliveryOperationInspection {
   const path = checkpointPath(store, cycleId);
-  const lockPresent = existsSync(lockPath(store, cycleId));
-  if (!existsSync(path)) {
+  const acquisitionPath = lockPath(store, cycleId);
+  const lockPresent = existsSync(acquisitionPath);
+  if (!existsSync(path) && !lockPresent) {
     return {
       controlStatus: "missing",
       record: null,
-      lockPresent,
+      lockPresent: false,
       ownerState: "not-recorded",
       childState: "not-recorded",
-      disposition: lockPresent ? "blocked" : "healthy",
-      findings: lockPresent
-        ? ["delivery operation lock exists without a durable checkpoint"]
-        : [],
+      disposition: "healthy",
+      findings: [],
     };
   }
 
   let record: DeliveryOperationRecord;
+  const checkpointFindings: string[] = [];
   try {
-    record = readRecord(path);
+    if (existsSync(path)) {
+      record = readRecord(path);
+    } else {
+      record = readRecord(acquisitionPath);
+      checkpointFindings.push(
+        "primary checkpoint is missing; using the integrity-valid acquisition lock record"
+      );
+    }
   } catch (error) {
     return {
       controlStatus: "invalid",
@@ -188,8 +251,8 @@ export function inspectDeliveryOperation(
   }
 
   const ownerState = processState(record.ownerHost, record.ownerPid);
-  const childState = processState(record.ownerHost, record.childPid);
-  const findings: string[] = [];
+  const childState = childProcessState(record.ownerHost, record.childPid);
+  const findings: string[] = [...checkpointFindings];
   let disposition: DeliveryOperationDisposition = "healthy";
 
   if (record.status === "running") {
@@ -200,16 +263,16 @@ export function inspectDeliveryOperation(
       disposition = "active";
       findings.push(
         childState === "alive"
-          ? "delivery child process is still alive"
+          ? "delivery child process or process group is still alive"
           : "delivery owner process is still alive"
       );
     } else {
       disposition = "stale";
-      findings.push("delivery owner and recorded child process are no longer alive");
+      findings.push("delivery owner and recorded child process group are no longer alive");
     }
   } else if (lockPresent) {
     disposition = "stale";
-    findings.push("terminal operation left a stale lock directory");
+    findings.push("terminal operation left a stale lock file");
   }
 
   return {
@@ -223,11 +286,14 @@ export function inspectDeliveryOperation(
   };
 }
 
-function acquireOperationLock(store: EvolutionStore, cycleId: string): void {
-  const directory = operationDirectory(store, cycleId);
-  mkdirSync(directory, { recursive: true, mode: 0o700 });
+function acquireOperationLock(
+  store: EvolutionStore,
+  cycleId: string,
+  preparedCheckpointPath: string
+): void {
+  mkdirSync(operationDirectory(store, cycleId), { recursive: true, mode: 0o700 });
   try {
-    mkdirSync(lockPath(store, cycleId), { mode: 0o700 });
+    linkSync(preparedCheckpointPath, lockPath(store, cycleId));
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
     const inspection = inspectDeliveryOperation(store, cycleId);
@@ -238,7 +304,7 @@ function acquireOperationLock(store: EvolutionStore, cycleId: string): void {
 }
 
 function releaseOperationLock(store: EvolutionStore, cycleId: string): void {
-  rmSync(lockPath(store, cycleId), { recursive: true, force: true });
+  rmSync(lockPath(store, cycleId), { force: true });
 }
 
 function updateHeartbeat(path: string, operationId: string): void {
@@ -278,7 +344,6 @@ export async function withDeliveryOperation<T>(
     );
   }
 
-  acquireOperationLock(input.store, input.cycleId);
   const path = checkpointPath(input.store, input.cycleId);
   const startedAt = input.now ?? new Date().toISOString();
   let record = withDigest({
@@ -299,11 +364,20 @@ export async function withDeliveryOperation<T>(
     errorDigest: null,
     recoveryEvidenceRef: null,
   });
-
+  const preparedCheckpointPath = candidatePath(
+    input.store,
+    input.cycleId,
+    record.operationId
+  );
+  atomicWriteJsonSync(preparedCheckpointPath, record);
+  let acquired = false;
   try {
-    atomicWriteJsonSync(path, record);
+    acquireOperationLock(input.store, input.cycleId, preparedCheckpointPath);
+    acquired = true;
+    renameSync(preparedCheckpointPath, path);
   } catch (error) {
-    releaseOperationLock(input.store, input.cycleId);
+    rmSync(preparedCheckpointPath, { force: true });
+    if (acquired) releaseOperationLock(input.store, input.cycleId);
     throw error;
   }
 
@@ -388,6 +462,31 @@ export async function reconcileDeliveryOperation(input: ReconcileDeliveryOperati
       resolve(input.projectRoot)
     ).registerJson("delivery-operation-recovery", recovery);
     recoveryEvidenceRef = `evidence:${evidence.occurrenceId}`;
+    const refreshed = inspectDeliveryOperation(input.store, input.cycleId);
+    if (
+      refreshed.disposition !== "stale" ||
+      refreshed.controlStatus !== "valid" ||
+      refreshed.record?.operationId !== record.operationId
+    ) {
+      return {
+        cycleId: input.cycleId,
+        inspectedAt,
+        decision: "blocked" as const,
+        applyRequested: true,
+        applied: false,
+        inspection: refreshed,
+        record: refreshed.record,
+        recoveryEvidenceRef,
+        nextAction: "Operation ownership changed during recovery; inspect again before any mutation.",
+        limitations: [
+          "process liveness can only be proven for the current host",
+          "hard crashes can lose command output that was never durably recorded",
+          "direct library calls bypass this CLI operation lease boundary",
+          "publication subprocess PIDs are not yet captured; publish is protected by the owner-process lease",
+          "operation recovery never kills processes, reruns commands, merges, deploys, or writes production",
+        ],
+      };
+    }
     record = writeRecord(checkpointPath(input.store, input.cycleId), {
       ...record,
       childPid: null,
@@ -396,6 +495,7 @@ export async function reconcileDeliveryOperation(input: ReconcileDeliveryOperati
       status: record.status === "running" ? "abandoned" : record.status,
       recoveryEvidenceRef,
     });
+    rmSync(candidatePath(input.store, input.cycleId, record.operationId), { force: true });
     releaseOperationLock(input.store, input.cycleId);
     applied = true;
   }
