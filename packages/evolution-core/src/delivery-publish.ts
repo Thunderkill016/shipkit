@@ -77,6 +77,14 @@ async function runGit(cwd: string, args: string[]): Promise<string> {
   return await runCommand(cwd, "git", args);
 }
 
+async function optionalGitConfig(cwd: string, key: string): Promise<string> {
+  try {
+    return await runGit(cwd, ["config", "--get", key]);
+  } catch {
+    return "";
+  }
+}
+
 async function runGh(cwd: string, args: string[]): Promise<string> {
   try {
     return await runCommand(cwd, "gh", args);
@@ -223,9 +231,13 @@ export async function publishDelivery(input: PublishDeliveryInput) {
     throw new DeliveryError("verified delivery publication requires exactly one commit after the recorded base");
   }
 
-  const remoteUrl = await runGit(projectRoot, ["remote", "get-url", remoteName]);
-  const pushUrl = await runGit(projectRoot, ["remote", "get-url", "--push", remoteName]);
+  const remoteUrl = await runGit(projectRoot, ["config", "--get", `remote.${remoteName}.url`]);
+  const configuredPushUrl = await optionalGitConfig(projectRoot, `remote.${remoteName}.pushurl`);
   const repository = parseGitHubRepository(remoteUrl);
+  const pushRepository = parseGitHubRepository(configuredPushUrl || remoteUrl);
+  if (pushRepository !== repository) {
+    throw new DeliveryError("remote fetch and push URLs must identify the same github.com repository");
+  }
   const authorization = authorizeAction({
     autonomy: cycle.autonomy,
     risk: cycle.risk,
@@ -242,7 +254,7 @@ export async function publishDelivery(input: PublishDeliveryInput) {
   const existingRemote = await runGit(projectRoot, [
     "ls-remote",
     "--heads",
-    pushUrl,
+    remoteName,
     `refs/heads/${branchName}`,
   ]);
   if (existingRemote) {
@@ -258,7 +270,7 @@ export async function publishDelivery(input: PublishDeliveryInput) {
   const remoteLine = await runGit(projectRoot, [
     "ls-remote",
     "--heads",
-    pushUrl,
+    remoteName,
     `refs/heads/${branchName}`,
   ]);
   const remoteCommit = remoteLine.split(/\s+/)[0] ?? "";
