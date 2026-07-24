@@ -191,10 +191,11 @@ process.exit(2);
 }
 
 async function remoteHead(projectRoot: string, branchName: string): Promise<string> {
+  const pushUrl = await run(projectRoot, "git", ["remote", "get-url", "--push", "origin"]);
   return await run(projectRoot, "git", [
     "ls-remote",
     "--heads",
-    "origin",
+    pushUrl,
     `refs/heads/${branchName}`,
   ]);
 }
