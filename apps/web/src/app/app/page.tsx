@@ -73,6 +73,29 @@ export default async function AppHomePage() {
           </div>
         </Link>
 
+        <Link
+          href="/app/evolution/delivery"
+          className="group block rounded-2xl border border-border bg-card p-6 transition-colors hover:border-accent"
+        >
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted">
+                Governed delivery operations
+              </p>
+              <h2 className="mt-2 text-lg font-semibold text-foreground group-hover:text-accent">
+                Open Delivery Recovery Console
+              </h2>
+              <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted">
+                Inspect implementation, independent verification, draft publication, process leases,
+                and fail-closed recovery without exposing execute, merge or deploy controls.
+              </p>
+            </div>
+            <span className="rounded-full border border-border px-3 py-1 text-xs text-muted">
+              inspect & recover →
+            </span>
+          </div>
+        </Link>
+
         <div className="rounded-xl border border-border bg-card p-5">
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted">
@@ -102,6 +125,7 @@ export default async function AppHomePage() {
             <li>Inspect and assess the repository.</li>
             <li>Prepare a research bundle with three opportunities.</li>
             <li>Review the selected experiment and execution handoff in the workspace.</li>
+            <li>Inspect durable delivery and recover stale or interrupted operations.</li>
           </ol>
         </div>
 
