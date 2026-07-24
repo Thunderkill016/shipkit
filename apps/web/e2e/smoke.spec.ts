@@ -36,6 +36,13 @@ test.describe("Demo mode only", () => {
     await expect(page.getByText(/demo|session|adapter/i).first()).toBeVisible();
   });
 
+  test("delivery recovery console is discoverable and loads", async ({ page }) => {
+    await page.goto("/app");
+    await page.getByRole("link", { name: /open delivery recovery console/i }).click();
+    await expect(page.getByRole("heading", { name: /delivery operations/i })).toBeVisible();
+    await expect(page.getByText(/no cycle selected|operator actions|delivery state/i).first()).toBeVisible();
+  });
+
   test("notes example page loads", async ({ page }) => {
     await page.goto("/app/notes");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
