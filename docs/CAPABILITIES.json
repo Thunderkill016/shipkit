@@ -3,7 +3,7 @@
   "project": "cyclewarden",
   "primaryProduct": "CycleWarden",
   "lastVerified": "2026-07-24",
-  "verificationScope": "Repository evidence and GitHub Actions through merged pull request #38, plus local unit, type, browser and full-repository verification for the gated interactive Evolution Workspace. CycleWarden supports a standalone Evolution Core package on Node.js 20, 22 and 24, durable repository and explicit-source research, manifest-grounded named-candidate decisions, bounded GitHub public repository discovery, and a fail-closed six-session external decision-value pilot protocol whose technical gate is ready. The pilot remains 0/6 with its clock not started; hosted multi-tenant cycle state, general web discovery, direct user decision-value proof, coding-agent delivery, release and measured learning are not claimed.",
+  "verificationScope": "Repository evidence and GitHub Actions through merged pull requests #41 and #39. CycleWarden supports a standalone Evolution Core package on Node.js 20, 22 and 24, a bounded local A2/R1 workspace from objective through reviewed execution handoff, durable repository and explicit-source research, manifest-grounded named-candidate decisions, bounded GitHub public repository discovery, and a fail-closed six-session external decision-value pilot protocol whose technical operating gate is ready. The pilot remains 0/6 with its clock not started; hosted multi-tenant cycle state, general web discovery, direct user decision-value proof, coding-agent delivery, release and measured learning are not claimed.",
   "capabilities": [
     {
       "id": "integrated-product-workspace",
@@ -30,7 +30,7 @@
         "CI: production build",
         "CI: E2E / demo mode",
         "CI: E2E / portable-pg",
-        "Local E2E: create through reviewed execution handoff"
+        "CI: E2E create through reviewed execution handoff"
       ],
       "limitations": [
         "Mutations are local-first, explicitly opt-in, restricted to one server-configured trusted repository and rejected on Vercel ephemeral storage",

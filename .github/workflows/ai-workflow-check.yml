@@ -27,44 +27,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  apply-truth-refresh:
-    if: github.head_ref == 'agent/post-merge-truth-refresh' && github.actor != 'github-actions[bot]'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: agent/post-merge-truth-refresh
-          fetch-depth: 0
-      - name: Apply exact post-merge memory updates and remove temporary automation
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          path = Path('docs/CAPABILITIES.json')
-          text = path.read_text()
-          old_scope = 'Repository evidence and GitHub Actions through merged pull request #38, plus local unit, type, browser and full-repository verification for the gated interactive Evolution Workspace. CycleWarden supports a standalone Evolution Core package on Node.js 20, 22 and 24, durable repository and explicit-source research, manifest-grounded named-candidate decisions, bounded GitHub public repository discovery, and a fail-closed six-session external decision-value pilot protocol whose technical gate is ready. The pilot remains 0/6 with its clock not started; hosted multi-tenant cycle state, general web discovery, direct user decision-value proof, coding-agent delivery, release and measured learning are not claimed.'
-          new_scope = 'Repository evidence and GitHub Actions through merged pull requests #41 and #39. CycleWarden supports a standalone Evolution Core package on Node.js 20, 22 and 24, a bounded local A2/R1 workspace from objective through reviewed execution handoff, durable repository and explicit-source research, manifest-grounded named-candidate decisions, bounded GitHub public repository discovery, and a fail-closed six-session external decision-value pilot protocol whose technical operating gate is ready. The pilot remains 0/6 with its clock not started; hosted multi-tenant cycle state, general web discovery, direct user decision-value proof, coding-agent delivery, release and measured learning are not claimed.'
-          assert old_scope in text
-          text = text.replace(old_scope, new_scope, 1)
-          assert 'Local E2E: create through reviewed execution handoff' in text
-          text = text.replace('Local E2E: create through reviewed execution handoff', 'CI: E2E create through reviewed execution handoff', 1)
-          path.write_text(text)
-          PY
-
-          git fetch origin main
-          git show origin/main:.github/workflows/ai-workflow-check.yml > .github/workflows/ai-workflow-check.yml
-          rm -f .github/workflows/post-merge-truth-refresh.yml .github/truth-refresh-trigger
-
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add docs/CAPABILITIES.json docs/ai/PROJECT_MODEL.md .github/workflows/ai-workflow-check.yml
-          git add -u .github
-          git commit -m "Refresh post-merge capability truth"
-          git push origin HEAD:agent/post-merge-truth-refresh
-
   validate:
     runs-on: ubuntu-latest
     steps:
