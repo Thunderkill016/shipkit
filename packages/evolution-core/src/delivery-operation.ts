@@ -227,27 +227,73 @@ export function inspectDeliveryOperation(
     };
   }
 
-  let record: DeliveryOperationRecord;
+  let primaryRecord: DeliveryOperationRecord | null = null;
+  let acquisitionRecord: DeliveryOperationRecord | null = null;
   const checkpointFindings: string[] = [];
-  try {
-    if (existsSync(path)) {
-      record = readRecord(path);
-    } else {
-      record = readRecord(acquisitionPath);
+
+  if (lockPresent) {
+    try {
+      acquisitionRecord = readRecord(acquisitionPath);
+    } catch (error) {
+      return {
+        controlStatus: "invalid",
+        record: null,
+        lockPresent,
+        ownerState: "not-recorded",
+        childState: "not-recorded",
+        disposition: "blocked",
+        findings: [
+          `delivery acquisition lock cannot be trusted: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        ],
+      };
+    }
+  }
+
+  if (existsSync(path)) {
+    try {
+      primaryRecord = readRecord(path);
+    } catch (error) {
+      if (!acquisitionRecord) {
+        return {
+          controlStatus: "invalid",
+          record: null,
+          lockPresent,
+          ownerState: "not-recorded",
+          childState: "not-recorded",
+          disposition: "blocked",
+          findings: [error instanceof Error ? error.message : String(error)],
+        };
+      }
       checkpointFindings.push(
-        "primary checkpoint is missing; using the integrity-valid acquisition lock record"
+        `primary checkpoint cannot be trusted; using the acquisition lock record: ${
+          error instanceof Error ? error.message : String(error)
+        }`
       );
     }
-  } catch (error) {
-    return {
-      controlStatus: "invalid",
-      record: null,
-      lockPresent,
-      ownerState: "not-recorded",
-      childState: "not-recorded",
-      disposition: "blocked",
-      findings: [error instanceof Error ? error.message : String(error)],
-    };
+  }
+
+  let record: DeliveryOperationRecord;
+  if (
+    acquisitionRecord &&
+    (!primaryRecord || acquisitionRecord.operationId !== primaryRecord.operationId)
+  ) {
+    record = acquisitionRecord;
+    checkpointFindings.push(
+      primaryRecord
+        ? "acquisition lock belongs to a different operation and is authoritative"
+        : "primary checkpoint is missing; using the integrity-valid acquisition lock record"
+    );
+  } else if (primaryRecord) {
+    record = primaryRecord;
+  } else if (acquisitionRecord) {
+    record = acquisitionRecord;
+    checkpointFindings.push(
+      "primary checkpoint is missing; using the integrity-valid acquisition lock record"
+    );
+  } else {
+    throw new DeliveryOperationError("delivery operation state disappeared during inspection");
   }
 
   const ownerState = processState(record.ownerHost, record.ownerPid);
