@@ -2,7 +2,7 @@ import "server-only";
 
 import { execFile } from "node:child_process";
 import { existsSync } from "node:fs";
-import { stat } from "node:fs/promises";
+import { realpath, stat } from "node:fs/promises";
 import { basename, dirname, parse, resolve } from "node:path";
 import { promisify } from "node:util";
 
@@ -128,16 +128,17 @@ export function resolveEvolutionStateRoot(): string {
 }
 
 export async function assertEvolutionProjectRoot(): Promise<string> {
-  const projectRoot = resolveEvolutionProjectRoot();
+  const requestedRoot = resolveEvolutionProjectRoot();
+  let projectRoot: string;
+  try {
+    projectRoot = await realpath(requestedRoot);
+  } catch {
+    throw new Error(`Configured project root does not exist: ${requestedRoot}`);
+  }
   if (projectRoot === parse(projectRoot).root) {
     throw new Error("CYCLEWARDEN_PROJECT_ROOT may not target a filesystem root");
   }
-  let info;
-  try {
-    info = await stat(projectRoot);
-  } catch {
-    throw new Error(`Configured project root does not exist: ${projectRoot}`);
-  }
+  const info = await stat(projectRoot);
   if (!info.isDirectory()) {
     throw new Error(`Configured project root is not a directory: ${projectRoot}`);
   }
