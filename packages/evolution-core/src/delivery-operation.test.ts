@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, mkdtemp, readFile, rm, unlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -64,6 +64,11 @@ async function replaceRecord(
     `${JSON.stringify({ ...payload, integrityDigest: digestJson(payload) }, null, 2)}\n`,
     "utf8"
   );
+}
+
+async function createLockCopy(store: EvolutionStore, cycleId: string): Promise<void> {
+  await mkdir(dirname(lockPath(store, cycleId)), { recursive: true });
+  await copyFile(operationPath(store, cycleId), lockPath(store, cycleId));
 }
 
 afterEach(async () => {
@@ -195,7 +200,7 @@ describe("delivery operation checkpoints and process leases", () => {
       status: "running",
       recoveryEvidenceRef: null,
     }));
-    await mkdir(lockPath(current.store, current.cycleId), { recursive: true });
+    await createLockCopy(current.store, current.cycleId);
 
     const inspected = await reconcileDeliveryOperation({
       store: current.store,
@@ -221,6 +226,46 @@ describe("delivery operation checkpoints and process leases", () => {
     expect(inspectDeliveryOperation(current.store, current.cycleId).lockPresent).toBe(false);
   });
 
+  it("recovers an acquisition lock when the primary checkpoint was never renamed", async () => {
+    const current = await fixture("acquisition-only");
+    await withDeliveryOperation(
+      {
+        store: current.store,
+        cycleId: current.cycleId,
+        projectRoot: current.projectRoot,
+        actor: "fixture-operator",
+        operation: "execute",
+      },
+      async () => "done"
+    );
+    await replaceRecord(current.store, current.cycleId, (record) => ({
+      ...record,
+      ownerPid: 999_999_999,
+      childPid: null,
+      completedAt: null,
+      status: "running",
+      recoveryEvidenceRef: null,
+    }));
+    await createLockCopy(current.store, current.cycleId);
+    await unlink(operationPath(current.store, current.cycleId));
+
+    const inspection = inspectDeliveryOperation(current.store, current.cycleId);
+    expect(inspection.controlStatus).toBe("valid");
+    expect(inspection.disposition).toBe("stale");
+    expect(inspection.findings.join(" ")).toMatch(/acquisition lock record/);
+
+    const applied = await reconcileDeliveryOperation({
+      store: current.store,
+      cycleId: current.cycleId,
+      projectRoot: current.projectRoot,
+      actor: "recovery-operator",
+      apply: true,
+    });
+    expect(applied.applied).toBe(true);
+    expect(applied.record?.status).toBe("abandoned");
+    expect(inspectDeliveryOperation(current.store, current.cycleId).lockPresent).toBe(false);
+  });
+
   it("refuses to clear a lease while a recorded child process is alive", async () => {
     const current = await fixture("live-child");
     await withDeliveryOperation(
@@ -240,8 +285,7 @@ describe("delivery operation checkpoints and process leases", () => {
       completedAt: null,
       status: "running",
     }));
-    await mkdir(dirname(lockPath(current.store, current.cycleId)), { recursive: true });
-    await mkdir(lockPath(current.store, current.cycleId), { recursive: true });
+    await createLockCopy(current.store, current.cycleId);
 
     const result = await reconcileDeliveryOperation({
       store: current.store,
