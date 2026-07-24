@@ -207,8 +207,14 @@ export function CycleControls({
           )}
 
           <div className="mt-5 border-t border-border pt-4 text-xs leading-relaxed text-muted">
-            Configured repository:{" "}
-            <code className="break-all text-foreground">{projectRoot}</code>
+            {enabled ? (
+              <>
+                Configured repository:{" "}
+                <code className="break-all text-foreground">{projectRoot}</code>
+              </>
+            ) : (
+              "Configured repository path is hidden until operator access is granted."
+            )}
           </div>
         </div>
       </div>
