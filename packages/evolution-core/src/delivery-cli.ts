@@ -14,6 +14,7 @@ import {
   requestDeliveryCancellation,
   showDeliveryCancellation,
 } from "./delivery-cancel.js";
+import { showDeliveryProgress } from "./delivery-progress.js";
 import { EvolutionStore } from "./persistence.js";
 import { resolveDefaultStateRoot } from "./runtime-paths.js";
 
@@ -63,8 +64,8 @@ It never merges, deploys, writes production, or accepts implementation output wi
 independent verifier.
 
 execute, verify and publish use the same lease-protected public API exported by the package. Direct
-library callers and the CLI therefore share write-ahead checkpoints, overlap prevention and stale
-operation recovery.
+library callers and the CLI therefore share write-ahead checkpoints, overlap prevention, stale
+operation recovery and an integrity-chained append-only progress timeline.
 
 recover inspects cycle, control-sidecar, branch and worktree state. It is read-only by default.
 Use --apply only after reviewing the proposed transition. Recovery never treats an unrecorded
@@ -237,6 +238,7 @@ export async function runDeliveryCli(
       ...(await showDeliveryRecovery(store, cycleId)),
       ...showDeliveryOperation(store, cycleId),
       ...showDeliveryCancellation(store, cycleId),
+      ...showDeliveryProgress(store, cycleId),
     });
     return 0;
   }
