@@ -22,14 +22,25 @@ export type DeliveryOperationView = {
   ownerState: string;
   childState: string;
   findings: string[];
+  cancellable: boolean;
+  cancellation: {
+    operationId: string;
+    actor: string;
+    requestedAt: string;
+    signalSentAt: string | null;
+  } | null;
   record: {
     operationId: string;
     operation: string;
     actor: string;
     status: string;
+    phase: string;
     startedAt: string;
     heartbeatAt: string;
     completedAt: string | null;
+    cancelRequestedAt: string | null;
+    cancelRequestedBy: string | null;
+    cancelSignalAt: string | null;
   } | null;
 };
 
@@ -110,10 +121,30 @@ function strings(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
 }
 
-function operationView(value: unknown): DeliveryOperationView {
+function operationView(value: unknown, cancellationValue: unknown): DeliveryOperationView {
   const outer = record(value);
   const inspection = record(outer?.inspection ?? outer?.deliveryOperation ?? value);
   const operationRecord = record(inspection?.record);
+  const cancellationOuter = record(cancellationValue);
+  const cancellationInspection = record(
+    cancellationOuter?.deliveryCancellation ?? cancellationValue
+  );
+  const cancellationRecord = record(cancellationInspection?.request);
+  const status = text(operationRecord?.status);
+  const matchingCancellation =
+    cancellationRecord &&
+    text(cancellationRecord.operationId) === text(operationRecord?.operationId)
+      ? cancellationRecord
+      : null;
+  const inferredPhase =
+    status !== "running"
+      ? status
+      : matchingCancellation
+        ? "cancel-requested"
+        : text(inspection?.childState, "not-recorded") === "alive"
+          ? "command-running"
+          : "preparing";
+  const phase = text(operationRecord?.phase, inferredPhase);
   return {
     controlStatus: text(inspection?.controlStatus, "missing"),
     disposition: text(inspection?.disposition, "healthy"),
@@ -121,15 +152,33 @@ function operationView(value: unknown): DeliveryOperationView {
     ownerState: text(inspection?.ownerState, "not-recorded"),
     childState: text(inspection?.childState, "not-recorded"),
     findings: strings(inspection?.findings),
+    cancellable: cancellationInspection?.cancellable === true && !matchingCancellation,
+    cancellation: matchingCancellation
+      ? {
+          operationId: text(matchingCancellation.operationId),
+          actor: text(matchingCancellation.actor),
+          requestedAt: text(matchingCancellation.requestedAt),
+          signalSentAt: nullableText(matchingCancellation.signalSentAt),
+        }
+      : null,
     record: operationRecord
       ? {
           operationId: text(operationRecord.operationId),
           operation: text(operationRecord.operation),
           actor: text(operationRecord.actor),
-          status: text(operationRecord.status),
+          status: phase === status ? status : `${status} · ${phase}`,
+          phase,
           startedAt: text(operationRecord.startedAt),
           heartbeatAt: text(operationRecord.heartbeatAt),
           completedAt: nullableText(operationRecord.completedAt),
+          cancelRequestedAt:
+            nullableText(operationRecord.cancelRequestedAt) ??
+            nullableText(matchingCancellation?.requestedAt),
+          cancelRequestedBy:
+            nullableText(operationRecord.cancelRequestedBy) ?? nullableText(matchingCancellation?.actor),
+          cancelSignalAt:
+            nullableText(operationRecord.cancelSignalAt) ??
+            nullableText(matchingCancellation?.signalSentAt),
         }
       : null,
   };
@@ -188,7 +237,7 @@ export function normalizeDeliveryWorkspace(
         }
       : null,
     recovery: record(show.recovery),
-    operation: operationView(operationOutput),
+    operation: operationView(operationOutput, show.deliveryCancellation),
   };
 }
 
