@@ -1,251 +1,234 @@
-# 🔬 CycleWarden — Nghiên cứu Toàn diện & Định hướng Phát triển Chiến lược
+# CycleWarden — định hướng chiến lược theo bằng chứng
 
-> **Phạm vi:** Đọc toàn bộ mã nguồn, nghiên cứu thị trường toàn cầu, phân tích đối thủ cạnh tranh, và đề xuất lộ trình phát triển phù hợp thực tế.
->
-> **Ngày thực hiện:** 2026-07-24
->
-> **Nguồn dữ liệu:** Toàn bộ codebase `Thunderkill016/cyclewarden`, 8 cuộc nghiên cứu web chuyên sâu, và hồ sơ đối soát nội bộ (`docs/COMPETITIVE_BENCHMARK.md`, `docs/evolution/COMPARATIVE_ANALYSIS.md`).
+> **Trạng thái:** quyết định vận hành có thể bị bác bỏ, không phải tuyên bố thị trường hay product-market fit.  
+> **Ngày khóa:** 2026-07-24  
+> **Nguồn sự thật ưu tiên:** `IDEA.md` → `ROADMAP.md` → `docs/ai/PROJECT_MODEL.md` → `docs/CAPABILITIES.json` → protocol #14.
 
----
+## 1. Quyết định hiện tại
 
-## Phần I: Phân tích Hiện trạng Dự án CycleWarden
+CycleWarden **không mở rộng theo SaaS feature parity, MCP, microVM, monetization hoặc marketing trước khi hoàn thành gate giá trị người dùng #14**.
 
-### 1.1 Tổng quan Kỹ thuật
+Rủi ro lớn nhất hiện tại không phải thiếu kiến trúc. Rủi ro lớn nhất là xây một hệ thống kỹ thuật đáng tin cậy cho một quyết định mà người dùng không cần.
 
-CycleWarden (trước đây là Shipkit, vừa đổi tên) là một **hệ thống phát triển sản phẩm AI-native hợp nhất** bao gồm 2 thành phần cốt lõi:
-
-| Thành phần | Mô tả | Trạng thái |
-| :--- | :--- | :--- |
-| **Web Application Foundation** (`apps/web`) | Next.js 15 + React 19 + Tailwind v4, dual auth (Supabase / Better-Auth), Drizzle/PostgreSQL, Stripe, i18n, Sentry, Playwright E2E | 🟢 Hoạt động |
-| **Evolution Core Engine** (`packages/evolution-core`) | State machine 17 giai đoạn, append-only journal, SHA-256 evidence registry, A0–A4 autonomy policy, Docker sandbox proof | 🟢 Hoạt động (A2) |
-
-### 1.2 Kiến trúc Monorepo (10 packages + 1 app)
+Chuỗi ưu tiên được khóa:
 
 ```text
-cyclewarden/
-├── apps/web                    # Next.js 15 web workspace (Landing, Auth, Dashboard, Evolution UI, Notes, Billing)
-├── packages/
-│   ├── evolution-core          # 54 TypeScript files — State Machine, Persistence, Policy, Evidence, Research, CLI
-│   ├── auth                    # AuthPort interface (framework-agnostic)
-│   ├── config                  # Zod-validated environment config
-│   ├── db                      # Drizzle ORM schemas & PostgreSQL client
-│   ├── i18n                    # en/vi dictionaries
-│   ├── logger                  # Structured logging port
-│   ├── mail                    # Email delivery port (Resend adapter)
-│   ├── payment                 # Stripe billing adapter
-│   ├── security                # OWASP headers, rate limiting (Upstash)
-│   └── storage                 # S3/R2 object storage
-├── scripts/                    # 23 validation/test scripts
-├── prompts/                    # 9 standardized AI agent prompts
-├── docs/                       # 30+ documentation files
-│   ├── ai/                     # AI governance specs, plans, research, templates
-│   └── evolution/              # Architecture, research capability, comparative analysis
-└── .github/workflows/          # 2 CI pipelines (8 jobs total)
+interactive A2 workspace
+→ exactly 6 external decision audits
+→ apply the fixed pass / inconclusive / fail rule
+→ only then choose governed execution or problem repositioning
 ```
 
-### 1.3 Năng lực Kỹ thuật Đã Kiểm Chứng (CI: 8/8 PASS)
+## 2. Trạng thái đã kiểm chứng
 
-- ✅ **Deterministic State Machine:** 17 stages, transition validation, artifact requirements
-- ✅ **Append-Only Event Sourcing:** JSONL journal + atomic snapshots + SHA-256 checksum chains
-- ✅ **Cryptographic Evidence Registry:** Content-addressed SHA-256 blobs + secret scrubbing
-- ✅ **Policy Engine:** A0–A4 autonomy × R0–R4 risk matrix với expiring approvals
-- ✅ **Research Intelligence:** Public GitHub search, citation integrity, contradiction detection
-- ✅ **Hostile Docker Sandbox:** Container isolation proof (secret leak, network, process)
-- ✅ **Web Foundation:** Landing, auth, notes CRUD, billing stub, evolution dashboard
-- ✅ **Multi-Node CI Matrix:** Tested on Node 20, 22, 24
+### Đã có bằng chứng kỹ thuật
 
-### 1.4 Điểm yếu & Khoảng trống Hiện tại
+- deterministic Evolution Cycle, policy và durable journal;
+- content-addressed evidence và exact citation records;
+- repository research, explicit-source capture và GitHub repository search;
+- named-candidate decision records và parameter-bound `ExecutionHandoff`;
+- trusted-local và hostile Docker execution baseline;
+- independent package boundary trên Node.js 20, 22 và 24;
+- A2 pilot protocol cố định và fail-closed operations pack;
+- Next.js product foundation, authentication paths và PostgreSQL isolation tests.
 
-| Khoảng trống | Mức độ | Chi tiết |
-| :--- | :--- | :--- |
-| **Billing chưa hoàn chỉnh** | 🔴 Nghiêm trọng | Stripe adapter env-gated, chưa có checkout flow end-to-end hoàn chỉnh |
-| **A3 Sandbox chưa production-ready** | 🔴 Nghiêm trọng | Docker sandbox đã proof-of-concept nhưng chưa có microVM (Firecracker/E2B) |
-| **Web UI chưa đấu nối đầy đủ với Engine** | 🟡 Quan trọng | `/app/evolution` page tồn tại nhưng tương tác chủ yếu qua CLI |
-| **Không có Teams / Multi-tenant** | 🟡 Quan trọng | Chỉ single-user, chưa có RBAC |
-| **Không có Admin Dashboard** | 🟡 Quan trọng | Thiếu user management, activity logs |
-| **Chưa có Background Jobs** | 🟡 Phụ | Chưa có hệ thống job queue |
-| **Chưa có Blog / CMS** | ⚪ Thấp | Không ảnh hưởng core value |
-| **Tên VISION.md / DECISIONS.md chưa đồng bộ với IDEA.md** | ⚪ Thấp | VISION.md vẫn focus "vibe coding kit", chưa phản ánh evolution engine |
+### Chưa có bằng chứng sản phẩm
 
----
+- external completed audits: **0/6**;
+- pilot clock: **chưa bắt đầu**;
+- chưa có người dùng ngoài xác nhận CycleWarden thay đổi, xác nhận hoặc ngăn một quyết định có ý nghĩa;
+- chưa có repeat-use evidence;
+- chưa có coding-agent delivery qua approved handoff;
+- chưa có independent implementation verdict, release hoặc measured outcome.
 
-## Phần II: Phân tích Thị trường & Xu hướng Toàn cầu (2025–2026)
+Technical CI success không được tính là decision value.
 
-### 2.1 Bối cảnh Thị trường AI Agent
+## 3. Xử lý tài liệu chiến lược trước đây
 
-> [!IMPORTANT]
-> **Thị trường AI Coding Agent đang bùng nổ chưa từng có:**
-> - **Cursor (Anysphere):** $4B ARR, bị SpaceX mua lại với giá $60B (06/2026)
-> - **Cognition AI (Devin):** $492M ARR, định giá $26B (05/2026)
-> - **Factory AI:** Đạt Unicorn $1.5B, doanh thu tăng gấp đôi mỗi tháng
-> - **40% ứng dụng doanh nghiệp** dự kiến tích hợp AI agent đến giữa 2026
+Các quan sát về thị trường AI agent, tăng trưởng của công ty coding-agent hoặc quy định pháp lý chỉ là **context**, không phải bằng chứng CycleWarden có demand.
 
-### 2.2 Xu hướng Kỹ thuật Chính
+Các tuyên bố sau không còn được dùng làm lý do ưu tiên mặc định:
 
-| Xu hướng | Mô tả | Vị thế CycleWarden |
-| :--- | :--- | :--- |
-| **Agent = Model + Harness** | Ngành công nghiệp chuẩn hóa mô hình kiểm soát định hình quanh LLM | 🟢 **Đi đầu** — Evolution Kernel là đúng mô hình này |
-| **Graduated Autonomy (A0–A4)** | Phân cấp quyền tự chủ tương tự xe tự lái | 🟢 **Đi đầu** — Đã triển khai A0–A4 × R0–R4 |
-| **MCP (Model Context Protocol)** | ~97M SDK downloads/tháng, Linux Foundation quản lý | 🟡 Đã thiết kế nhưng chưa expose MCP server |
-| **SLSA / in-toto Attestations** | Tiêu chuẩn bắt buộc cho supply chain security (EU AI Act 08/2026) | 🟢 **Đã có nền tảng** — SHA-256 evidence blobs |
-| **MicroVM Sandbox (Firecracker/E2B)** | Gold standard cho AI agent sandbox 2026 | 🟡 Chỉ có Docker proof, chưa có microVM |
-| **Agent Memory / Continuous Learning** | Mem0, Zep, Letta — Memory-first architecture | 🟡 Thiết kế có nhưng chưa triển khai |
+- “CycleWarden phải đạt feature parity với Open SaaS trước”;
+- “Stripe Checkout là blocker lớn nhất của sản phẩm”;
+- “kiến trúc hiện tại đã compliance-ready với EU AI Act”;
+- “không đối thủ nào có cùng moat”;
+- mục tiêu GitHub stars, MRR hoặc user count không có acquisition experiment.
 
-### 2.3 Quy định Pháp lý
+Lý do:
 
-> [!WARNING]
-> **EU AI Act — Hiệu lực đầy đủ từ 02/08/2026:**
-> - Yêu cầu hệ thống AI high-risk phải có: Risk Management, Data Governance, Technical Documentation, Automatic Logging, Transparency, và Human Oversight
-> - CycleWarden's Evolution Kernel **tự nhiên đáp ứng hầu hết yêu cầu này** (append-only logging, human approval gates, evidence chain, policy versioning)
-> - **Đây là lợi thế cạnh tranh cực lớn** mà hầu hết SaaS boilerplate khác không có
+1. Chưa có external user evidence xác định billing, teams, admin hoặc OAuth là vấn đề cần giải quyết tiếp theo.
+2. Logging, evidence và approval gates có thể hỗ trợ governance, nhưng không tự chứng minh tuân thủ pháp lý.
+3. Các thương vụ, doanh thu và định giá của công ty khác không chứng minh willingness-to-use hoặc willingness-to-pay cho CycleWarden.
+4. Mọi định vị “duy nhất”, “đi đầu” hoặc “compliance-ready” phải có review độc lập và phạm vi claim rõ ràng.
 
----
+## 4. Kế hoạch triển khai đã khóa
 
-## Phần III: Phân tích Vị thế Cạnh tranh
+### Gate 0 — usable A2 audit surface
 
-### 3.1 CycleWarden đang ở đâu?
-
-Dựa trên ma trận đánh giá trong [COMPETITIVE_BENCHMARK.md](file:///home/thunder/Code/cyclewarden/docs/COMPETITIVE_BENCHMARK.md):
+Mục tiêu: một operator có thể chạy flow hiện có mà không ghép CLI thủ công.
 
 ```text
-MakerKit        ████████████████████████████████████████████  4.4/5  (Production B2B leader)
-Open SaaS       ██████████████████████████████████████████    4.2/5  (Free feature leader)
-supastarter     █████████████████████████████████████████     4.1/5  (Multi-framework leader)
-CycleWarden     ████████████████████████████████              3.2/5  (Agent DX + docs leader)
-ShipFast        █████████████████████████████████             3.3/5  (Speed-to-market leader)
-next starter    █████████████████████████████                 2.9/5  (Minimal official)
+objective
+→ inspect
+→ trusted assessment
+→ bounded repository research
+→ independent review
+→ decision + reversible experiment
+→ persisted ExecutionHandoff
 ```
 
-### 3.2 Lợi thế Cạnh tranh Duy nhất (Unique Moat)
+Phạm vi:
 
-CycleWarden có 3 yếu tố mà **KHÔNG CÓ đối thủ nào trong nhóm SaaS Boilerplate sở hữu:**
+- hoàn thiện PR #39;
+- local-first, A2/R1, một server-configured trusted repository;
+- explicit opt-in, authorization, rate limits và bounded subprocess;
+- không execute handoff, không sửa code, không merge, không deploy;
+- không lộ filesystem path cho người không có quyền;
+- canonicalize repository path trước mọi filesystem-root trust check.
 
-1. **Deterministic Evolution Engine:** Không ai khác có state machine quản trị AI agent với evidence chain và policy enforcement
-2. **EU AI Act Compliance-Ready Architecture:** Append-only logging + human approval gates + evidence provenance = sẵn sàng tuân thủ quy định
-3. **Vietnamese-First Non-Dev Documentation:** Tài liệu tiếng Việt cho người không phải developer
+**Exit:** final CI xanh, review không còn blocker và PR chỉ merge khi owner cho phép rõ ràng.
 
-### 3.3 Điểm yếu so với Đối thủ
+### Gate 1 — external decision-value pilot #14
 
-| So với | CycleWarden yếu hơn ở | Mức độ cần thiết |
-| :--- | :--- | :--- |
-| **Open SaaS** | Billing wired, Admin dashboard, Background jobs | 🔴 Cần đuổi ngay |
-| **MakerKit** | Teams/RBAC, Session rigor, Migration story | 🟡 Đuổi về quality, không copy scope |
-| **ShipFast** | Time-to-first-product speed, Landing conversion | 🟡 Cải thiện DX |
+Giữ nguyên protocol đã precommit:
 
----
+- đúng **6 developer / 6 repository**;
+- một primary audit mỗi repository;
+- tối đa 90 phút mỗi session;
+- tối đa 14 ngày từ external session đầu tiên;
+- không thêm participant, repository hoặc tuần sau khi thấy kết quả.
 
-## Phần IV: Định hướng Phát triển Chiến lược
+Decision rule:
 
-### 4.1 Định vị Sản phẩm Đề xuất
+```text
+SUCCESS
+≥ 3/6 audit tạo decision value
+và ≥ 4/6 participant giải thích, phản biện được ranking
+và không có repeated serious evidence/privacy/safety failure
 
-> **CycleWarden = Nền tảng Phát triển Sản phẩm AI-Native duy nhất kết hợp:**
-> 1. **SaaS Starter Kit** cấp sản xuất (Next.js, Auth, DB, Security, Deploy)
-> 2. **Deterministic AI Governance Engine** (Evidence-backed lifecycle control)
-> 3. **EU AI Act Compliance-Ready** architecture (Audit trail, human oversight, policy versioning)
+INCONCLUSIVE
+exactly 2/6 audit tạo decision value
 
-### 4.2 Lộ trình Phát triển 4 Giai đoạn
+FAIL
+≤ 1/6 audit tạo decision value
+hoặc serious failure lặp lại
+```
 
----
+Trường hợp protocol chưa phân loại phải được báo là protocol gap; không tự đặt threshold mới.
 
-#### 🔵 Giai đoạn 1: Ngang bằng Open SaaS (4–6 tuần)
-**Mục tiêu:** Đạt feature parity với Free SaaS Boilerplate hàng đầu
+**Exit:** sáu redacted session records và report áp dụng đúng rule đã khóa.
 
-| # | Nhiệm vụ | Ưu tiên | Đối soát với |
-| :--- | :--- | :--- | :--- |
-| 1 | **Hoàn thiện Stripe Checkout flow** end-to-end (subscription + webhook + portal) | 🔴 P0 | Open SaaS, ShipFast |
-| 2 | **Email transactional flow** (welcome email on signup, password reset via Resend) | 🔴 P0 | Open SaaS |
-| 3 | **Notes/Domain data persistence** với user isolation test | 🔴 P0 | Tất cả |
-| 4 | **E2E test: Signup → Login → App → Notes → Billing** portable-pg path | 🟡 P1 | MakerKit quality |
-| 5 | **OAuth social login** (Google + GitHub) verified trong CI | 🟡 P1 | Open SaaS, MakerKit |
+### Gate 2A — nếu pilot SUCCESS
 
-**Kết quả:** CycleWarden có thể dùng làm SaaS starter kit thực sự, không chỉ là demo
+Triển khai một vertical slice duy nhất:
 
----
+```text
+approved ExecutionHandoff
+→ thin AgentAdapter contract
+→ generic command baseline
+→ one real coding agent
+→ isolated branch/worktree
+→ change manifest
+→ independent verifier
+→ draft PR
+```
 
-#### 🟢 Giai đoạn 2: Đấu nối Web UI + MCP Server (4–6 tuần)
-**Mục tiêu:** Biến Evolution Engine từ CLI-only thành sản phẩm trực quan
+Nguyên tắc:
 
-| # | Nhiệm vụ | Ưu tiên | Lý do |
-| :--- | :--- | :--- | :--- |
-| 6 | **Evolution Dashboard** hoàn chỉnh: hiển thị cycles, stages, evidence graph, decisions | 🔴 P0 | Core product differentiation |
-| 7 | **MCP Server integration** — Expose evolution operations qua MCP protocol | 🟡 P1 | MCP là chuẩn ngành 2026, ~97M downloads/tháng |
-| 8 | **API Routes** cho evolution-core (REST/Server Actions) | 🟡 P1 | Backend cho web dashboard |
-| 9 | ~~**Đồng bộ VISION.md, DECISIONS.md, llms.txt** phản ánh đúng dual identity~~ | ✅ Done | Đã hoàn thành 2026-07-24 |
+- adapter generic phải mỏng và được ép bởi một agent thật trong cùng milestone;
+- agent không sở hữu cycle state, authorization, acceptance, merge hoặc deployment;
+- verifier phải tách khỏi implementer;
+- draft PR only;
+- #12 hard quota, process-exhaustion và security-review gaps được đánh giá theo exposure thật trước khi chạy untrusted code.
 
-**Kết quả:** Người dùng có thể quản lý evolution cycles trên giao diện web thay vì chỉ gõ CLI
+### Gate 2B — nếu pilot INCONCLUSIVE
 
----
+Cho phép đúng một redesigned pilot với cùng sample size và precommitted rule.
 
-#### 🟡 Giai đoạn 3: A3 Sandbox + Agent Adapters (6–8 tuần)
-**Mục tiêu:** Mở khóa Autonomy A3 — AI tự sửa code trong môi trường an toàn
+Chỉ sửa những yếu tố được evidence chỉ ra, ví dụ:
 
-| # | Nhiệm vụ | Ưu tiên | Đối soát với |
-| :--- | :--- | :--- | :--- |
-| 10 | **MicroVM Sandbox Backend** (Firecracker hoặc tích hợp E2B/Daytona) | 🔴 P0 | OpenHands, E2B, Daytona |
-| 11 | **Coding Agent Adapter #1** (OpenHands hoặc Codex CLI) | 🟡 P1 | OpenHands, SWE-agent |
-| 12 | **Draft PR generation** qua evolution cycle (inspect → research → implement → PR) | 🟡 P1 | Factory AI Droids |
-| 13 | **SLSA-compatible attestations** cho mỗi evolution action | 🟡 P1 | EU AI Act compliance |
+- beachhead chưa đúng;
+- audit output khó hiểu;
+- source coverage thiếu;
+- decision framing quá rộng;
+- session workflow tạo friction.
 
-**Kết quả:** CycleWarden có thể chạy chu trình: Nghiên cứu → Quyết định → Viết code → Tạo PR → Chờ duyệt
+Không mở rộng broad research, SaaS features hoặc agents chỉ để “thử thêm”.
 
----
+### Gate 2C — nếu pilot FAIL
 
-#### 🔴 Giai đoạn 4: Measurement, Learning & Monetization (8–12 tuần)
-**Mục tiêu:** Hoàn thiện vòng đời sản phẩm + xây dựng mô hình kinh doanh
+Dừng mở rộng research và agent capability.
 
-| # | Nhiệm vụ | Ưu tiên | Đối soát với |
-| :--- | :--- | :--- | :--- |
-| 14 | **Outcome Measurement** — Track code quality, test coverage, deploy frequency | 🟡 P1 | Unique (không ai có) |
-| 15 | **Durable Learning System** — Memory records with expiry, scope, paired evaluation | 🟡 P1 | Reflexion, Voyager, Mem0 |
-| 16 | **Admin Dashboard** tối thiểu (user list, cycle history, audit logs) | 🟡 P1 | Open SaaS |
-| 17 | **Mô hình kinh doanh Open Core:** Free OSS + Managed Cloud Service + Enterprise | 🟡 P1 | Industry standard |
+Reassess theo thứ tự:
 
-**Kết quả:** CycleWarden trở thành sản phẩm hoàn chỉnh có khả năng tạo doanh thu
+1. người dùng mục tiêu;
+2. quyết định thật họ đang gặp;
+3. workaround hiện tại;
+4. lý do CycleWarden không thay đổi quyết định;
+5. có nên thu hẹp, reposition hoặc dừng hướng hiện tại.
 
----
+## 5. Công việc bị hoãn có chủ đích
 
-### 4.3 Mô hình Kinh doanh Đề xuất
+Các hạng mục sau là destination architecture hoặc hypothesis, không phải next task mặc định:
 
-| Tier | Giá | Bao gồm |
-| :--- | :--- | :--- |
-| **Community (Free MIT)** | $0 | Full SaaS starter kit + Evolution CLI + Self-hosted |
-| **Cloud (Managed)** | $29–99/tháng | Hosted evolution engine + MCP server + Dashboard + Auto-scaling sandbox |
-| **Enterprise** | Custom | SSO/SAML + RBAC + EU AI Act compliance reports + SLA + Dedicated sandbox |
+- Stripe checkout, subscription portal và billing parity;
+- teams, RBAC và admin dashboard;
+- OAuth provider expansion;
+- blog/CMS và marketing campaign;
+- MCP/A2A server;
+- Firecracker/E2B/remote sandbox;
+- general web search, browser/PDF adapters;
+- hosted multi-tenant CycleWarden;
+- monetization tiers và MRR targets.
 
-### 4.4 Metrics Đo lường Thành công
+Một hạng mục chỉ được kích hoạt khi:
 
-| Metric | Mục tiêu Giai đoạn 1 | Mục tiêu Giai đoạn 4 |
-| :--- | :--- | :--- |
-| **Time-to-First-Product (TTFP)** | < 30 phút | < 15 phút |
-| **Competitive Score** | 4.0/5 (ngang Open SaaS) | 4.5/5 (vượt Open SaaS) |
-| **GitHub Stars** | 500+ | 5,000+ |
-| **Weekly Active CLI Users** | 50+ | 1,000+ |
-| **Managed Cloud MRR** | — | $10K+ |
+- pilot evidence chỉ ra nó chặn decision value; hoặc
+- một workflow đã được xác nhận cần nó; hoặc
+- safety/dependency gate của vertical slice kế tiếp bắt buộc nó.
 
----
+## 6. Metrics hiện tại
 
-## Phần V: Kết luận & Khuyến nghị Hành động Ngay
+### Primary
 
-### 5.1 Tóm tắt Vị thế
+- decision-value audits: target gate `≥3/6`;
+- explainable/challengeable rankings: target gate `≥4/6`;
+- repeated serious evidence/privacy/safety failure: `0`.
 
-CycleWarden đang ở **vị trí chiến lược cực kỳ thuận lợi** vì:
+### Diagnostic
 
-1. **Đúng thời điểm:** Ngành công nghiệp đang chuyển từ "AI copilot" sang "AI agent governance" — đây chính xác là thứ CycleWarden đã xây dựng
-2. **Đúng kiến trúc:** Mô hình `Agent = Model + Harness` đã trở thành chuẩn ngành 2026, và CycleWarden đã có sẵn
-3. **Đúng compliance:** EU AI Act có hiệu lực 02/08/2026 yêu cầu chính xác những gì CycleWarden đã thiết kế (audit trail, human oversight, evidence chain)
+- thời gian từ pre-audit decision đến decision-changing evidence;
+- recommendation changed / confirmed / prevented / no effect;
+- false positives, missing context và rejected recommendations;
+- technical outcome tách khỏi product outcome;
+- willingness to repeat, không được dùng thay primary outcome.
 
-### 5.2 Hành động Ngay (Tuần tới)
+Không dùng GitHub stars, competitive score hoặc projected MRR làm success criterion của pilot này.
 
-1. **Hoàn thiện Stripe Checkout** — Đây là rào cản lớn nhất ngăn CycleWarden trở thành SaaS starter kit thực sự
-2. **Đồng bộ tài liệu** — Cập nhật VISION.md, DECISIONS.md, llms.txt phản ánh đúng dual identity (Starter Kit + Evolution Engine)
-3. **Viết blog/tweet giới thiệu** về CycleWarden với góc nhìn "EU AI Act compliance-ready AI governance engine"
+## 7. External context policy
 
-### 5.3 Cảnh báo Rủi ro
+External facts phải:
 
-> [!CAUTION]
-> **Rủi ro lớn nhất:** CycleWarden có thể bị "kẹt giữa" — không đủ feature để cạnh tranh với SaaS boilerplate (Open SaaS, MakerKit), đồng thời chưa đủ production-ready để cạnh tranh với AI Agent platform (OpenHands, Factory AI).
->
-> **Giải pháp:** Tập trung vào **Giai đoạn 1** (SaaS parity) trước, sau đó mới mở rộng Evolution Engine. Không cố làm cả hai cùng lúc.
+- đến từ primary source khi có thể;
+- ghi event date, publication date và access date;
+- tách fact khỏi inference;
+- có expiry/review date;
+- không được biến thành product demand claim.
 
-> [!TIP]
-> **Lợi thế thời gian:** Không có dự án nào trong thị trường SaaS boilerplate có governance engine. Không có dự án nào trong thị trường AI Agent platform có SaaS starter kit. CycleWarden là duy nhất ở giao điểm này — hãy giữ vững vị trí này.
+Ví dụ, announced merger agreement, company-reported revenue hoặc regulatory timetable chỉ cho thấy context thay đổi; chúng không chứng minh CycleWarden nên xây billing, MCP hoặc compliance product ngay.
+
+## 8. Definition of done cho giai đoạn hiện tại
+
+Giai đoạn hiện tại hoàn tất khi:
+
+1. PR #39 đạt final CI và review gate;
+2. owner quyết định merge riêng;
+3. recruitment channel được owner cho phép;
+4. đúng sáu external audits được thực hiện và redacted;
+5. fixed decision rule được áp dụng không đổi;
+6. next workstream được chọn từ kết quả pilot, không từ độ hấp dẫn của một roadmap lớn.
+
+Cho tới lúc đó, trạng thái trung thực là:
+
+> CycleWarden có một A2 technical foundation đáng kể và một pilot operational pack, nhưng external product decision value vẫn chưa được chứng minh.
