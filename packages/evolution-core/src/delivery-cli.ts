@@ -10,6 +10,10 @@ import {
   reconcileDeliveryOperation,
   showDeliveryOperation,
 } from "./delivery-operation.js";
+import {
+  requestDeliveryCancellation,
+  showDeliveryCancellation,
+} from "./delivery-cancel.js";
 import { EvolutionStore } from "./persistence.js";
 import { resolveDefaultStateRoot } from "./runtime-paths.js";
 
@@ -41,6 +45,9 @@ Usage:
   cyclewarden-deliver operation <cycle-id>
     [--root .cyclewarden] [--project-root .] [--actor cyclewarden-recovery-operator]
     [--apply]
+  cyclewarden-deliver cancel <cycle-id> --operation-id <exact-operation-id>
+    [--root .cyclewarden] [--project-root .] [--actor cyclewarden-cancellation-operator]
+    [--apply]
   cyclewarden-deliver show <cycle-id> [--root .cyclewarden]
 
 execute requires a planned A3/A4 cycle and a manifest whose expectedParameterDigest matches the
@@ -65,6 +72,11 @@ commit as accepted verification and never reruns implementation, merges or deplo
 
 operation inspects the write-ahead checkpoint, owner PID, child PID and lock. It clears a stale
 lease only with --apply and only when the integrity-valid local owner and child are both dead.
+
+cancel is read-only by default. With --apply it records a durable cancellation intent and sends
+SIGTERM only to the exact integrity-valid active child process group on the current host. The
+operation ID, heartbeat and process start identity are rechecked immediately before signalling.
+Cancellation never escalates to SIGKILL, merges, deploys or writes production.
 `;
 
 function parseArgs(argv: string[]): ParsedArgs {
@@ -205,12 +217,26 @@ export async function runDeliveryCli(
     return 0;
   }
 
+  if (command === "cancel") {
+    const result = await requestDeliveryCancellation({
+      store,
+      cycleId,
+      projectRoot: projectRootFrom(parsed),
+      actor: one(parsed, "actor")?.trim() || "cyclewarden-cancellation-operator",
+      expectedOperationId: required(parsed, "operation-id"),
+      apply: one(parsed, "apply") === "true",
+    });
+    printJson(io, result);
+    return 0;
+  }
+
   if (command === "show") {
     printJson(io, {
       ...(await showDelivery(store, cycleId)),
       ...(await showDeliveryPublication(store, cycleId)),
       ...(await showDeliveryRecovery(store, cycleId)),
       ...showDeliveryOperation(store, cycleId),
+      ...showDeliveryCancellation(store, cycleId),
     });
     return 0;
   }

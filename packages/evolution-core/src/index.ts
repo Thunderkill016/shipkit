@@ -37,6 +37,7 @@ export {
 export { executeDelivery, publishDelivery, verifyDelivery } from "./delivery-api.js";
 export * from "./delivery-recovery.js";
 export * from "./delivery-operation.js";
+export * from "./delivery-cancel.js";
 export * from "./delivery-cli.js";
 
 export * from "./candidate-research.js";

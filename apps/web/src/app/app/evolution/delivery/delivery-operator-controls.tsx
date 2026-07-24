@@ -36,18 +36,40 @@ function useRefreshAfterSuccess(state: DeliveryActionState) {
   }, [router, state.cycleId, state.message, state.ok, state.operation]);
 }
 
+function useLiveRefresh(active: boolean) {
+  const router = useRouter();
+  useEffect(() => {
+    if (!active) return;
+    const refresh = () => {
+      if (document.visibilityState === "visible") router.refresh();
+    };
+    const timer = window.setInterval(refresh, 5_000);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, [active, router]);
+}
+
 export function DeliveryOperatorControls({
   cycleId,
   enabled,
   accessReason,
   operationDisposition,
+  operationCancellable,
 }: {
   cycleId: string;
   enabled: boolean;
   accessReason: string;
   operationDisposition: string;
+  operationCancellable: boolean;
 }) {
   const [inspectState, inspectAction, inspectPending] = useActionState(
+    runDeliveryWorkspaceAction,
+    initialState
+  );
+  const [cancelState, cancelAction, cancelPending] = useActionState(
     runDeliveryWorkspaceAction,
     initialState
   );
@@ -56,7 +78,9 @@ export function DeliveryOperatorControls({
     initialState
   );
   useRefreshAfterSuccess(inspectState);
+  useRefreshAfterSuccess(cancelState);
   useRefreshAfterSuccess(applyState);
+  useLiveRefresh(operationDisposition === "active");
 
   return (
     <section className="rounded-2xl border border-border bg-card p-6">
@@ -66,11 +90,12 @@ export function DeliveryOperatorControls({
             Operator actions
           </p>
           <h2 className="mt-2 text-lg font-semibold text-foreground">
-            Inspect first, apply explicitly
+            Inspect first, mutate explicitly
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
-            These controls call the official delivery CLI. They never execute implementation,
-            verification, publication, merge or deployment commands.
+            Active delivery state refreshes every five seconds. Every mutation still runs through the
+            official delivery CLI and rechecks the exact lease before changing state or signalling a
+            process.
           </p>
         </div>
         <span className="rounded-full border border-border px-3 py-1 text-xs text-muted">
@@ -85,15 +110,15 @@ export function DeliveryOperatorControls({
         </div>
       )}
 
-      <div className="mt-5 grid gap-4 lg:grid-cols-2">
+      <div className="mt-5 grid gap-4 xl:grid-cols-3">
         <form action={inspectAction} className="space-y-4 rounded-xl border border-border bg-background p-4">
           <input type="hidden" name="cycleId" value={cycleId} />
           <p className="font-medium text-foreground">Read-only inspection</p>
           <p className="text-sm leading-relaxed text-muted">
-            Recheck process ownership and compare durable delivery records with the cycle journal,
+            Recheck process identity and compare durable delivery records with the cycle journal,
             branch and worktree.
           </p>
-          <div className="grid gap-2 sm:grid-cols-2">
+          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
             <button
               type="submit"
               name="operation"
@@ -116,12 +141,51 @@ export function DeliveryOperatorControls({
           <Feedback state={inspectState} />
         </form>
 
+        <form action={cancelAction} className="space-y-4 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">
+          <input type="hidden" name="cycleId" value={cycleId} />
+          <input type="hidden" name="operation" value="request-cancellation" />
+          <p className="font-medium text-foreground">Graceful cancellation</p>
+          <p className="text-sm leading-relaxed text-muted">
+            Record a durable cancellation intent and send SIGTERM only to the exact active child
+            process group. No SIGKILL escalation is available.
+          </p>
+          <label className="flex items-start gap-3 rounded-xl border border-border bg-card p-3 text-sm leading-relaxed text-muted">
+            <input
+              type="checkbox"
+              required
+              name="confirmApply"
+              value="confirmed"
+              disabled={!enabled || cancelPending}
+              className="mt-1 h-4 w-4 shrink-0 accent-[var(--accent)]"
+            />
+            <span>I reviewed the live operation and authorize graceful cancellation.</span>
+          </label>
+          <button
+            type="submit"
+            disabled={
+              !enabled ||
+              cancelPending ||
+              operationDisposition !== "active" ||
+              !operationCancellable
+            }
+            className="min-h-11 w-full rounded-xl border border-amber-500/60 px-3 py-2 text-sm font-medium text-amber-200 transition-colors hover:border-amber-400 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {cancelPending ? "Requesting cancellation…" : "Request graceful cancellation"}
+          </button>
+          {!operationCancellable && operationDisposition === "active" && (
+            <p className="text-xs leading-relaxed text-muted">
+              Cancellation is unavailable until the engine records a validated local child process.
+            </p>
+          )}
+          <Feedback state={cancelState} />
+        </form>
+
         <form action={applyAction} className="space-y-4 rounded-xl border border-red-500/30 bg-red-500/5 p-4">
           <input type="hidden" name="cycleId" value={cycleId} />
           <p className="font-medium text-foreground">Explicit recovery apply</p>
           <p className="text-sm leading-relaxed text-muted">
-            Apply only after reviewing the current inspection. The CLI still fails closed if the
-            lease or durable records changed since inspection.
+            Apply only after reviewing the current inspection. The CLI fails closed if the lease or
+            durable records changed since inspection.
           </p>
           <label className="flex items-start gap-3 rounded-xl border border-border bg-card p-3 text-sm leading-relaxed text-muted">
             <input
@@ -134,7 +198,7 @@ export function DeliveryOperatorControls({
             />
             <span>I reviewed the current evidence and explicitly authorize this recovery action.</span>
           </label>
-          <div className="grid gap-2 sm:grid-cols-2">
+          <div className="grid gap-2">
             <button
               type="submit"
               name="operation"
