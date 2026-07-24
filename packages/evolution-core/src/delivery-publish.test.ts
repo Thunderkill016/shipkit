@@ -13,6 +13,7 @@ import type { EvolutionCycle, ExecutionHandoff, EvolutionStage } from "./types.j
 const execFileAsync = promisify(execFile);
 const temporaryRoots: string[] = [];
 const originalPath = process.env.PATH;
+const fixtureRepositoryUrl = "https://github.com/example/cyclewarden-fixture.git";
 
 async function run(cwd: string, executable: string, args: string[]): Promise<string> {
   const result = await execFileAsync(executable, args, {
@@ -103,13 +104,12 @@ async function setup(name: string) {
   await run(projectRoot, "git", ["add", "README.md"]);
   await run(projectRoot, "git", ["commit", "-m", "Initial fixture"]);
   await run(root, "git", ["init", "--bare", remoteRoot]);
+  await run(projectRoot, "git", ["remote", "add", "origin", fixtureRepositoryUrl]);
   await run(projectRoot, "git", [
-    "remote",
-    "add",
-    "origin",
-    "https://github.com/example/cyclewarden-fixture.git",
+    "config",
+    `url.${remoteRoot}.insteadOf`,
+    fixtureRepositoryUrl,
   ]);
-  await run(projectRoot, "git", ["config", "remote.origin.pushurl", remoteRoot]);
 
   const store = new EvolutionStore(join(root, ".cyclewarden"));
   const cycleId = `fixture:publish-${name}`;
@@ -190,12 +190,11 @@ process.exit(2);
   return { logPath };
 }
 
-async function remoteHead(projectRoot: string, branchName: string): Promise<string> {
-  const pushUrl = await run(projectRoot, "git", ["remote", "get-url", "--push", "origin"]);
-  return await run(projectRoot, "git", [
+async function remoteHead(remoteRoot: string, branchName: string): Promise<string> {
+  return await run(dirname(remoteRoot), "git", [
     "ls-remote",
     "--heads",
-    pushUrl,
+    remoteRoot,
     `refs/heads/${branchName}`,
   ]);
 }
@@ -218,7 +217,7 @@ describe("verified draft PR publication", () => {
       number: 42,
       isDraft: true,
     });
-    expect(await remoteHead(fixture.projectRoot, fixture.verified.branchName)).toContain(
+    expect(await remoteHead(fixture.remoteRoot, fixture.verified.branchName)).toContain(
       fixture.verified.verification.commitSha!
     );
     expect((await showDelivery(fixture.store, fixture.cycleId)).publication).toMatchObject({
@@ -254,7 +253,7 @@ describe("verified draft PR publication", () => {
         confirmPushAndDraftPr: false,
       })
     ).rejects.toThrow(/explicit --confirm-push-and-draft-pr/);
-    expect(await remoteHead(fixture.projectRoot, fixture.verified.branchName)).toBe("");
+    expect(await remoteHead(fixture.remoteRoot, fixture.verified.branchName)).toBe("");
   });
 
   it("fails authentication before pushing the verified branch", async () => {
@@ -270,7 +269,7 @@ describe("verified draft PR publication", () => {
         confirmPushAndDraftPr: true,
       })
     ).rejects.toThrow(/GitHub CLI failed for gh auth status/);
-    expect(await remoteHead(fixture.projectRoot, fixture.verified.branchName)).toBe("");
+    expect(await remoteHead(fixture.remoteRoot, fixture.verified.branchName)).toBe("");
   });
 
   it("fails when gh is unavailable before pushing the verified branch", async () => {
@@ -291,6 +290,26 @@ describe("verified draft PR publication", () => {
       })
     ).rejects.toThrow(/GitHub CLI failed for gh --version/);
     process.env.PATH = originalPath;
-    expect(await remoteHead(fixture.projectRoot, fixture.verified.branchName)).toBe("");
+    expect(await remoteHead(fixture.remoteRoot, fixture.verified.branchName)).toBe("");
+  });
+
+  it("rejects a push URL that targets a different GitHub repository", async () => {
+    const fixture = await setup("push-mismatch");
+    await run(fixture.projectRoot, "git", [
+      "config",
+      "remote.origin.pushurl",
+      "https://github.com/other-owner/other-repository.git",
+    ]);
+    await expect(
+      publishDelivery({
+        store: fixture.store,
+        cycleId: fixture.cycleId,
+        projectRoot: fixture.projectRoot,
+        actor: "fixture-publisher",
+        baseBranch: "main",
+        confirmPushAndDraftPr: true,
+      })
+    ).rejects.toThrow(/fetch and push URLs must identify the same/);
+    expect(await remoteHead(fixture.remoteRoot, fixture.verified.branchName)).toBe("");
   });
 });
