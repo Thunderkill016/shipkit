@@ -15,6 +15,7 @@ const OperationSchema = z.enum([
   "clear-stale-operation",
   "inspect-recovery",
   "apply-recovery",
+  "request-cancellation",
 ]);
 const CycleIdSchema = z
   .string()
@@ -37,7 +38,18 @@ export type DeliveryActionState = {
 type OperationResult = {
   decision?: string;
   applied?: boolean;
-  inspection?: { disposition?: string; findings?: string[] };
+  inspection?: {
+    disposition?: string;
+    findings?: string[];
+    record?: { operationId?: string; status?: string };
+  };
+};
+
+type CancellationResult = {
+  decision?: string;
+  applied?: boolean;
+  signalSent?: boolean;
+  nextAction?: string;
 };
 
 type RecoveryResult = {
@@ -72,7 +84,9 @@ export async function runDeliveryWorkspaceAction(
   if (!access.allowed || !access.actor) return { error: access.reason };
 
   const isApply =
-    operation.data === "clear-stale-operation" || operation.data === "apply-recovery";
+    operation.data === "clear-stale-operation" ||
+    operation.data === "apply-recovery" ||
+    operation.data === "request-cancellation";
   if (isApply && !applyConfirmed(formData)) {
     return { error: "Confirm the explicit apply action after reviewing the current inspection." };
   }
@@ -87,10 +101,43 @@ export async function runDeliveryWorkspaceAction(
   try {
     const root = resolveEvolutionStateRoot();
     const projectRoot = await assertEvolutionProjectRoot();
-    const actor = `${access.actor}:delivery-recovery`;
+    const actor = `${access.actor}:delivery-operator`;
     let message: string;
 
-    if (
+    if (operation.data === "request-cancellation") {
+      const inspected = await runDeliveryCoreCli<OperationResult>([
+        "operation",
+        cycleId.data,
+        "--root",
+        root,
+        "--project-root",
+        projectRoot,
+        "--actor",
+        actor,
+      ]);
+      const exactOperationId = inspected.inspection?.record?.operationId?.trim();
+      if (!exactOperationId || inspected.inspection?.disposition !== "active") {
+        return { error: "No exact active delivery operation is available for cancellation." };
+      }
+      const result = await runDeliveryCoreCli<CancellationResult>([
+        "cancel",
+        cycleId.data,
+        "--root",
+        root,
+        "--project-root",
+        projectRoot,
+        "--actor",
+        `${actor}:cancellation`,
+        "--operation-id",
+        exactOperationId,
+        "--apply",
+      ]);
+      message = result.applied
+        ? result.signalSent
+          ? "Graceful cancellation requested. SIGTERM was sent to the exact active child process group."
+          : "Cancellation intent was persisted; the child had already stopped before SIGTERM."
+        : `Cancellation was not applied: ${result.decision ?? "blocked"}.`;
+    } else if (
       operation.data === "inspect-operation" ||
       operation.data === "clear-stale-operation"
     ) {
