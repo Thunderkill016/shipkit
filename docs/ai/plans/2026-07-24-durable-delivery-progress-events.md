@@ -14,7 +14,7 @@ Replace inferred-only delivery phase reporting with a durable append-only timeli
 - operation-started, child-step-started/exited, final step-result and operation terminal events;
 - public API protection for CLI and direct library callers through the existing delivery façade;
 - final execution and verification results mapped back to the observed step order;
-- `cyclewarden-deliver show` progress inspection;
+- control-independent `cyclewarden-deliver progress` inspection plus progress in `show` output;
 - bounded web normalization and a live timeline in the delivery workspace;
 - regressions for event ordering, cross-operation chaining, tamper detection and web fail-soft parsing.
 
