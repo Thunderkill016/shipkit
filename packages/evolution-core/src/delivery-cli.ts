@@ -2,6 +2,7 @@
 
 import { resolve } from "node:path";
 import { executeDelivery, showDelivery, verifyDelivery } from "./delivery.js";
+import { publishDelivery } from "./delivery-publish.js";
 import { EvolutionStore } from "./persistence.js";
 import { resolveDefaultStateRoot } from "./runtime-paths.js";
 
@@ -23,6 +24,9 @@ Usage:
     --trusted-repository
   cyclewarden-deliver verify <cycle-id>
     [--root .cyclewarden] [--project-root .] [--actor cyclewarden-independent-verifier]
+  cyclewarden-deliver publish <cycle-id> --base main
+    [--root .cyclewarden] [--project-root .] [--actor cyclewarden-publisher]
+    [--remote origin] [--title "Draft PR title"] --confirm-push-and-draft-pr
   cyclewarden-deliver show <cycle-id> [--root .cyclewarden]
 
 execute requires a planned A3/A4 cycle and a manifest whose expectedParameterDigest matches the
@@ -30,8 +34,11 @@ latest persisted ExecutionHandoff. It creates an isolated git worktree and branc
 without a shell, and rejects changes outside allowedScope or inside enforceable forbiddenScope.
 
 verify requires a different actor. It reruns the manifest verification commands without a shell,
-rejects patch drift, and creates a local commit only after every check passes. This CLI never merges,
-deploys, writes production, or accepts implementation output without an independent verifier.
+rejects patch drift, and creates a local commit only after every check passes.
+
+publish requires an accepted verified commit, an explicit confirmation flag, an authenticated GitHub CLI,
+and a github.com remote. It performs a non-force push, verifies the remote ref, and opens an open draft PR.
+This CLI never merges, deploys, writes production, or accepts implementation output without an independent verifier.
 `;
 
 function parseArgs(argv: string[]): ParsedArgs {
@@ -116,6 +123,21 @@ export async function runDeliveryCli(
       cycleId,
       projectRoot: projectRootFrom(parsed),
       actor: one(parsed, "actor")?.trim() || "cyclewarden-independent-verifier",
+    });
+    printJson(io, result);
+    return 0;
+  }
+
+  if (command === "publish") {
+    const result = await publishDelivery({
+      store,
+      cycleId,
+      projectRoot: projectRootFrom(parsed),
+      actor: one(parsed, "actor")?.trim() || "cyclewarden-publisher",
+      remoteName: one(parsed, "remote")?.trim() || "origin",
+      baseBranch: required(parsed, "base"),
+      title: one(parsed, "title")?.trim() || undefined,
+      confirmPushAndDraftPr: one(parsed, "confirm-push-and-draft-pr") === "true",
     });
     printJson(io, result);
     return 0;
