@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "protocolVersion": "2026-07-24-v1",
+  "issueUrl": "https://github.com/Thunderkill016/shipkit/issues/14",
+  "status": "not-started",
+  "technicalGate": {
+    "pullRequest": 31,
+    "status": "ready"
+  },
+  "clockStartedAt": null,
+  "externalCompletedAudits": 0,
+  "finalDecision": null,
+  "excludedAttempts": [],
+  "sessions": [
+    {
+      "participantId": "P01",
+      "repositoryId": "R01",
+      "status": "not-started",
+      "startedAt": null,
+      "redactedRecord": null
+    },
+    {
+      "participantId": "P02",
+      "repositoryId": "R02",
+      "status": "not-started",
+      "startedAt": null,
+      "redactedRecord": null
+    },
+    {
+      "participantId": "P03",
+      "repositoryId": "R03",
+      "status": "not-started",
+      "startedAt": null,
+      "redactedRecord": null
+    },
+    {
+      "participantId": "P04",
+      "repositoryId": "R04",
+      "status": "not-started",
+      "startedAt": null,
+      "redactedRecord": null
+    },
+    {
+      "participantId": "P05",
+      "repositoryId": "R05",
+      "status": "not-started",
+      "startedAt": null,
+      "redactedRecord": null
+    },
+    {
+      "participantId": "P06",
+      "repositoryId": "R06",
+      "status": "not-started",
+      "startedAt": null,
+      "redactedRecord": null
+    }
+  ]
+}
