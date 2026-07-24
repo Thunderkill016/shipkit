@@ -97,6 +97,7 @@ type PullRequestView = {
   isDraft: boolean;
   state: string;
   headRefName: string;
+  headRefOid: string;
   baseRefName: string;
   number?: number;
 };
@@ -474,7 +475,7 @@ export async function publishDelivery(input: PublishDeliveryInput) {
       "--state",
       "open",
       "--json",
-      "url,isDraft,state,headRefName,baseRefName,number",
+      "url,isDraft,state,headRefName,headRefOid,baseRefName,number",
       "--limit",
       "10",
     ],
@@ -496,13 +497,16 @@ export async function publishDelivery(input: PublishDeliveryInput) {
   const existing = pullRequests.find((pullRequest) => pullRequest.headRefName === branchName);
   if (existing) {
     const matches =
-      existing.isDraft && existing.state.toUpperCase() === "OPEN" && existing.baseRefName === baseBranch;
+      existing.isDraft &&
+      existing.state.toUpperCase() === "OPEN" &&
+      existing.baseRefName === baseBranch &&
+      existing.headRefOid === commitSha;
     steps.draftPr = matches ? "passed" : "failed";
     return await finish(
       matches ? "published" : "rejected",
       matches
         ? []
-        : ["an open pull request already exists but is not the requested draft/base combination"],
+        : ["an open pull request already exists but does not match the requested draft/base/commit combination"],
       existing.url
     );
   }
@@ -539,7 +543,7 @@ export async function publishDelivery(input: PublishDeliveryInput) {
 
   const viewResult = await runProcess(
     "gh",
-    ["pr", "view", createdUrl, "--json", "url,isDraft,state,headRefName,baseRefName,number"],
+    ["pr", "view", createdUrl, "--json", "url,isDraft,state,headRefName,headRefOid,baseRefName,number"],
     worktreePath
   );
   if (viewResult.status !== "passed") {
@@ -564,6 +568,7 @@ export async function publishDelivery(input: PublishDeliveryInput) {
     created.isDraft &&
     created.state.toUpperCase() === "OPEN" &&
     created.headRefName === branchName &&
+    created.headRefOid === commitSha &&
     created.baseRefName === baseBranch;
   return await finish(
     verifiedDraft ? "published" : "rejected",
