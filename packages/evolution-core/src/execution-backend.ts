@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { spawn } from "node:child_process";
 import { isAbsolute, relative, resolve, sep } from "node:path";
+import { recordDeliveryChildProcess } from "./delivery-operation.js";
 
 export const EXECUTION_CAPABILITIES = [
   "filesystem-containment",
@@ -222,6 +223,15 @@ async function runProcess(
       timedOut = true;
       void terminateProcess(child, detached);
     }, options.timeoutMs);
+
+    try {
+      recordDeliveryChildProcess(child.pid ?? null);
+    } catch (error) {
+      stderr.append(error instanceof Error ? error.message : String(error));
+      void terminateProcess(child, detached);
+      finish({ status: "unavailable", exitCode: null, signal: null });
+      return;
+    }
 
     child.stdout?.on("data", stdout.append);
     child.stderr?.on("data", stderr.append);

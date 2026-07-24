@@ -5,6 +5,11 @@ import { resolve } from "node:path";
 import { executeDelivery, showDelivery, verifyDelivery } from "./delivery.js";
 import { publishDelivery, showDeliveryPublication } from "./delivery-publish.js";
 import { recoverDelivery, showDeliveryRecovery } from "./delivery-recovery.js";
+import {
+  reconcileDeliveryOperation,
+  showDeliveryOperation,
+  withDeliveryOperation,
+} from "./delivery-operation.js";
 import { EvolutionStore } from "./persistence.js";
 import { resolveDefaultStateRoot } from "./runtime-paths.js";
 
@@ -33,6 +38,9 @@ Usage:
   cyclewarden-deliver recover <cycle-id>
     [--root .cyclewarden] [--project-root .] [--actor cyclewarden-recovery-operator]
     [--apply]
+  cyclewarden-deliver operation <cycle-id>
+    [--root .cyclewarden] [--project-root .] [--actor cyclewarden-recovery-operator]
+    [--apply]
   cyclewarden-deliver show <cycle-id> [--root .cyclewarden]
 
 execute requires a planned A3/A4 cycle and a manifest whose expectedParameterDigest matches the
@@ -50,6 +58,9 @@ independent verifier.
 recover inspects cycle, control-sidecar, branch and worktree state. It is read-only by default.
 Use --apply only after reviewing the proposed transition. Recovery never treats an unrecorded
 commit as accepted verification and never reruns implementation, merges or deploys.
+
+operation inspects the write-ahead checkpoint, owner PID, child PID and lock. It clears a stale
+lease only with --apply and only when the integrity-valid local owner and child are both dead.
 `;
 
 function parseArgs(argv: string[]): ParsedArgs {
@@ -116,44 +127,56 @@ export async function runDeliveryCli(
   const store = new EvolutionStore(rootFrom(parsed));
 
   if (command === "execute") {
-    const result = await executeDelivery({
-      store,
-      cycleId,
-      projectRoot: projectRootFrom(parsed),
-      manifestPath: resolve(required(parsed, "manifest")),
-      actor: one(parsed, "actor")?.trim() || "cyclewarden-implementer",
-      trustedRepository: one(parsed, "trusted-repository") === "true",
-    });
-    printJson(io, result);
+    const projectRoot = projectRootFrom(parsed);
+    const actor = one(parsed, "actor")?.trim() || "cyclewarden-implementer";
+    const protectedResult = await withDeliveryOperation(
+      { store, cycleId, projectRoot, actor, operation: "execute" },
+      () =>
+        executeDelivery({
+          store,
+          cycleId,
+          projectRoot,
+          manifestPath: resolve(required(parsed, "manifest")),
+          actor,
+          trustedRepository: one(parsed, "trusted-repository") === "true",
+        })
+    );
+    printJson(io, { ...protectedResult.value, deliveryOperation: protectedResult.operation });
     return 0;
   }
 
   if (command === "verify") {
-    const result = await verifyDelivery({
-      store,
-      cycleId,
-      projectRoot: projectRootFrom(parsed),
-      actor: one(parsed, "actor")?.trim() || "cyclewarden-independent-verifier",
-    });
-    printJson(io, result);
+    const projectRoot = projectRootFrom(parsed);
+    const actor = one(parsed, "actor")?.trim() || "cyclewarden-independent-verifier";
+    const protectedResult = await withDeliveryOperation(
+      { store, cycleId, projectRoot, actor, operation: "verify" },
+      () => verifyDelivery({ store, cycleId, projectRoot, actor })
+    );
+    printJson(io, { ...protectedResult.value, deliveryOperation: protectedResult.operation });
     return 0;
   }
 
   if (command === "publish") {
     const bodyFile = one(parsed, "body-file")?.trim();
-    const result = await publishDelivery({
-      store,
-      cycleId,
-      projectRoot: projectRootFrom(parsed),
-      actor: one(parsed, "actor")?.trim() || "cyclewarden-publisher",
-      draftPr: one(parsed, "draft-pr") === "true",
-      remote: one(parsed, "remote")?.trim() || "origin",
-      hostname: one(parsed, "hostname")?.trim(),
-      baseBranch: one(parsed, "base")?.trim(),
-      title: one(parsed, "title")?.trim(),
-      body: bodyFile ? await readFile(resolve(bodyFile), "utf8") : undefined,
-    });
-    printJson(io, result);
+    const projectRoot = projectRootFrom(parsed);
+    const actor = one(parsed, "actor")?.trim() || "cyclewarden-publisher";
+    const protectedResult = await withDeliveryOperation(
+      { store, cycleId, projectRoot, actor, operation: "publish" },
+      async () =>
+        publishDelivery({
+          store,
+          cycleId,
+          projectRoot,
+          actor,
+          draftPr: one(parsed, "draft-pr") === "true",
+          remote: one(parsed, "remote")?.trim() || "origin",
+          hostname: one(parsed, "hostname")?.trim(),
+          baseBranch: one(parsed, "base")?.trim(),
+          title: one(parsed, "title")?.trim(),
+          body: bodyFile ? await readFile(resolve(bodyFile), "utf8") : undefined,
+        })
+    );
+    printJson(io, { ...protectedResult.value, deliveryOperation: protectedResult.operation });
     return 0;
   }
 
@@ -169,11 +192,24 @@ export async function runDeliveryCli(
     return 0;
   }
 
+  if (command === "operation") {
+    const result = await reconcileDeliveryOperation({
+      store,
+      cycleId,
+      projectRoot: projectRootFrom(parsed),
+      actor: one(parsed, "actor")?.trim() || "cyclewarden-recovery-operator",
+      apply: one(parsed, "apply") === "true",
+    });
+    printJson(io, result);
+    return 0;
+  }
+
   if (command === "show") {
     printJson(io, {
       ...(await showDelivery(store, cycleId)),
       ...(await showDeliveryPublication(store, cycleId)),
       ...(await showDeliveryRecovery(store, cycleId)),
+      ...showDeliveryOperation(store, cycleId),
     });
     return 0;
   }
