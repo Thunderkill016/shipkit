@@ -15,9 +15,10 @@ planned ExecutionHandoff
 → separate verifier commands
 → accepted / rejected / inconclusive
 → local verified commit
+→ optional confirmed push and draft PR
 ```
 
-The implementation actor cannot be the verifier actor. CycleWarden orchestration creates a local commit only after independent verification and does not itself push, open a PR, merge, deploy, read production secrets, or spend money. The trusted implementation command still runs with the current operating-system user's privileges, so CycleWarden cannot technically prevent that command from invoking other installed tools or accessing resources available to that user.
+The implementation actor cannot be the verifier actor. CycleWarden orchestration creates a local commit only after independent verification and does not itself merge, deploy, read production secrets, or spend money. Push and draft-PR publication are separate explicit operations. The trusted implementation command still runs with the current operating-system user's privileges, so CycleWarden cannot technically prevent that command from invoking other installed tools or accessing resources available to that user.
 
 ## Manifest
 
@@ -96,3 +97,18 @@ Only `directory/**`, exact files and directory-prefix rules are enforced. Descri
 The first beta uses the existing `trusted-local` backend because the current Docker baseline denies network access and therefore cannot run an authenticated online Codex workflow. Although its bind-mounted workspace can be writable, it was verified as a bounded check backend rather than as a complete agent-mutation environment. Trusted-local execution is **not a security sandbox**. The selected repository, command and command arguments must be trusted, and the process can access files, credentials and network resources available to the current operating-system user.
 
 The delivery control sidecar is atomically written with an integrity digest and is cross-checked against the cycle, execution evidence and handoff before verification. It is not part of the synchronized cycle journal: loss of that local sidecar blocks verification. The first slice also has no crash-safe delivery resume, so an unexpected process termination after the cycle enters `executing` may require manual recovery. A later slice may add a writable remote or microVM backend, explicit egress policy and recovery records. This document must not be used to claim such isolation or resilience today.
+
+## Opt-in draft PR publication
+
+After independent verification creates a clean local commit, an operator may run:
+
+```bash
+cyclewarden-deliver publish <cycle-id> \
+  --base main \
+  --remote origin \
+  --confirm-push-and-draft-pr
+```
+
+Publication fails before push unless the cycle is still `verified`, the integrity-checked control points to an accepted verification, the local branch and worktree both equal the exact verified commit, the worktree is clean, the configured fetch URL and any explicit push URL identify the same `github.com` repository, and `gh auth status --hostname github.com` succeeds. Push uses a single non-force refspec. CycleWarden verifies the remote ref equals the verified commit, opens a draft PR, confirms the PR URL/repository/head/base/draft state with `gh pr view`, and stores a content-addressed publication record.
+
+The command never invokes merge or deployment. If the branch push succeeds but draft PR creation or confirmation fails, CycleWarden stores an inconclusive publication record and blocks duplicate automated publication so a human can recover safely. A process crash between push and record persistence can still leave a remote branch that requires manual recovery; crash-safe publication resume is not implemented in this slice.

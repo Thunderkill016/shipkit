@@ -199,6 +199,7 @@ Implemented beta baseline:
 - separate implementation and verification actors;
 - independent command checks, patch-drift rejection and local commit only after
   an accepted verdict;
+- opt-in non-force push and GitHub draft PR publication for the exact verified commit;
 - Docker hostile fixtures for secrets, credentials, symlinks, root writes, host
   paths, network and cleanup.
 
@@ -208,7 +209,7 @@ Remaining:
   filesystem, credentials and network privileges;
 - the integrity-checked delivery control sidecar is outside the synchronized cycle journal; loss blocks verification;
 - crash-safe resume or rollback for a cycle stranded at `executing`;
-- explicit push and draft-PR operation after verification;
+- web controls for explicit push and draft-PR publication;
 - workspace execution, pause/cancel, progress and intervention controls;
 - writable remote or microVM agent backend, egress policy and disk quota;
 - OpenHands and additional agent adapters, cross-platform support and external
@@ -227,7 +228,7 @@ Partially implemented:
 Remaining:
 
 - project-generated test/lint/type/build/security packs and policy re-evaluation;
-- explicit push and draft PR with a GitHub scorecard;
+- web GitHub scorecard and human review controls for the existing draft PR publication path;
 - provenance attestations, authorized release/deployment adapters, rollback and
   incident records;
 - Vercel/Docker operational execution and environment-specific evidence.
