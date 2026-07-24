@@ -41,10 +41,12 @@ type OperationResult = {
 };
 
 type RecoveryResult = {
-  decision?: string;
-  applied?: boolean;
-  findings?: string[];
-  proposedTransition?: string | null;
+  recovery?: {
+    decision?: string;
+    applied?: boolean;
+    targetStage?: string | null;
+    nextAction?: string;
+  };
 };
 
 function validationError(result: {
@@ -119,8 +121,9 @@ export async function runDeliveryWorkspaceAction(
         actor,
         ...(operation.data === "apply-recovery" ? ["--apply"] : []),
       ]);
-      const decision = result.decision ?? result.proposedTransition ?? "no-transition";
-      message = result.applied
+      const recovery = result.recovery;
+      const decision = recovery?.decision ?? recovery?.targetStage ?? "no-transition";
+      message = recovery?.applied
         ? `Delivery reconciliation applied: ${decision}.`
         : `Delivery reconciliation inspected: ${decision}. No lifecycle state was changed.`;
     }
