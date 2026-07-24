@@ -447,15 +447,42 @@ async function loadControl(store: EvolutionStore, cycleId: string): Promise<Deli
   }
 }
 
+async function containedCommandWorkingDirectory(
+  worktreePath: string,
+  relativeWorkingDirectory: string
+): Promise<string> {
+  const root = await realpath(resolve(worktreePath));
+  const requested = resolve(root, relativeWorkingDirectory || ".");
+  let workingDirectory: string;
+  try {
+    workingDirectory = await realpath(requested);
+  } catch (error) {
+    throw new DeliveryError(
+      `command working directory does not exist: ${relativeWorkingDirectory}; ${
+        error instanceof Error ? error.message : String(error)
+      }`
+    );
+  }
+  const offset = relative(root, workingDirectory);
+  if (offset === ".." || offset.startsWith(`..${sep}`) || isAbsolute(offset)) {
+    throw new DeliveryError("command working directory resolves outside the delivery worktree");
+  }
+  return offset || ".";
+}
+
 async function runBoundedCommand(
   worktreePath: string,
   spec: DeliveryCommandSpec
 ): Promise<ExecutionBackendResult> {
+  const relativeWorkingDirectory = await containedCommandWorkingDirectory(
+    worktreePath,
+    spec.relativeWorkingDirectory ?? "."
+  );
   const backend = new TrustedLocalExecutionBackend();
   await backend.assertAvailable();
   return await backend.execute({
     workspaceRoot: worktreePath,
-    relativeWorkingDirectory: spec.relativeWorkingDirectory ?? ".",
+    relativeWorkingDirectory,
     executable: spec.executable,
     arguments: spec.arguments,
     environment: safeEnvironment(),
@@ -471,12 +498,10 @@ function executionStatus(
   changedFiles: string[],
   violations: string[]
 ): DeliveryExecutionStatus {
-  if (violations.length > 0) return "failed";
+  if (violations.length > 0 || result.status === "failed") return "failed";
+  if (result.status === "unavailable" || result.status === "timed-out") return "inconclusive";
   if (result.status === "passed" && changedFiles.length > 0) return "implemented";
-  if (result.status === "unavailable" || result.status === "timed-out" || changedFiles.length === 0) {
-    return "inconclusive";
-  }
-  return "failed";
+  return "inconclusive";
 }
 
 export async function executeDelivery(input: ExecuteDeliveryInput) {
@@ -526,25 +551,28 @@ export async function executeDelivery(input: ExecuteDeliveryInput) {
   await input.store.save(planned, executing);
 
   let result: ExecutionBackendResult;
+  let commandBoundaryError: string | null = null;
   try {
     result = await runBoundedCommand(worktreePath, manifest.command);
   } catch (error) {
+    commandBoundaryError = error instanceof Error ? error.message : String(error);
     result = {
-      status: "unavailable",
+      status: "failed",
       exitCode: null,
       signal: null,
       stdout: "",
-      stderr: error instanceof Error ? error.message : String(error),
+      stderr: commandBoundaryError,
       stdoutTruncated: false,
       stderrTruncated: false,
     };
   }
   let changedFiles: string[] = [];
   let implementationPatchDigest = sha256("");
-  let violations: string[] = [];
+  let violations: string[] = commandBoundaryError ? [commandBoundaryError] : [];
   try {
     changedFiles = await listChangedFiles(worktreePath);
-    violations = scopeViolations(changedFiles, handoff.allowedScope, handoff.forbiddenScope);
+    violations.push(...scopeViolations(changedFiles, handoff.allowedScope, handoff.forbiddenScope));
+    violations = [...new Set(violations)];
     implementationPatchDigest = await patchDigest(worktreePath, changedFiles);
   } catch (error) {
     violations = [error instanceof Error ? error.message : String(error)];
@@ -668,8 +696,9 @@ export async function verifyDelivery(input: VerifyDeliveryInput) {
       try {
         result = await runBoundedCommand(control.worktreePath, spec);
       } catch (error) {
+        const boundaryFailure = error instanceof DeliveryError;
         result = {
-          status: "unavailable",
+          status: boundaryFailure ? "failed" : "unavailable",
           exitCode: null,
           signal: null,
           stdout: "",

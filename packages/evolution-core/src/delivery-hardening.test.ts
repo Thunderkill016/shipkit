@@ -132,6 +132,7 @@ async function writeManifest(
     executable?: string;
     arguments?: string[];
     verificationSource?: string;
+    relativeWorkingDirectory?: string;
   }
 ): Promise<string> {
   const path = join(root, `delivery-${Math.random().toString(16).slice(2)}.json`);
@@ -145,6 +146,7 @@ async function writeManifest(
         command: {
           executable: options.executable ?? process.execPath,
           arguments: options.arguments ?? ["-e", options.commandSource],
+          relativeWorkingDirectory: options.relativeWorkingDirectory,
           timeoutMs: 10_000,
           maxOutputBytes: 16_384,
         },
@@ -322,5 +324,70 @@ describe("governed delivery hardening", () => {
     temporaryRoots.push(dirname(executed.worktreePath));
     expect(executed.cycle.stage).toBe("rejected");
     expect(executed.execution.scopeViolations.join(" ")).toMatch(/symlink escapes/);
+  });
+
+  it("classifies a failed implementation command as rejected even when it creates no files", async () => {
+    const fixture = await setup("failed-command");
+    const manifestPath = await writeManifest(fixture.root, {
+      commandSource: "process.exit(7)",
+    });
+    const executed = await executeDelivery({
+      store: fixture.store,
+      cycleId: fixture.cycleId,
+      projectRoot: fixture.projectRoot,
+      manifestPath,
+      actor: "fixture-implementer",
+      trustedRepository: true,
+    });
+    temporaryRoots.push(dirname(executed.worktreePath));
+    expect(executed.execution.commandStatus).toBe("failed");
+    expect(executed.execution.status).toBe("failed");
+    expect(executed.cycle.stage).toBe("rejected");
+  });
+
+  it("keeps a genuinely unavailable implementation tool inconclusive", async () => {
+    const fixture = await setup("unavailable-command");
+    const manifestPath = await writeManifest(fixture.root, {
+      commandSource: "",
+      executable: "cyclewarden-command-that-does-not-exist",
+      arguments: [],
+    });
+    const executed = await executeDelivery({
+      store: fixture.store,
+      cycleId: fixture.cycleId,
+      projectRoot: fixture.projectRoot,
+      manifestPath,
+      actor: "fixture-implementer",
+      trustedRepository: true,
+    });
+    temporaryRoots.push(dirname(executed.worktreePath));
+    expect(executed.execution.commandStatus).toBe("unavailable");
+    expect(executed.execution.status).toBe("inconclusive");
+    expect(executed.cycle.stage).toBe("inconclusive");
+  });
+
+  it("rejects a command working directory symlink that resolves outside the worktree", async () => {
+    const fixture = await setup("cwd-symlink-escape");
+    const outside = join(fixture.root, "outside-directory");
+    await mkdir(outside, { recursive: true });
+    await symlink(outside, join(fixture.projectRoot, "linked-workdir"));
+    await run(fixture.projectRoot, "git", ["add", "linked-workdir"]);
+    await run(fixture.projectRoot, "git", ["commit", "-m", "Add external cwd fixture"]);
+    const manifestPath = await writeManifest(fixture.root, {
+      commandSource: "process.stdout.write('must not run outside')",
+      relativeWorkingDirectory: "linked-workdir",
+    });
+    const executed = await executeDelivery({
+      store: fixture.store,
+      cycleId: fixture.cycleId,
+      projectRoot: fixture.projectRoot,
+      manifestPath,
+      actor: "fixture-implementer",
+      trustedRepository: true,
+    });
+    temporaryRoots.push(dirname(executed.worktreePath));
+    expect(executed.execution.status).toBe("failed");
+    expect(executed.execution.scopeViolations.join(" ")).toMatch(/working directory resolves outside/);
+    expect(executed.cycle.stage).toBe("rejected");
   });
 });
