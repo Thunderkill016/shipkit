@@ -172,7 +172,8 @@ Operationally ready:
 
 - the fixed issue #14 protocol is machine-readable and merged on `main`;
 - exactly six pseudonymous participant/repository slots are precommitted;
-- the technical gate is ready after PR #31 merged;
+- the protocol and fail-closed operations pack technical gate is ready after PR #31;
+- the bounded interactive A2/R1 operator surface is merged after PR #39;
 - eligibility, consent, pre-audit decision, product/technical outcome
   separation, redaction and aggregate classification are checked in CI;
 - schema drift, early session start, timebox violations, record-path mismatch,
@@ -292,20 +293,16 @@ future gates.
 
 ## Verification baseline
 
-Latest verified merged state through PR #38:
+Latest verified merged state through PRs #41 and #39:
 
 - Test & Build;
 - Evolution Core standalone on Node.js 20, 22 and 24;
 - Evolution Engine Proof;
 - hostile Docker sandbox proof;
-- demo-mode browser E2E;
+- demo-mode browser E2E, including create-to-handoff;
 - portable PostgreSQL auth and user-isolation E2E;
 - AI workflow, capability registry, external-system registry and A2 pilot
   protocol checks.
-
-The interactive workspace additionally has a deterministic browser fixture that
-creates a cycle and advances it through inspected, assessed, independently
-reviewed research to a persisted execution handoff.
 
 Passing CI proves compatibility with the tested repository state, not complete integration or product usefulness.
 
@@ -324,24 +321,21 @@ Passing CI proves compatibility with the tested repository state, not complete i
 
 ## Priority order
 
-1. Keep one unified product identity and module map.
-2. Complete persistence, policy and evidence hardening.
-3. Define shared typed contracts and workspace integration skeleton.
-4. Expand workspace research beyond the deterministic local repository path.
-5. Build real sandbox and interchangeable agent execution.
-6. Add independent verification, draft PR and rollback.
-7. Add authorized release/deployment and outcome measurement.
-8. Add measured learning, MCP/A2A interoperability and hosted team operation.
+1. Keep one unified product identity, capability truth and fixed pilot protocol.
+2. Keep the merged A2 workspace stable while running exactly six consented external decision audits under #14.
+3. Apply the precommitted success, inconclusive, failure or protocol-gap rule without changing thresholds.
+4. If successful, build one governed execution vertical slice from approved `ExecutionHandoff` through one real agent, independent verification and a draft PR.
+5. If inconclusive, run at most one evidence-targeted redesigned pilot of the same size; if failed, reassess the beachhead, problem and value proposition before expanding capability.
+6. Activate broader research, sandbox, release, learning, interoperability or hosted operation only when pilot evidence or a required dependency justifies it.
 
-This order expresses dependency and safety. It does not remove any module from the intended product.
+This order is a product-value gate, not a deletion of the intended full product.
 
 ## Workstream tracking
 
 - #11 — persistence crash, migration and multi-process proof;
 - #12 — fail-closed sandbox execution backends;
 - #13 — research-to-decision integrated milestone;
-- #14 — real-user decision-value validation; operations are merged and the
-  technical gate is ready, but external evidence remains `0/6`;
+- #14 — real-user decision-value validation; operations and the A2 operator surface are merged, but external evidence remains `0/6`;
 - #15 — independent/versioned Evolution Core package;
 - #16 — interactive product workspace integration.
 
