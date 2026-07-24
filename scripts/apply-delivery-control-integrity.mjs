@@ -143,7 +143,7 @@ const test = `
     temporaryRoots.push(dirname(executed.worktreePath));
     const control = JSON.parse(await readFile(executed.controlPath, "utf8"));
     control.manifest.verification[0].arguments = ["-e", "process.exit(0)"];
-    await writeFile(executed.controlPath, \`${JSON.stringify(control, null, 2)}\\n\`, "utf8");
+    await writeFile(executed.controlPath, JSON.stringify(control, null, 2) + "\\n", "utf8");
     await expect(
       verifyDelivery({
         store: fixture.store,
