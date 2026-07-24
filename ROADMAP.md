@@ -80,7 +80,8 @@ Implementation is sequenced by safety and dependency. Sequencing does not remove
 - three-opportunity portfolios, decision and reversible experiment records;
 - parameter-bound `ExecutionHandoff` persisted through the same cycle;
 - CLI commands to run repository research, prepare manual handoffs and inspect research state;
-- read-only `/app/evolution` workspace showing runs, coverage, stopping reasons and review verdicts;
+- `/app/evolution` workspace showing runs, coverage, stopping reasons and review verdicts;
+- opt-in local operator flow from A2/R1 objective through inspect, trusted assessment, bounded repository research and persisted execution handoff;
 - Next.js product foundation, auth, PostgreSQL, security and delivery recipes;
 - product generator and AI workflow;
 - CLI and CI dogfood on CycleWarden plus assessment proof on an unrelated repository;
@@ -141,6 +142,7 @@ workspace objective
 - [x] bind the execution handoff to an experiment and SHA-256 parameter digest;
 - [x] CLI `research-repository`, `prepare-handoff` and `research-show` over the shared durable store;
 - [x] workspace views for research usage, coverage, stop reason, reviewer checks, sources, claims, contradictions, opportunities, decisions, experiments and execution scope;
+- [x] gated local-first workspace actions for cycle creation, repository inspection, trusted assessment and bounded repository research;
 - [x] CycleWarden dogfood proof for autonomous repository research and journal reload;
 - [ ] public web, paper, specification, competitor, changelog, incident and dataset adapters;
 - [ ] adaptive query reformulation, citation chasing, entity resolution and hostile-source defenses;

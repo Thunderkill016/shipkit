@@ -1,9 +1,11 @@
-import { execFile } from "node:child_process";
-import { existsSync } from "node:fs";
-import { promisify } from "node:util";
 import Link from "next/link";
-import { basename, dirname, resolve } from "node:path";
 import type { ReactNode } from "react";
+import { CycleControls } from "./cycle-controls";
+import { getEvolutionMutationAccess } from "@/lib/evolution-access";
+import {
+  loadEvolutionWorkspace,
+  resolveEvolutionProjectRoot,
+} from "@/lib/evolution-workspace";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -11,156 +13,6 @@ export const runtime = "nodejs";
 type PageProps = {
   searchParams: Promise<{ cycle?: string }>;
 };
-
-type CycleSummary = {
-  cycleId: string;
-  objective: string;
-  stage: string;
-  autonomy: string;
-  risk: string;
-  updatedAt: string;
-};
-
-type OpportunityView = {
-  recordId: string;
-  title: string;
-  problem: string;
-  smallestExperiment: string;
-};
-
-type DecisionView = {
-  selectedOpportunityId: string;
-  rejectedOpportunityIds: string[];
-  rationale: string;
-};
-
-type ExperimentView = {
-  hypothesis: string;
-  method: string;
-  successCriteria: string[];
-};
-
-type HandoffView = {
-  parameterDigest: string;
-  allowedScope: string[];
-  forbiddenScope: string[];
-  acceptanceCriteria: string[];
-  verificationPlan: string[];
-};
-
-type ResearchRunView = {
-  adapter: string;
-  outcome: string;
-  usage: {
-    queries: number;
-    sources: number;
-    minutes: number;
-    costUsd: number;
-  };
-  coverage: {
-    required: string[];
-    answered: string[];
-    gaps: string[];
-  };
-  stopReason: string;
-};
-
-type ResearchEvaluationView = {
-  actor: string;
-  verdict: string;
-  checks: Array<{ id: string; passed: boolean; summary: string }>;
-  unsupportedClaimIds: string[];
-  unresolvedContradictionIds: string[];
-  limitations: string[];
-};
-
-type ResearchView = {
-  runs?: ResearchRunView[];
-  sources: Array<{ recordId: string }>;
-  claims: Array<{ recordId: string }>;
-  contradictions: Array<{ recordId: string }>;
-  opportunities: OpportunityView[];
-  evaluations?: ResearchEvaluationView[];
-  decisions: DecisionView[];
-  experiments: ExperimentView[];
-  executionHandoffs: HandoffView[];
-};
-
-type CycleView = {
-  cycleId: string;
-  objective: string;
-  stage: string;
-  autonomy: string;
-  risk: string;
-  history: unknown[];
-  artifacts: Record<string, string[]>;
-  research?: ResearchView;
-};
-
-type StatusOutput = {
-  root: string;
-  cycles: CycleSummary[];
-};
-
-type ShowOutput = {
-  cycle: CycleView;
-};
-
-const execFileAsync = promisify(execFile);
-
-function repositoryRoot(): string {
-  const cwd = process.cwd();
-  return basename(cwd) === "web" && basename(dirname(cwd)) === "apps"
-    ? resolve(cwd, "../..")
-    : cwd;
-}
-
-function stateRoot(): string {
-  const configuredRoot =
-    process.env.CYCLEWARDEN_STATE_ROOT ?? process.env.SHIPKIT_STATE_ROOT;
-  if (configuredRoot) return resolve(configuredRoot);
-
-  const canonicalRoot = resolve(repositoryRoot(), ".cyclewarden");
-  const legacyRoot = resolve(repositoryRoot(), ".shipkit");
-  return existsSync(canonicalRoot) || !existsSync(legacyRoot) ? canonicalRoot : legacyRoot;
-}
-
-function cliPath(): string {
-  return resolve(
-    process.env.CYCLEWARDEN_EVOLUTION_CLI ??
-      process.env.SHIPKIT_EVOLUTION_CLI ??
-      resolve(repositoryRoot(), "packages/evolution-core/dist/cli.js")
-  );
-}
-
-async function runCoreCli<T>(args: string[]): Promise<T> {
-  const { stdout } = await execFileAsync(process.execPath, [cliPath(), ...args], {
-    cwd: repositoryRoot(),
-    env: process.env,
-    maxBuffer: 4 * 1024 * 1024,
-  });
-  return JSON.parse(stdout) as T;
-}
-
-async function loadWorkspace(selectedCycleId?: string) {
-  const root = stateRoot();
-  try {
-    const status = await runCoreCli<StatusOutput>(["status", "--root", root]);
-    const selectedSummary =
-      status.cycles.find((cycle) => cycle.cycleId === selectedCycleId) ?? status.cycles[0] ?? null;
-    const selected = selectedSummary
-      ? (await runCoreCli<ShowOutput>(["show", selectedSummary.cycleId, "--root", root])).cycle
-      : null;
-    return { root: status.root, summaries: status.cycles, selected, error: null };
-  } catch (error) {
-    return {
-      root,
-      summaries: [] as CycleSummary[],
-      selected: null as CycleView | null,
-      error: error instanceof Error ? error.message : String(error),
-    };
-  }
-}
 
 function Badge({ children }: { children: ReactNode }) {
   return (
@@ -172,7 +24,10 @@ function Badge({ children }: { children: ReactNode }) {
 
 export default async function EvolutionWorkspacePage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const workspace = await loadWorkspace(params.cycle);
+  const [workspace, mutationAccess] = await Promise.all([
+    loadEvolutionWorkspace(params.cycle),
+    getEvolutionMutationAccess(),
+  ]);
   const selected = workspace.selected;
   const research = selected?.research;
   const run = research?.runs?.at(-1) ?? null;
@@ -195,9 +50,8 @@ export default async function EvolutionWorkspacePage({ searchParams }: PageProps
           </p>
           <h1 className="mt-2 text-2xl font-semibold text-foreground">Evolution cycles</h1>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
-            This server view calls the official Evolution Core CLI. The CLI and web workspace therefore
-            share the same journal replay, recovery, policy and cycle state instead of maintaining two
-            sources of truth.
+            Create and operate the bounded A2 research flow through the official Evolution Core CLI.
+            The CLI and web workspace share one journal, recovery path, policy and evidence model.
           </p>
         </div>
         <Link
@@ -212,6 +66,13 @@ export default async function EvolutionWorkspacePage({ searchParams }: PageProps
         State root: <code className="break-all text-foreground">{workspace.root}</code>
       </div>
 
+      <CycleControls
+        enabled={mutationAccess.allowed}
+        accessReason={mutationAccess.reason}
+        projectRoot={resolveEvolutionProjectRoot()}
+        selected={selected ? { cycleId: selected.cycleId, stage: selected.stage } : null}
+      />
+
       {workspace.error && (
         <div className="mt-6 rounded-xl border border-red-500/40 bg-red-500/5 p-4 text-sm text-red-300">
           Could not load CycleWarden state: {workspace.error}
@@ -222,7 +83,7 @@ export default async function EvolutionWorkspacePage({ searchParams }: PageProps
         <section className="mt-8 rounded-2xl border border-border bg-card p-6">
           <h2 className="font-medium text-foreground">No durable cycle found</h2>
           <p className="mt-2 text-sm text-muted">
-            Initialize a cycle, inspect and assess the repository, then run bounded repository research.
+            Create the first cycle above, or use the CLI fallback to initialize the same durable state.
           </p>
           <pre className="mt-4 overflow-x-auto rounded-xl bg-background p-4 text-xs text-muted">
             {`pnpm evolve -- init

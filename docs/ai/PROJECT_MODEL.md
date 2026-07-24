@@ -38,7 +38,7 @@ Initial validation may focus on developers already using coding agents, but this
 
 | Area | Unified product role | Current boundary | Confidence |
 | --- | --- | --- | --- |
-| `apps/web` | human-facing product workspace and application foundation | currently exposes starter/product capabilities, not the complete lifecycle | High |
+| `apps/web` | human-facing product workspace and application foundation | operates the local A2 research-to-handoff slice, not the complete lifecycle | High |
 | `packages/evolution-core` | deterministic lifecycle, policy, persistence, evidence, inspection and CLI | no model or paid API required | High |
 | shared `packages/*` | auth, DB, security, mail, storage, payment and delivery capabilities | vendor calls behind adapters | High |
 | `docs/evolution` | architecture, research, comparison, governance and integrated roadmap | decisions require evidence and falsification tests | High |
@@ -66,13 +66,16 @@ Implemented:
 - PostgreSQL data and user-isolation tests;
 - security, mail, storage and payment ports;
 - Vercel and Docker recipes;
-- generated-project workflow.
+- generated-project workflow;
+- durable cycle, research, decision, experiment and execution-handoff views;
+- opt-in local actions for A2/R1 cycle creation, repository inspection, trusted
+  temporary-workspace assessment and bounded repository research.
 
 Integration gaps:
 
-- cycle dashboard;
-- research/claim/contradiction review;
-- opportunity and experiment approval;
+- hosted durable multi-user cycle state and operator isolation;
+- manual research-plan, claim, contradiction, opportunity and decision editing;
+- explicit opportunity and experiment approval surfaces;
 - agent execution controls;
 - verification and release surfaces;
 - outcome and learning history.
@@ -281,14 +284,18 @@ workspace objective
 → persisted execution handoff
 ```
 
-This is the next slice of the complete CycleWarden lifecycle, not a separate final product.
+The local workspace now operates this bounded deterministic slice against one
+server-configured trusted repository. It remains one slice of the complete
+CycleWarden lifecycle: public-web and direct-user research, manual decision
+authoring, execution, verification, release and learning are still separate
+future gates.
 
 ## Verification baseline
 
-Latest verified merged state through PR #33:
+Latest verified merged state through PR #38:
 
 - Test & Build;
-- Evolution Core standalone on Node.js 20 and 22;
+- Evolution Core standalone on Node.js 20, 22 and 24;
 - Evolution Engine Proof;
 - hostile Docker sandbox proof;
 - demo-mode browser E2E;
@@ -296,12 +303,17 @@ Latest verified merged state through PR #33:
 - AI workflow, capability registry, external-system registry and A2 pilot
   protocol checks.
 
+The interactive workspace additionally has a deterministic browser fixture that
+creates a cycle and advances it through inspected, assessed, independently
+reviewed research to a persisted execution handoff.
+
 Passing CI proves compatibility with the tested repository state, not complete integration or product usefulness.
 
 ## Product integration gaps
 
 - no single workspace operates the complete lifecycle;
-- no completed research-to-decision flow through the interface;
+- the interface operates only the deterministic local A2 repository path, not
+  hosted collaboration, manual research authoring or external evidence;
 - no real untrusted sandbox or coding-agent delivery;
 - no independent full verification-to-release flow;
 - no deployment governed by the durable cycle;
@@ -315,7 +327,7 @@ Passing CI proves compatibility with the tested repository state, not complete i
 1. Keep one unified product identity and module map.
 2. Complete persistence, policy and evidence hardening.
 3. Define shared typed contracts and workspace integration skeleton.
-4. Implement research-to-decision through the workspace.
+4. Expand workspace research beyond the deterministic local repository path.
 5. Build real sandbox and interchangeable agent execution.
 6. Add independent verification, draft PR and rollback.
 7. Add authorized release/deployment and outcome measurement.
@@ -330,7 +342,8 @@ This order expresses dependency and safety. It does not remove any module from t
 - #13 — research-to-decision integrated milestone;
 - #14 — real-user decision-value validation; operations are merged and the
   technical gate is ready, but external evidence remains `0/6`;
-- #15 — independent/versioned Evolution Core package.
+- #15 — independent/versioned Evolution Core package;
+- #16 — interactive product workspace integration.
 
 These issues are modules and prerequisites of the single CycleWarden product, not separate product directions.
 
